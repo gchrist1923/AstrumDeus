@@ -51,7 +51,7 @@ Mockup itu bukan kode produksi. Ia memakai CSS biasa, sementara implementasi mem
 | `surface-raised` | `#212121` | Kartu, baris hasil, panel |
 | `surface-overlay` | `#2A2A2A` | Dropdown, panel samping, input |
 | `border` | `#383838` | Garis pemisah dekoratif |
-| `border-strong` | `#6B6B6B` | Bingkai input dan kontrol |
+| `border-strong` | `#7C7C7C` | Bingkai input dan kontrol |
 | `content-primary` | `#FFFFFF` | Judul dan teks utama |
 | `content-secondary` | `#BCBCBC` | Paragraf pendukung |
 | `content-muted` | `#9B9B9B` | Label dan keterangan |
@@ -65,9 +65,11 @@ Rasio kontras di atas `surface-raised` sudah dihitung, bukan diperkirakan: `acce
 
 Warna teks pendukung ditulis sebagai hex solid, bukan putih dengan opacity. Nilai `rgba` menghasilkan kontras yang berubah mengikuti latar di belakangnya, sehingga tidak bisa dijamin lolos AA dan tidak bisa diuji otomatis. `#BCBCBC` dan `#9B9B9B` adalah hasil komposit dari opacity 70 dan 55 persen di atas `surface-raised`, jadi tampilannya sama tetapi nilainya pasti.
 
-`border` sengaja dipisah dari `border-strong`. `border` hanya 1,4:1 terhadap `surface-raised`, cukup untuk garis pemisah dekoratif tetapi tidak memenuhi syarat 3:1 untuk batas kontrol. Setiap input, checkbox dan tombol bergaris memakai `border-strong` yang mencapai 3,0:1.
+`border` sengaja dipisah dari `border-strong`. `border` hanya 1,4:1 terhadap `surface-raised`, cukup untuk garis pemisah dekoratif tetapi tidak memenuhi syarat 3:1 untuk batas kontrol. Setiap input, checkbox dan tombol bergaris memakai `border-strong`, yang mencapai 3,4:1 di atas `surface-overlay`, 3,9:1 di atas `surface-raised` dan 4,3:1 di atas `surface-base`.
 
-Tiga nilai di sini hasil koreksi saat review. `content-muted` semula opacity 45 persen yang hanya mencapai 4,4:1, `danger` semula `#E5484D` yang hanya mencapai 4,1:1, dan batas kontrol semula memakai `border`. Ketiganya gagal memenuhi WCAG AA padahal dipakai di label 12px, angka pengeluaran dan bingkai input, jadi nilainya diperbaiki.
+Empat nilai di sini hasil koreksi saat review. `content-muted` semula opacity 45 persen yang hanya mencapai 4,4:1, `danger` semula `#E5484D` yang hanya mencapai 4,1:1, dan batas kontrol semula memakai `border`. Ketiganya gagal memenuhi WCAG AA padahal dipakai di label 12px, angka pengeluaran dan bingkai input, jadi nilainya diperbaiki.
+
+Koreksi keempat muncul saat implementasi. `border-strong` semula `#6B6B6B`, yang lolos 3:1 di atas `surface-base` dan `surface-raised` tetapi hanya mencapai 2,7:1 di atas `surface-overlay`. Karena `surface-overlay` justru latar tempat input berada, bingkai input di kondisi nyatanya gagal memenuhi syarat, sementara test saat itu tidak memeriksa pasangan tersebut sehingga kegagalannya tidak terlihat. Nilainya dinaikkan ke `#7C7C7C` supaya ketiga latar punya kelonggaran, bukan sekadar lolos tipis, dan pasangan `border-strong` di atas `surface-overlay` kini ikut diuji.
 
 ### Tipografi
 

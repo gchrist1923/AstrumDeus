@@ -12,7 +12,7 @@
 
 Nilai berikut dikutip apa adanya dari `docs/superpowers/specs/2026-09-07-ui-ux-astrum-deus-design.md` dan berlaku untuk semua task.
 
-- Warna: `surface-base` `#171717`, `surface-raised` `#212121`, `surface-overlay` `#2A2A2A`, `border` `#383838`, `border-strong` `#6B6B6B`, `content-primary` `#FFFFFF`, `content-secondary` `#BCBCBC`, `content-muted` `#9B9B9B`, `accent` `#F0B429`, `accent-strong` `#C68A15`, `accent-soft` `#FFD166`, `danger` `#FF6369`, `danger-solid` `#C62828`
+- Warna: `surface-base` `#171717`, `surface-raised` `#212121`, `surface-overlay` `#2A2A2A`, `border` `#383838`, `border-strong` `#7C7C7C`, `content-primary` `#FFFFFF`, `content-secondary` `#BCBCBC`, `content-muted` `#9B9B9B`, `accent` `#F0B429`, `accent-strong` `#C68A15`, `accent-soft` `#FFD166`, `danger` `#FF6369`, `danger-solid` `#C62828`
 - Huruf display Chakra Petch bobot 600 dan 700, huruf teks Barlow bobot 400 sampai 700
 - Radius sudut 0 di seluruh antarmuka
 - Skala spasi 4, 8, 12, 16, 24, 32, 48, 64, 96, 128 piksel
@@ -391,6 +391,7 @@ const PASANGAN_TEKS: Array<[string, string]> = [
 const PASANGAN_KONTROL: Array<[string, string]> = [
   ['border-strong', 'surface-base'],
   ['border-strong', 'surface-raised'],
+  ['border-strong', 'surface-overlay'],
 ]
 
 describe('parseThemeTokens', () => {
@@ -531,7 +532,7 @@ Ganti seluruh isi `web/app/globals.css` dengan:
   --color-surface-raised: #212121;
   --color-surface-overlay: #2A2A2A;
   --color-border: #383838;
-  --color-border-strong: #6B6B6B;
+  --color-border-strong: #7C7C7C;
   --color-content-primary: #FFFFFF;
   --color-content-secondary: #BCBCBC;
   --color-content-muted: #9B9B9B;
@@ -1915,5 +1916,6 @@ Enam hal yang muncul saat memeriksa plan ini terhadap spec, dan sudah ditangani 
 4. Container 1240px semula ditulis `max-w-lg`, yang salah. Di Tailwind v4 utility `max-w-*` mengambil nilai dari skala container dan bukan dari breakpoint, sehingga `max-w-lg` berarti 32rem alias 512px. Diganti token `--container-page` beserta utility `max-w-page`, dan ditambah pemeriksaan di test token.
 5. Judul semula tidak menyebut bobot huruf, padahal Chakra Petch hanya diunduh pada bobot 600 dan 700. Tanpa bobot eksplisit, browser memalsukan ketebalan dari bobot 400 yang tidak tersedia. Bobot dipasang lewat `--text-*--font-weight` supaya ikut menempel di setiap utility ukuran.
 6. Perintah scaffold semula bisa membuat `web/.git` di dalam repo yang sudah punya git, sehingga `web/` berisiko masuk riwayat sebagai gitlink. Flag `--disable-git` ditambahkan.
+7. Daftar pasangan kontras semula melewatkan `border-strong` di atas `surface-overlay`, padahal `surface-overlay` adalah latar input. Pasangan itu ternyata hanya 2,7:1 pada nilai `#6B6B6B`, jadi test-nya lolos sementara bingkai input yang sebenarnya gagal memenuhi syarat 3:1. Ini ditemukan review Task 2, bukan saat plan ditulis. Pasangan tersebut kini diuji dan `border-strong` dinaikkan ke `#7C7C7C`.
 
 Yang belum tercakup plan ini dan memang milik plan berikutnya: seluruh halaman publik, komponen `MatchRow`, `PlayerCard`, `ArticleCard`, `AssetCard`, `PartnerPlate`, `ContactForm`, `Hero`, `LiveBar`, `StatTrio`, serta seluruh area internal.
