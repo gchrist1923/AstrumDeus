@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-*: initial;
+  --radius-*: initial;
+  --breakpoint-*: initial;
+
+  --color-surface-base: #171717;
+  --color-surface-raised: #212121;
+  --color-surface-overlay: #2A2A2A;
+  --color-border: #383838;
+  --color-border-strong: #6B6B6B;
+  --color-content-primary: #FFFFFF;
+  --color-content-secondary: #BCBCBC;
+  --color-content-muted: #9B9B9B;
+  --color-accent: #F0B429;
+  --color-accent-strong: #C68A15;
+  --color-accent-soft: #FFD166;
+  --color-danger: #FF6369;
+  --color-danger-solid: #C62828;
+
+  --font-display: var(--font-chakra-petch), "Chakra Petch", system-ui, sans-serif;
+  --font-text: var(--font-barlow), "Barlow", system-ui, sans-serif;
+
+  --text-display: clamp(3.375rem, 9.5vw, 8.25rem);
+  --text-display--line-height: 0.9;
+  --text-display--font-weight: 700;
+  --text-page: clamp(2.5rem, 6vw, 4.5rem);
+  --text-page--line-height: 1;
+  --text-page--font-weight: 700;
+  --text-section: clamp(1.875rem, 4.2vw, 3.25rem);
+  --text-section--line-height: 1;
+  --text-section--font-weight: 700;
+  --text-card: 1.5rem;
+  --text-card--line-height: 1.25;
+  --text-card--font-weight: 700;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.55;
+  --text-article: 1.1875rem;
+  --text-article--line-height: 1.7;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.45;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.16em;
+  --text-label--font-weight: 700;
+
+  --radius-none: 0;
+
+  --container-page: 77.5rem;
+
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 60rem;
+  --breakpoint-lg: 77.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
