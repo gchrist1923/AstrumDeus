@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astrum Deus - Arah C: Mono + Aksen Emas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#212121;
+    --deep:#191919;
+    --paper:#ffffff;
+    --gold:#F0B429;
+    --p-70:rgba(255,255,255,.7);
+    --p-45:rgba(255,255,255,.45);
+    --p-14:rgba(255,255,255,.14);
+    --display:"Chakra Petch",system-ui,sans-serif;
+    --text:"Barlow",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--text);font-size:17px;line-height:1.55}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+  a{color:inherit}
+  a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+  .top{border-bottom:1px solid var(--p-14)}
+  .top-in{display:flex;align-items:center;gap:40px;height:84px}
+  .brand img{height:36px;display:block}
+  nav{margin-left:auto;display:flex;gap:26px}
+  nav a{
+    text-decoration:none;font-family:var(--display);font-size:14px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--p-70);padding:8px 0;
+    border-bottom:2px solid transparent;
+  }
+  nav a[aria-current]{color:var(--paper);border-bottom-color:var(--gold)}
+  nav a:hover{color:var(--paper)}
+
+  /* live bar: the one place the accent earns its keep */
+  .live-bar{background:var(--gold);color:var(--ink)}
+  .live-in{display:flex;align-items:center;gap:16px;padding:12px 0;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+  .live-in .dot{width:9px;height:9px;background:var(--ink);border-radius:50%}
+  .live-in .sep{opacity:.45}
+  .live-in a{margin-left:auto;text-decoration:none;border-bottom:2px solid var(--ink)}
+
+  .hero{position:relative;overflow:hidden;min-height:min(80vh,700px);display:flex;align-items:center}
+  .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:18% 26%;filter:grayscale(1) contrast(1.08) brightness(.7)}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(85deg,rgba(25,25,25,.96) 8%,rgba(25,25,25,.5) 58%,rgba(25,25,25,.86) 100%)}
+  .hero-in{position:relative;z-index:2;padding:80px 0;width:100%}
+  .eyebrow{display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 20px}
+  .eyebrow span{width:34px;height:2px;background:var(--gold)}
+  h1{font-family:var(--display);font-weight:700;margin:0;font-size:clamp(54px,9.5vw,132px);line-height:.9;letter-spacing:-.015em;text-transform:uppercase}
+  .lede{font-size:20px;max-width:44ch;color:var(--p-70);margin:24px 0 0}
+  .actions{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap}
+  .btn{
+    display:inline-block;padding:16px 30px;text-decoration:none;background:var(--gold);color:var(--ink);
+    font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  }
+  .btn.ghost{background:transparent;color:var(--paper);box-shadow:inset 0 0 0 2px var(--p-45)}
+  .stats{display:flex;gap:40px;margin-top:52px;flex-wrap:wrap}
+  .stats div{border-left:2px solid var(--gold);padding-left:16px}
+  .stats b{display:block;font-family:var(--display);font-weight:700;font-size:38px;line-height:1}
+  .stats i{font-style:normal;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--p-45)}
+
+  section{padding:96px 0}
+  .sec-head{display:flex;align-items:center;gap:18px;margin-bottom:34px}
+  h2{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.2vw,52px);line-height:1;margin:0;text-transform:uppercase}
+  .sec-head .rule{flex:1;height:1px;background:var(--p-14)}
+  .sec-head a{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--gold)}
+
+  .results{display:grid;gap:12px}
+  .row{background:var(--deep);display:grid;grid-template-columns:86px 1fr auto auto;gap:26px;align-items:center;padding:22px 26px;border-left:3px solid var(--p-14)}
+  .row.win{border-left-color:var(--gold)}
+  .rank{font-family:var(--display);font-weight:700;font-size:46px;line-height:1}
+  .row.win .rank{color:var(--gold)}
+  .ev{font-family:var(--display);font-size:22px;font-weight:700;text-transform:uppercase;line-height:1.15}
+  .ev span{display:block;font-family:var(--text);font-size:14px;font-weight:400;text-transform:none;color:var(--p-45)}
+  .stat{text-align:right;font-variant-numeric:tabular-nums}
+  .stat b{display:block;font-family:var(--display);font-weight:700;font-size:26px;line-height:1}
+  .stat i{font-style:normal;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--p-45)}
+
+  .roster{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .player{position:relative;display:block;text-decoration:none;background:var(--deep);overflow:hidden}
+  .player img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;filter:grayscale(1) contrast(1.1) brightness(.88)}
+  .player .tag{position:absolute;inset:auto 0 0 0;padding:48px 18px 18px;background:linear-gradient(180deg,transparent,rgba(25,25,25,.96))}
+  .player h3{font-family:var(--display);font-weight:700;font-size:28px;margin:0;text-transform:uppercase;line-height:1}
+  .player p{margin:6px 0 0;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+
+  .news{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .story{background:var(--deep);padding:28px;text-decoration:none;display:block}
+  .story time{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .story h3{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.15;margin:12px 0 10px}
+  .story p{margin:0;color:var(--p-70);font-size:16px}
+
+  .logos{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .logos div{background:var(--deep);height:116px;display:grid;place-items:center;font-family:var(--display);font-size:14px;letter-spacing:.2em;color:var(--p-45)}
+
+  footer{background:var(--deep);border-top:2px solid var(--gold);padding:64px 0 36px}
+  .foot{display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap}
+  footer img{height:52px}
+  .foot nav{margin-left:auto;display:grid;grid-template-columns:repeat(2,auto);gap:10px 48px}
+  .foot-note{margin-top:48px;padding-top:20px;border-top:1px solid var(--p-14);font-size:13px;color:var(--p-45)}
+
+  @media (max-width:960px){
+    .roster,.news,.logos{grid-template-columns:repeat(2,1fr)}
+    .row{grid-template-columns:60px 1fr;gap:14px}
+    nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="live-bar">
+  <div class="wrap live-in">
+    <span class="dot"></span> Live
+    <span class="sep">&middot;</span> PMSL SEA Group Stage
+    <span class="sep">&middot;</span> Match 3 &middot; Erangel
+    <a href="#">Tonton stream</a>
+  </div>
+</div>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#"><img src="assets/logo-light.png" alt="Astrum Deus"></a>
+    <nav>
+      <a href="#" aria-current="page">Home</a>
+      <a href="#">Roster</a>
+      <a href="#">Matches</a>
+      <a href="#">News</a>
+      <a href="#">Media Kit</a>
+      <a href="#">Partners</a>
+      <a href="#">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <img class="bg" src="assets/hero.jpg" alt="Lima pemain Astrum Deus berdiri berjajar memegang ponsel">
+    <div class="wrap hero-in">
+      <p class="eyebrow"><span></span> PUBG Mobile &middot; Indonesia</p>
+      <h1>Astrum<br>Deus</h1>
+      <p class="lede">Tim PUBG Mobile yang berlatih terjadwal dan membuka hasilnya, dari klasemen sampai catatan scrim.</p>
+      <div class="actions">
+        <a class="btn" href="#">Lihat roster</a>
+        <a class="btn ghost" href="#">Jadwal pertandingan</a>
+      </div>
+      <div class="stats">
+        <div><b>4</b><i>Gelar</i></div>
+        <div><b>12</b><i>Turnamen</i></div>
+        <div><b>68</b><i>WWCD</i></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section>
+      <div class="sec-head"><h2>Hasil</h2><span class="rule"></span><a href="#">Semua pertandingan</a></div>
+      <div class="results">
+        <div class="row"><div class="rank">2</div><div class="ev">PMNC 2026 Grand Final<span>Jakarta &middot; 30 Agustus 2026</span></div><div class="stat"><b>128</b><i>Poin</i></div><div class="stat"><b>9</b><i>WWCD</i></div></div>
+        <div class="row win"><div class="rank">1</div><div class="ev">PMSL SEA Week 3<span>Online &middot; 17 Agustus 2026</span></div><div class="stat"><b>142</b><i>Poin</i></div><div class="stat"><b>11</b><i>WWCD</i></div></div>
+        <div class="row"><div class="rank">5</div><div class="ev">PMPL ID Season 8<span>Bandung &middot; 26 Juli 2026</span></div><div class="stat"><b>96</b><i>Poin</i></div><div class="stat"><b>5</b><i>WWCD</i></div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Roster</h2><span class="rule"></span><a href="#">Profil lengkap</a></div>
+      <div class="roster">
+        <a class="player" href="#"><img src="assets/portrait.jpg" alt="Pemain Reza"><span class="tag"><h3>Reza</h3><p>IGL</p></span></a>
+        <a class="player" href="#"><img src="assets/portrait.jpg" alt="Pemain Bagas"><span class="tag"><h3>Bagas</h3><p>Assaulter</p></span></a>
+        <a class="player" href="#"><img src="assets/portrait.jpg" alt="Pemain Dimas"><span class="tag"><h3>Dimas</h3><p>Sniper</p></span></a>
+        <a class="player" href="#"><img src="assets/portrait.jpg" alt="Pemain Arya"><span class="tag"><h3>Arya</h3><p>Support</p></span></a>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Berita</h2><span class="rule"></span><a href="#">Arsip</a></div>
+      <div class="news">
+        <a class="story" href="#"><time>04 Sep 2026</time><h3>Lolos ke Grand Final PMNC 2026</h3><p>Tiga hari klasemen berturut-turut di empat besar mengunci slot Grand Final.</p></a>
+        <a class="story" href="#"><time>28 Agu 2026</time><h3>Rotasi roster musim PMSL SEA</h3><p>Satu posisi filter bergeser, alasan dan datanya kami buka di sini.</p></a>
+        <a class="story" href="#"><time>14 Agu 2026</time><h3>Catatan scrim block Agustus</h3><p>42 scrim, rata-rata placement 4,1, dan apa yang kami perbaiki.</p></a>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Partner</h2><span class="rule"></span><a href="#">Kerja sama</a></div>
+      <div class="logos"><div>SPONSOR</div><div>SPONSOR</div><div>SPONSOR</div><div>SPONSOR</div></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <img src="assets/logo-light.png" alt="Astrum Deus">
+      <nav>
+        <a href="#">Roster</a><a href="#">Media Kit</a>
+        <a href="#">Matches</a><a href="#">Partners</a>
+        <a href="#">News</a><a href="#">Contact</a>
+      </nav>
+    </div>
+    <p class="foot-note">Arah C &mdash; Mono + Aksen Emas &middot; mockup, konten dummy</p>
+  </div>
+</footer>
+
+</body>
+</html>
+
