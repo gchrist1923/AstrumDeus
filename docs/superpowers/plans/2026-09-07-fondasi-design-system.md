@@ -1635,8 +1635,8 @@ export function MobileMenu({ items, pathname }: { items: NavItem[]; pathname: st
             onClick={() => setTerbuka(false)}
             className={`ml-auto inline-flex min-h-11 min-w-11 items-center justify-center border-2 border-border-strong px-4 font-display text-label uppercase ${KELAS_FOKUS}`}
           >
-            Tutup
-            <span className="sr-only"> menu</span>
+            Tutup{' '}
+            <span className="sr-only">menu</span>
           </button>
 
           <nav aria-label="Navigasi utama">
@@ -1668,7 +1668,7 @@ export function MobileMenu({ items, pathname }: { items: NavItem[]; pathname: st
 }
 ```
 
-Nama tombol tutup terbaca "Tutup menu" oleh screen reader karena kata "menu" disembunyikan secara visual, sementara di layar cukup tertulis "Tutup".
+Nama tombol tutup terbaca "Tutup menu" oleh screen reader karena kata "menu" disembunyikan secara visual, sementara di layar cukup tertulis "Tutup". Pemisah `{' '}` wajib ada. Tanpa itu JSX membuang spasi di antara kedua simpul teks dan nama tombolnya terbaca "Tutupmenu".
 
 - [ ] **Step 4: Jalankan test untuk memastikan lolos**
 
