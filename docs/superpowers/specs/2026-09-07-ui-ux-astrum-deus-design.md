@@ -50,10 +50,11 @@ Mockup itu bukan kode produksi. Ia memakai CSS biasa, sementara implementasi mem
 | `surface-base` | `#171717` | Latar halaman |
 | `surface-raised` | `#212121` | Kartu, baris hasil, panel |
 | `surface-overlay` | `#2A2A2A` | Dropdown, panel samping, input |
-| `border` | `#383838` | Garis pemisah dan bingkai |
+| `border` | `#383838` | Garis pemisah dekoratif |
+| `border-strong` | `#6B6B6B` | Bingkai input dan kontrol |
 | `content-primary` | `#FFFFFF` | Judul dan teks utama |
-| `content-secondary` | `rgba(255,255,255,.70)` | Paragraf pendukung |
-| `content-muted` | `rgba(255,255,255,.55)` | Label dan keterangan |
+| `content-secondary` | `#BCBCBC` | Paragraf pendukung |
+| `content-muted` | `#9B9B9B` | Label dan keterangan |
 | `accent` | `#F0B429` | Live, CTA utama, penanda juara, role, angka kunci |
 | `accent-strong` | `#C68A15` | Hover dan garis aksen |
 | `accent-soft` | `#FFD166` | Teks emas ukuran kecil |
@@ -62,7 +63,11 @@ Mockup itu bukan kode produksi. Ia memakai CSS biasa, sementara implementasi mem
 
 Rasio kontras di atas `surface-raised` sudah dihitung, bukan diperkirakan: `accent` 8,6:1, `accent-soft` 11,2:1, `accent-strong` 5,4:1, `content-secondary` 8,5:1, `content-muted` 5,8:1, `danger` 5,6:1. Teks putih di atas `danger-solid` memberi 5,6:1. Semuanya lolos WCAG AA untuk teks ukuran normal.
 
-Dua nilai di sini hasil koreksi saat review. `content-muted` semula `.45` yang hanya mencapai 4,4:1, dan `danger` semula `#E5484D` yang hanya mencapai 4,1:1. Keduanya gagal AA untuk teks ukuran normal padahal justru dipakai pada label 12px dan angka pengeluaran, jadi nilainya dinaikkan.
+Warna teks pendukung ditulis sebagai hex solid, bukan putih dengan opacity. Nilai `rgba` menghasilkan kontras yang berubah mengikuti latar di belakangnya, sehingga tidak bisa dijamin lolos AA dan tidak bisa diuji otomatis. `#BCBCBC` dan `#9B9B9B` adalah hasil komposit dari opacity 70 dan 55 persen di atas `surface-raised`, jadi tampilannya sama tetapi nilainya pasti.
+
+`border` sengaja dipisah dari `border-strong`. `border` hanya 1,4:1 terhadap `surface-raised`, cukup untuk garis pemisah dekoratif tetapi tidak memenuhi syarat 3:1 untuk batas kontrol. Setiap input, checkbox dan tombol bergaris memakai `border-strong` yang mencapai 3,0:1.
+
+Tiga nilai di sini hasil koreksi saat review. `content-muted` semula opacity 45 persen yang hanya mencapai 4,4:1, `danger` semula `#E5484D` yang hanya mencapai 4,1:1, dan batas kontrol semula memakai `border`. Ketiganya gagal memenuhi WCAG AA padahal dipakai di label 12px, angka pengeluaran dan bingkai input, jadi nilainya diperbaiki.
 
 ### Tipografi
 
