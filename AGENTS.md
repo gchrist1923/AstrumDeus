@@ -14,6 +14,18 @@ This project uses the [Superpowers](https://github.com/obra/superpowers) plugin.
 
 Project rules in this file override skill defaults when they conflict. Direct user instructions override both.
 
+## Interface skills (anti AI-slop)
+
+UI/UX skills from [jakubkrehel/skills](https://github.com/jakubkrehel/skills) live in `.cursor/skills/`.
+
+When building or changing UI, product copy, layout, color, typography, or accessibility:
+
+- Read and follow **better-interface** (routes the domain skills)
+- Prefer **better-ui**, **better-typography**, **better-colors**, **better-layout**, **better-writing**, **better-accessibility** as needed
+- For a full pass on a change, use **interface-review** when asked
+- Avoid generic AI-default looks: purple gradients, cream+serif+terracotta clichés, Inter/Roboto stacks, pill spam, glow-heavy dark UI, card-everything layouts
+- One composition per viewport; brand-first on branded pages; real visual anchors over decorative gradients
+
 ## Working style
 
 - Prefer small, focused changes over broad rewrites
