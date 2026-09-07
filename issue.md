@@ -9,18 +9,28 @@ Penanda yang dipakai di dokumen ini:
 - `TBD (Grace)` berarti belum diputuskan dan sengaja tidak diisi.
 - `Asumsi` berarti usulan default dari agent yang boleh langsung ditimpa.
 
+Desain UI/UX-nya diputuskan di dokumen terpisah, `docs/superpowers/specs/2026-09-07-ui-ux-astrum-deus-design.md`. Dokumen itu yang berlaku untuk hal visual, sedangkan dokumen ini mengatur kebutuhan produk.
+
+Yang sudah diputuskan setelah draft awal:
+
+- Bidang dan audience: tim esports PUBG Mobile, audiensnya pemain dan penonton esports
+- Fondasi front-end: Next.js App Router, TypeScript dan Tailwind
+- Arah visual: gelap monokrom dengan aksen emas
+- Menu bertambah dua, Roster dan Matches, keduanya Use Y/N
+- Urutan section Home
+
 Yang masih `TBD (Grace)`:
 
-- Profil dan brand Astrum Deus (bidang usaha, audience, tone)
-- Stack dan pilihan CMS
-- Isi tiap section Home, kategori News, isi Media Kit, kriteria Partners, kanal Contact
-- Kategori pengeluaran dan daftar anggota tim
+- Pilihan CMS, database dan penyedia autentikasi
+- Kategori News, isi Media Kit, kriteria Partners, kanal Contact
+- Kategori pemasukan dan pengeluaran, serta daftar anggota tim
+- Daftar pemain beserta role-nya, dan riwayat turnamen yang mau ditampilkan
 
 ## Ringkasan
 
-Astrum Deus butuh satu web profile perusahaan yang isinya bisa dikelola sendiri lewat CMS, tanpa minta developer setiap kali ada perubahan konten. Di sisi lain, tim juga butuh area internal untuk mengatur jadwal dan mencatat keuangan operasional, sehingga satu aplikasi melayani dua audience: publik dan tim internal.
+Astrum Deus adalah tim esports PUBG Mobile. Tim ini butuh satu situs profil yang isinya bisa dikelola sendiri lewat CMS, tanpa minta developer setiap kali ada perubahan konten. Di sisi lain, tim juga butuh area internal untuk mengatur jadwal dan mencatat keuangan operasional, sehingga satu aplikasi melayani dua audience: publik dan tim internal.
 
-Profil perusahaan, bidang usaha, target audience dan positioning brand: `TBD (Grace)`.
+Audiensnya pemain PUBG Mobile dan orang yang mengikuti esports, bukan pembeli produk atau klien korporat. Karena itu yang paling dicari pengunjung adalah roster dan hasil pertandingan, sementara sponsor menilai tim dari prestasinya lebih dulu sebelum melihat media kit.
 
 ## Tujuan
 
@@ -51,7 +61,7 @@ Lima peran yang dipakai:
 
 Matriks akses per modul:
 
-- Home, News, Media Kit, Partners: baca untuk Visitor bila aktif, CRUD untuk Editor dan Admin
+- Home, Roster, Matches, News, Media Kit, Partners: baca untuk Visitor bila aktif, CRUD untuk Editor dan Admin
 - Toggle menu dan pengaturan situs: Admin saja
 - Contact: kirim pesan untuk Visitor, baca dan kelola pesan untuk Editor dan Admin
 - Schedule Team: baca untuk semua peran internal, tulis untuk Team Member pada event miliknya, tulis penuh untuk Admin
@@ -63,15 +73,19 @@ Matriks akses per modul:
 
 ## Aturan menu audience
 
-Menu audience terdiri dari lima item, dengan dua status berbeda:
+Menu audience terdiri dari tujuh item, dengan dua status berbeda:
 
 | Menu | Status | Bisa dimatikan |
 | --- | --- | --- |
 | Home | Mandatory | Tidak |
+| Roster | Use Y/N | Ya |
+| Matches | Use Y/N | Ya |
 | News | Mandatory | Tidak |
 | Media Kit | Use Y/N | Ya |
 | Partners | Use Y/N | Ya |
 | Contact | Mandatory | Tidak |
+
+Urutan di tabel ini sekaligus urutan tampil di navigasi.
 
 Menu mandatory selalu tampil di navigasi. Yang bisa diubah hanya kontennya lewat CMS, bukan keberadaannya, sehingga toggle-nya tidak ditampilkan atau ditampilkan dalam keadaan terkunci.
 
@@ -80,6 +94,8 @@ Menu Use Y/N punya flag `is_enabled` yang dikontrol Admin. Perilaku saat flag ma
 - Item hilang dari navigasi utama dan dari footer
 - Route halamannya membalas 404, bukan halaman kosong atau redirect
 - Halamannya keluar dari sitemap
+- Section terkait di Home ikut hilang: cuplikan roster saat Roster mati, section hasil saat Matches mati, strip partner saat Partners mati
+- Tautan dari artikel News ke halaman yang mati berubah jadi teks biasa, bukan tautan mati
 - Kontennya tetap tersimpan, jadi menyalakan ulang tidak perlu input ulang
 
 Perubahan flag berlaku tanpa deploy ulang. Kalau pakai static generation, halaman navigasi direvalidasi saat flag berubah.
@@ -90,13 +106,54 @@ Perubahan flag berlaku tanpa deploy ulang. Kalau pakai static generation, halama
 
 Halaman utama tersusun dari section yang bisa diatur urutannya lewat CMS. Editor bisa menambah, mengubah urutan, menyembunyikan dan menghapus section.
 
-Daftar section yang dibutuhkan: `TBD (Grace)`. `Asumsi` sebagai titik awal: hero, tentang singkat, layanan, sorotan berita dan CTA ke Contact.
+Urutan section sudah diputuskan di design doc: bar live, hero, hasil terakhir, cuplikan roster, berita terbaru dan strip partner. Bar live hanya muncul bila ada pertandingan sedang berlangsung atau jadwal terdekat, dan hilang sepenuhnya bila tidak ada.
 
 Acceptance criteria:
 
 - Editor mengubah urutan section, dan urutan di halaman publik ikut berubah tanpa deploy
 - Section berstatus draft tidak tampil ke Visitor
-- Home tetap tampil utuh saat Media Kit dan Partners dimatikan
+- Home tetap tampil utuh saat Roster, Matches, Media Kit dan Partners dimatikan, tanpa menyisakan section kosong
+
+### Roster
+
+Daftar pemain aktif dengan halaman detail per pemain, aktif hanya bila flag `is_enabled` menyala.
+
+Kebutuhan:
+
+- CRUD pemain dengan IGN, nama asli yang opsional, role, foto, tanggal gabung, tautan media sosial dan urutan tampil
+- Role mengikuti istilah PUBG Mobile: IGL, Assaulter, Sniper, Support dan Filter
+- Pemain nonaktif tidak dihapus, tapi pindah ke bagian mantan pemain beserta tanggal keluarnya
+- Statistik per turnamen tampil di halaman detail pemain
+
+Daftar pemain dan role-nya: `TBD (Grace)`.
+
+Acceptance criteria:
+
+- Saat flag mati, `/roster` membalas 404, menu tidak muncul dan cuplikan roster di Home ikut hilang
+- Menonaktifkan pemain memindahkannya ke bagian mantan pemain tanpa menghapus halaman detailnya
+- Urutan pemain mengikuti field urutan, bukan urutan input
+
+### Matches
+
+Jadwal dan riwayat hasil pertandingan, aktif hanya bila flag `is_enabled` menyala.
+
+Kebutuhan:
+
+- CRUD turnamen dengan nama, penyelenggara, musim dan tahun
+- CRUD pertandingan dengan turnamen, tahap, jadwal, status, posisi akhir, poin, jumlah WWCD dan lokasi
+- Pertandingan berstatus jadwal tampil di bagian jadwal, yang sudah selesai pindah ke bagian hasil
+- Pertandingan bisa ditautkan ke satu artikel News sebagai recap
+- Filter per tahun dan per turnamen
+- Posisi akhir, poin dan WWCD hanya wajib diisi untuk pertandingan yang sudah selesai
+
+Riwayat turnamen yang mau ditampilkan: `TBD (Grace)`.
+
+Acceptance criteria:
+
+- Saat flag mati, `/matches` membalas 404, menu tidak muncul dan section hasil di Home ikut hilang
+- Pertandingan yang jadwalnya sudah lewat tapi hasilnya belum diisi tetap tampil di bagian jadwal, tidak hilang dari kedua bagian
+- Mengisi posisi akhir memindahkan pertandingan ke bagian hasil
+- Waktu pertandingan tampil dalam WIB
 
 ### News
 
@@ -160,7 +217,8 @@ Halaman kontak dengan form dan informasi perusahaan.
 
 Kebutuhan:
 
-- Form dengan nama, email, subjek dan pesan, plus validasi di server
+- Form dengan nama, email, tujuan dan pesan, plus validasi di server
+- Pilihan tujuan: kerja sama sponsor, media dan pers, tryout pemain, atau lainnya, supaya pesan calon pemain tidak tercampur dengan tawaran sponsor
 - Proteksi spam, `Asumsi` honeypot ditambah rate limit per IP
 - Pesan tersimpan di database dan bisa dibaca Editor serta Admin, dengan status baru, dibaca dan selesai
 - Notifikasi email ke alamat tujuan saat ada pesan masuk
@@ -254,6 +312,10 @@ Ditulis sebagai entitas dan field, bukan skema database atau schema CMS tertentu
 - **HomeSection**: `type`, `title`, `body`, `media`, `cta_label`, `cta_url`, `order`, `status`
 - **NewsPost**: `title`, `slug`, `excerpt`, `body`, `cover`, `status`, `published_at`, relasi ke `NewsCategory` dan `TeamMember` sebagai penulis
 - **NewsCategory**: `name`, `slug`, `description`
+- **Player**: `ign`, `real_name`, `role`, `photo`, `joined_at`, `left_at`, `is_active`, `social_links`, `order`
+- **Tournament**: `name`, `organizer`, `season`, `year`
+- **Match**: `tournament` ke `Tournament`, `stage`, `scheduled_at`, `status` bernilai jadwal atau selesai, `placement`, `points`, `wwcd_count`, `location`, `recap` ke `NewsPost`
+- **PlayerStat**: `player` ke `Player`, `tournament` ke `Tournament`, `matches_played`, `kills`, `average_placement`
 - **MediaKitAsset**: `name`, `description`, `group`, `file`, `file_type`, `file_size`, `order`
 - **Partner**: `name`, `logo`, `description`, `website_url`, `group`, `order`
 - **ContactMessage**: `name`, `email`, `subject`, `message`, `status`, `ip_address`, `handled_by`
@@ -274,7 +336,13 @@ erDiagram
   TeamMember }o--o{ ScheduleEvent : "hadir"
   NewsCategory ||--o{ NewsPost : "mengelompokkan"
   TeamMember ||--o{ NewsPost : "menulis"
+  Tournament ||--o{ Match : "menaungi"
+  NewsPost |o--o{ Match : "merekap"
+  Player ||--o{ PlayerStat : "punya"
+  Tournament ||--o{ PlayerStat : "mencatat"
 ```
+
+`Player` sengaja dipisah dari `TeamMember`. `TeamMember` adalah orang yang punya akses login ke area internal, sementara `Player` adalah pemain yang tampil di roster publik, dan keduanya tidak selalu orang yang sama.
 
 Laporan keuangan tidak punya entitas sendiri. Angkanya selalu dihitung dari `CashEntry`, sehingga tidak ada dua sumber angka yang bisa berbeda.
 
@@ -284,7 +352,7 @@ Laporan keuangan tidak punya entitas sendiri. Angkanya selalu dihitung dari `Cas
 
 **Performa.** Target LCP di bawah 2,5 detik pada koneksi 4G untuk Home dan halaman detail News. Gambar dioptimalkan dan diberi lazy loading di bawah lipatan.
 
-**Aksesibilitas dan UI.** Mengikuti skill `better-accessibility` dan `better-interface` di `.cursor/skills/`. Yang tidak bisa dikompromikan: navigasi lengkap lewat keyboard, focus state yang terlihat, kontras teks yang lolos WCAG AA, label form yang benar dan pengumuman error ke screen reader. Desain menghindari pola AI-default seperti gradasi ungu, tumpukan pill dan layout serba kartu.
+**Aksesibilitas dan UI.** Mengikuti skill `better-accessibility` dan `better-interface` di `.cursor/skills/`. Yang tidak bisa dikompromikan: navigasi lengkap lewat keyboard, focus state yang terlihat, kontras teks yang lolos WCAG AA, label form yang benar dan pengumuman error ke screen reader. Desain menghindari pola AI-default seperti gradasi ungu, tumpukan pill dan layout serba kartu. Token warna beserta rasio kontrasnya yang sudah dihitung ada di design doc, dan itu yang dipakai saat implementasi.
 
 **Audit dan integritas keuangan.** Entri kas tidak dihapus permanen. Setiap perubahan mencatat pelaku dan waktu, dan koreksi selalu berupa entri baru.
 
@@ -299,15 +367,20 @@ Laporan keuangan tidak punya entitas sendiri. Angkanya selalu dihitung dari `Cas
 **MVP**
 
 - Home dengan section yang bisa diatur
+- Roster dengan halaman detail pemain
+- Matches dengan jadwal dan hasil
 - News lengkap dengan kategori dan halaman detail
 - Contact dengan form, inbox dan notifikasi email
 - Cash book operasional dan kas tim
 - Laporan harian
 - Login dan peran dasar
+- Toggle Y/N untuk menu opsional, karena Roster dan Matches sudah memakainya sejak MVP
+
+Roster dan Matches masuk MVP meski statusnya Use Y/N, karena keduanya yang paling dicari audience dan tanpa itu situsnya kehilangan alasan untuk dikunjungi.
 
 **v1**
 
-- Media Kit dan Partners beserta toggle Y/N
+- Media Kit dan Partners
 - Schedule Team dengan tampilan bulanan dan mingguan
 - Laporan bulanan dan rekap per kategori
 - Ekspor CSV
@@ -315,7 +388,7 @@ Laporan keuangan tidak punya entitas sendiri. Angkanya selalu dihitung dari `Cas
 
 ## Open questions
 
-1. Stack dan CMS: aplikasi dengan admin sendiri, headless CMS atau CMS siap pakai. Belum diputuskan
+1. CMS dan database: aplikasi dengan admin sendiri, headless CMS atau CMS siap pakai. Fondasi front-end sudah diputuskan Next.js, TypeScript dan Tailwind, tapi sisi CMS-nya belum
 2. Hosting dan domain, termasuk lokasi penyimpanan file unggahan
 3. Autentikasi area internal: email dan password, atau login lewat penyedia identitas
 4. Multi-bahasa: apakah situs perlu Bahasa Indonesia dan Inggris sejak awal
@@ -323,16 +396,18 @@ Laporan keuangan tidak punya entitas sendiri. Angkanya selalu dihitung dari `Cas
 6. Approval laporan keuangan: apakah laporan bulanan perlu ditutup dan dikunci
 7. Retensi pesan Contact dan siapa penanggung jawab balasan
 8. Kebutuhan analytics dan tool yang dipakai
+9. Sumber data jadwal dan hasil pertandingan: diisi manual oleh Editor, atau diambil dari sumber lain
+10. Ketersediaan foto pemain dan foto tim, termasuk siapa yang mengambil dan menyeragamkan gayanya
 
 ## Ruang tambahan
 
 Bagian di bawah ini menunggu isi dari Grace.
 
-### Profil dan brand Astrum Deus
+### Daftar pemain dan role
 
 `TBD (Grace)`
 
-### Section Home
+### Turnamen dan hasil yang mau ditampilkan
 
 `TBD (Grace)`
 
