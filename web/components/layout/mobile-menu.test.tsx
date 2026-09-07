@@ -25,7 +25,7 @@ describe('MobileMenu', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Menu' }))
 
-    expect(screen.getByRole('dialog', { name: 'Menu utama' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Menu utama' })).toHaveClass('md:hidden')
     expect(screen.getByRole('link', { name: 'Roster' })).toBeInTheDocument()
   })
 
@@ -37,7 +37,52 @@ describe('MobileMenu', () => {
 
     await userEvent.click(tombol)
 
-    expect(screen.getByRole('button', { name: 'Menu' })).toHaveAttribute('aria-expanded', 'true')
+    expect(tombol).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('membuat saudara panel inert saat terbuka dan memulihkannya saat ditutup', async () => {
+    const latar = document.createElement('main')
+    const sudahInert = document.createElement('aside')
+    sudahInert.setAttribute('inert', '')
+    document.body.append(latar, sudahInert)
+
+    try {
+      render(<MobileMenu items={items} pathname="/" />)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Menu' }))
+
+      expect(latar).toHaveAttribute('inert')
+
+      await userEvent.click(screen.getByRole('button', { name: 'Tutup menu' }))
+
+      expect(latar).not.toHaveAttribute('inert')
+      expect(sudahInert).toHaveAttribute('inert')
+
+      await userEvent.click(screen.getByRole('button', { name: 'Menu' }))
+
+      expect(latar).toHaveAttribute('inert')
+    } finally {
+      latar.remove()
+      sudahInert.remove()
+    }
+  })
+
+  it('memulihkan saudara panel saat dilepas dalam keadaan terbuka', async () => {
+    const latar = document.createElement('main')
+    document.body.append(latar)
+
+    try {
+      const { unmount } = render(<MobileMenu items={items} pathname="/" />)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Menu' }))
+      expect(latar).toHaveAttribute('inert')
+
+      unmount()
+
+      expect(latar).not.toHaveAttribute('inert')
+    } finally {
+      latar.remove()
+    }
   })
 
   it('menutup panel dengan tombol Escape', async () => {
@@ -67,12 +112,59 @@ describe('MobileMenu', () => {
     expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(true)
   })
 
-  it('menandai halaman aktif dengan aria-current', async () => {
+  it('memberi setiap tautan target sentuh setinggi minimal 44px', async () => {
+    render(<MobileMenu items={items} pathname="/" />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Menu' }))
+
+    expect(screen.getByRole('link', { name: 'Roster' })).toHaveClass(
+      'inline-flex',
+      'min-h-11',
+      'items-center',
+    )
+  })
+
+  it('menandai halaman aktif dengan aria-current dan bilah aksen', async () => {
     render(<MobileMenu items={items} pathname="/roster" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Menu' }))
 
-    expect(screen.getByRole('link', { name: 'Roster' })).toHaveAttribute('aria-current', 'page')
+    const aktif = screen.getByRole('link', { name: 'Roster' })
+    const nonaktif = screen.getByRole('link', { name: 'Home' })
+
+    expect(aktif).toHaveAttribute('aria-current', 'page')
+    expect(aktif).toHaveClass('border-l-4', 'border-accent')
+    expect(nonaktif).toHaveClass('border-l-4', 'border-transparent')
+  })
+
+  it('membungkus fokus dari elemen terakhir ke elemen pertama dengan Tab', async () => {
+    const user = userEvent.setup()
+    render(<MobileMenu items={items} pathname="/" />)
+
+    await user.click(screen.getByRole('button', { name: 'Menu' }))
+    const tutup = screen.getByRole('button', { name: 'Tutup menu' })
+    const tautan = screen.getAllByRole('link')
+    const terakhir = tautan[tautan.length - 1]
+    terakhir.focus()
+
+    await user.tab()
+
+    expect(tutup).toHaveFocus()
+  })
+
+  it('membungkus fokus dari elemen pertama ke elemen terakhir dengan Shift+Tab', async () => {
+    const user = userEvent.setup()
+    render(<MobileMenu items={items} pathname="/" />)
+
+    await user.click(screen.getByRole('button', { name: 'Menu' }))
+    const tutup = screen.getByRole('button', { name: 'Tutup menu' })
+    const tautan = screen.getAllByRole('link')
+    const terakhir = tautan[tautan.length - 1]
+    tutup.focus()
+
+    await user.tab({ shift: true })
+
+    expect(terakhir).toHaveFocus()
   })
 
   it('menutup panel lewat tombol Tutup', async () => {
@@ -85,10 +177,10 @@ describe('MobileMenu', () => {
   })
 
   it('tidak punya pelanggaran aksesibilitas saat panel terbuka', async () => {
-    const { container } = render(<MobileMenu items={items} pathname="/" />)
+    render(<MobileMenu items={items} pathname="/" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Menu' }))
 
-    expect(await axe(container)).toHaveNoViolations()
+    expect(await axe(document.body)).toHaveNoViolations()
   })
 })

@@ -21,7 +21,9 @@ HTMLCanvasElement.prototype.getContext = () => null
 expect.extend(axeMatchers)
 
 declare module 'vitest' {
-  interface Matchers<R, T> {
+  // Declaration merging requires Vitest's second generic parameter even though this matcher does not use it.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface Matchers<R, _T> {
     toHaveNoViolations: () => R
   }
 }
