@@ -70,6 +70,32 @@ export function MobileMenu({ items, pathname }: { items: NavItem[]; pathname: st
     pernahTerbuka.current = terbuka
   }, [terbuka])
 
+  useEffect(() => {
+    if (!terbuka || typeof window.matchMedia !== 'function') {
+      return
+    }
+
+    const breakpointMd = getComputedStyle(document.documentElement)
+      .getPropertyValue('--breakpoint-md')
+      .trim()
+
+    if (!breakpointMd) {
+      return
+    }
+
+    const mediaDesktop = window.matchMedia(`(min-width: ${breakpointMd})`)
+
+    function saatBreakpointBerubah(event: MediaQueryListEvent) {
+      if (event.matches) {
+        setTerbuka(false)
+      }
+    }
+
+    mediaDesktop.addEventListener('change', saatBreakpointBerubah)
+
+    return () => mediaDesktop.removeEventListener('change', saatBreakpointBerubah)
+  }, [terbuka])
+
   return (
     <>
       <button

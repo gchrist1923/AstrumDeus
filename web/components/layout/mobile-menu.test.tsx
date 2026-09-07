@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { axe } from 'vitest-axe'
 import { MobileMenu } from '@/components/layout/mobile-menu'
 import { NAV_ITEMS } from '@/lib/nav'
@@ -38,6 +38,43 @@ describe('MobileMenu', () => {
     await userEvent.click(tombol)
 
     expect(tombol).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('menutup dan memulihkan halaman saat breakpoint desktop mulai cocok', async () => {
+    const latar = document.createElement('main')
+    const breakpointSebelumnya =
+      document.documentElement.style.getPropertyValue('--breakpoint-md')
+    let saatBerubah: ((event: MediaQueryListEvent) => void) | undefined
+    const mediaQuery = {
+      matches: false,
+      addEventListener: vi.fn(
+        (_jenis: string, listener: (event: MediaQueryListEvent) => void) => {
+          saatBerubah = listener
+        },
+      ),
+      removeEventListener: vi.fn(),
+    }
+    vi.stubGlobal('matchMedia', vi.fn(() => mediaQuery as unknown as MediaQueryList))
+    document.documentElement.style.setProperty('--breakpoint-md', '60rem')
+    document.body.append(latar)
+
+    try {
+      render(<MobileMenu items={items} pathname="/" />)
+      const tombol = screen.getByRole('button', { name: 'Menu' })
+
+      await userEvent.click(tombol)
+      expect(latar).toHaveAttribute('inert')
+
+      act(() => saatBerubah?.({ matches: true } as MediaQueryListEvent))
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      expect(latar).not.toHaveAttribute('inert')
+      expect(tombol).toHaveAttribute('aria-expanded', 'false')
+    } finally {
+      latar.remove()
+      document.documentElement.style.setProperty('--breakpoint-md', breakpointSebelumnya)
+      vi.unstubAllGlobals()
+    }
   })
 
   it('membuat saudara panel inert saat terbuka dan memulihkannya saat ditutup', async () => {
