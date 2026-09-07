@@ -8,8 +8,8 @@
   --color-surface-base: #171717;
   --color-surface-raised: #212121;
   --color-surface-overlay: #2A2A2A;
-  --color-border: #383838;
-  --color-border-strong: #6B6B6B;
+  --color-border: #383838; /* decorative dividers only — not for control/input frames */
+  --color-border-strong: #7C7C7C; /* control and input frames (≥3:1 on all surfaces) */
   --color-content-primary: #FFFFFF;
   --color-content-secondary: #BCBCBC;
   --color-content-muted: #9B9B9B;

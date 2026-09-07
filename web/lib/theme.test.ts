@@ -43,7 +43,24 @@ const PASANGAN_TEKS: Array<[string, string]> = [
 const PASANGAN_KONTROL: Array<[string, string]> = [
   ['border-strong', 'surface-base'],
   ['border-strong', 'surface-raised'],
+  ['border-strong', 'surface-overlay'],
 ]
+
+const WARNA_DISETUJUI: Record<string, string> = {
+  'surface-base': '#171717',
+  'surface-raised': '#212121',
+  'surface-overlay': '#2A2A2A',
+  border: '#383838',
+  'border-strong': '#7C7C7C',
+  'content-primary': '#FFFFFF',
+  'content-secondary': '#BCBCBC',
+  'content-muted': '#9B9B9B',
+  accent: '#F0B429',
+  'accent-strong': '#C68A15',
+  'accent-soft': '#FFD166',
+  danger: '#FF6369',
+  'danger-solid': '#C62828',
+}
 
 describe('parseThemeTokens', () => {
   it('melewati baris reset seperti --color-*: initial', () => {
@@ -65,6 +82,12 @@ describe('token warna di globals.css', () => {
   it('menulis setiap warna sebagai hex enam digit, bukan rgba', () => {
     for (const [nama, nilai] of Object.entries(warna)) {
       expect(nilai, `token ${nama}`).toMatch(/^#[0-9A-Fa-f]{6}$/)
+    }
+  })
+
+  it('memakai nilai hex yang disetujui persis untuk setiap warna', () => {
+    for (const [nama, hex] of Object.entries(WARNA_DISETUJUI)) {
+      expect(warna[nama], `token ${nama}`).toBe(hex)
     }
   })
 
@@ -107,6 +130,11 @@ describe('token huruf, skala dan breakpoint', () => {
 
 describe('aturan gerak', () => {
   it('menonaktifkan animasi saat prefers-reduced-motion aktif', () => {
-    expect(css).toContain('prefers-reduced-motion: reduce')
+    const blok = css.match(/@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{([\s\S]*?)\}/)?.[1] ?? ''
+
+    expect(blok).toContain('animation-duration: 0.01ms !important')
+    expect(blok).toContain('animation-iteration-count: 1 !important')
+    expect(blok).toContain('transition-duration: 0.01ms !important')
+    expect(blok).toContain('scroll-behavior: auto !important')
   })
 })
