@@ -15,6 +15,9 @@ vi.mock('next/font/google', () => ({
   }),
 }))
 
+// jsdom lacks canvas; axe colour-contrast checks call getContext and warn without this stub
+HTMLCanvasElement.prototype.getContext = () => null
+
 expect.extend(axeMatchers)
 
 declare module 'vitest' {

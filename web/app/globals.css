@@ -18,6 +18,7 @@
   --color-accent-soft: #FFD166;
   --color-danger: #FF6369;
   --color-danger-solid: #C62828;
+  --color-danger-strong: #9E1F1F; /* hover fill for destructive buttons */
 
   --font-display: var(--font-chakra-petch), "Chakra Petch", system-ui, sans-serif;
   --font-text: var(--font-barlow), "Barlow", system-ui, sans-serif;

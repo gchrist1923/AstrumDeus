@@ -14,19 +14,30 @@ describe('Button', () => {
   it('memakai varian primary secara default', () => {
     render(<Button>Kirim</Button>)
 
-    expect(screen.getByRole('button')).toHaveClass('bg-accent')
+    const tombol = screen.getByRole('button')
+
+    expect(tombol).toHaveClass('bg-accent')
+    expect(tombol).toHaveClass('text-surface-raised')
   })
 
   it('memakai latar danger-solid pada varian destruktif', () => {
     render(<Button variant="destructive">Hapus</Button>)
 
-    expect(screen.getByRole('button')).toHaveClass('bg-danger-solid')
+    const tombol = screen.getByRole('button')
+
+    expect(tombol).toHaveClass('bg-danger-solid')
+    expect(tombol).toHaveClass('text-content-primary')
+    expect(tombol).toHaveClass('hover:bg-danger-strong')
   })
 
   it('memakai bingkai border-strong pada varian sekunder', () => {
     render(<Button variant="secondary">Jadwal</Button>)
 
-    expect(screen.getByRole('button')).toHaveClass('border-border-strong')
+    const tombol = screen.getByRole('button')
+
+    expect(tombol).toHaveClass('border-2')
+    expect(tombol).toHaveClass('border-border-strong')
+    expect(tombol).toHaveClass('text-content-primary')
   })
 
   it('menjaga area sentuh minimal 44 piksel', () => {
@@ -41,7 +52,11 @@ describe('Button', () => {
   it('menampilkan focus state yang terlihat', () => {
     render(<Button>Kirim</Button>)
 
-    expect(screen.getByRole('button').className).toContain('focus-visible:outline-2')
+    const kelas = screen.getByRole('button').className
+
+    expect(kelas).toContain('focus-visible:outline-2')
+    expect(kelas).toContain('focus-visible:outline-offset-2')
+    expect(kelas).toContain('focus-visible:outline-accent')
   })
 
   it('memakai type button secara default supaya tidak submit form tanpa sengaja', () => {

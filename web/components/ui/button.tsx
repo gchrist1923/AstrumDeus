@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, forwardRef } from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'destructive'
+export type ButtonVariant = 'primary' | 'secondary' | 'destructive'
 
 const KELAS_DASAR = [
   'inline-flex min-h-11 min-w-11 items-center justify-center gap-2',
@@ -13,7 +13,7 @@ const KELAS_DASAR = [
 const KELAS_VARIAN: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-surface-raised hover:bg-accent-strong',
   secondary: 'border-2 border-border-strong text-content-primary hover:border-content-primary',
-  destructive: 'bg-danger-solid text-content-primary hover:bg-danger',
+  destructive: 'bg-danger-solid text-content-primary hover:bg-danger-strong',
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

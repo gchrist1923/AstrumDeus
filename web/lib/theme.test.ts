@@ -20,6 +20,7 @@ const WARNA_WAJIB = [
   'accent-soft',
   'danger',
   'danger-solid',
+  'danger-strong',
 ]
 
 const PASANGAN_TEKS: Array<[string, string]> = [
@@ -38,6 +39,7 @@ const PASANGAN_TEKS: Array<[string, string]> = [
   ['danger', 'surface-raised'],
   ['surface-raised', 'accent'],
   ['content-primary', 'danger-solid'],
+  ['content-primary', 'danger-strong'],
 ]
 
 const PASANGAN_KONTROL: Array<[string, string]> = [
@@ -60,6 +62,7 @@ const WARNA_DISETUJUI: Record<string, string> = {
   'accent-soft': '#FFD166',
   danger: '#FF6369',
   'danger-solid': '#C62828',
+  'danger-strong': '#9E1F1F',
 }
 
 describe('parseThemeTokens', () => {
