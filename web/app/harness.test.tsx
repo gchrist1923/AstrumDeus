@@ -10,6 +10,8 @@ describe('harness test', () => {
   })
 
   it('mengenali matcher aksesibilitas dan bisa menemukan pelanggaran', async () => {
+    // Missing alt is intentional test data proving the axe matcher detects violations.
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     const { container } = render(<img src="/contoh.png" />)
 
     const hasil = await axe(container)
