@@ -12,7 +12,7 @@
 
 Nilai berikut dikutip apa adanya dari `docs/superpowers/specs/2026-09-07-ui-ux-astrum-deus-design.md` dan berlaku untuk semua task.
 
-- Warna: `surface-base` `#171717`, `surface-raised` `#212121`, `surface-overlay` `#2A2A2A`, `border` `#383838`, `border-strong` `#7C7C7C`, `content-primary` `#FFFFFF`, `content-secondary` `#BCBCBC`, `content-muted` `#9B9B9B`, `accent` `#F0B429`, `accent-strong` `#C68A15`, `accent-soft` `#FFD166`, `danger` `#FF6369`, `danger-solid` `#C62828`
+- Warna: `surface-base` `#171717`, `surface-raised` `#212121`, `surface-overlay` `#2A2A2A`, `border` `#383838`, `border-strong` `#7C7C7C`, `content-primary` `#FFFFFF`, `content-secondary` `#BCBCBC`, `content-muted` `#9B9B9B`, `accent` `#F0B429`, `accent-strong` `#C68A15`, `accent-soft` `#FFD166`, `danger` `#FF6369`, `danger-solid` `#C62828`, `danger-strong` `#9E1F1F`
 - Huruf display Chakra Petch bobot 600 dan 700, huruf teks Barlow bobot 400 sampai 700
 - Radius sudut 0 di seluruh antarmuka
 - Skala spasi 4, 8, 12, 16, 24, 32, 48, 64, 96, 128 piksel
@@ -368,6 +368,7 @@ const WARNA_WAJIB = [
   'accent-soft',
   'danger',
   'danger-solid',
+  'danger-strong',
 ]
 
 const PASANGAN_TEKS: Array<[string, string]> = [
@@ -386,6 +387,7 @@ const PASANGAN_TEKS: Array<[string, string]> = [
   ['danger', 'surface-raised'],
   ['surface-raised', 'accent'],
   ['content-primary', 'danger-solid'],
+  ['content-primary', 'danger-strong'],
 ]
 
 const PASANGAN_KONTROL: Array<[string, string]> = [
@@ -541,6 +543,7 @@ Ganti seluruh isi `web/app/globals.css` dengan:
   --color-accent-soft: #FFD166;
   --color-danger: #FF6369;
   --color-danger-solid: #C62828;
+  --color-danger-strong: #9E1F1F;
 
   --font-display: var(--font-chakra-petch), "Chakra Petch", system-ui, sans-serif;
   --font-text: var(--font-barlow), "Barlow", system-ui, sans-serif;
@@ -896,7 +899,7 @@ const KELAS_DASAR = [
 const KELAS_VARIAN: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-surface-raised hover:bg-accent-strong',
   secondary: 'border-2 border-border-strong text-content-primary hover:border-content-primary',
-  destructive: 'bg-danger-solid text-content-primary hover:bg-danger',
+  destructive: 'bg-danger-solid text-content-primary hover:bg-danger-strong',
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -918,7 +921,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 })
 ```
 
-Varian destruktif memakai `bg-danger` saat hover, bukan `brightness`, supaya warnanya tetap berasal dari token dan bisa diuji.
+Varian destruktif memakai token saat hover, bukan `brightness`, supaya warnanya tetap berasal dari token dan bisa diuji. Token hover-nya `danger-strong`, bukan `danger`, karena `danger` adalah warna teks peringatan dan teks putih di atasnya hanya 2,9:1.
 
 - [ ] **Step 4: Jalankan test untuk memastikan lolos**
 
@@ -1917,5 +1920,6 @@ Enam hal yang muncul saat memeriksa plan ini terhadap spec, dan sudah ditangani 
 5. Judul semula tidak menyebut bobot huruf, padahal Chakra Petch hanya diunduh pada bobot 600 dan 700. Tanpa bobot eksplisit, browser memalsukan ketebalan dari bobot 400 yang tidak tersedia. Bobot dipasang lewat `--text-*--font-weight` supaya ikut menempel di setiap utility ukuran.
 6. Perintah scaffold semula bisa membuat `web/.git` di dalam repo yang sudah punya git, sehingga `web/` berisiko masuk riwayat sebagai gitlink. Flag `--disable-git` ditambahkan.
 7. Daftar pasangan kontras semula melewatkan `border-strong` di atas `surface-overlay`, padahal `surface-overlay` adalah latar input. Pasangan itu ternyata hanya 2,7:1 pada nilai `#6B6B6B`, jadi test-nya lolos sementara bingkai input yang sebenarnya gagal memenuhi syarat 3:1. Ini ditemukan review Task 2, bukan saat plan ditulis. Pasangan tersebut kini diuji dan `border-strong` dinaikkan ke `#7C7C7C`.
+8. Varian destruktif semula memakai `danger` sebagai latar hover, padahal peran token itu adalah warna teks peringatan. Teks putih di atasnya hanya 2,9:1, dan tidak ada test yang memeriksa pasangan hover, jadi kegagalannya tidak terlihat. Ditemukan review Task 4. Token `danger-strong` `#9E1F1F` ditambahkan khusus untuk hover dan memberi 7,9:1 dengan teks putih.
 
 Yang belum tercakup plan ini dan memang milik plan berikutnya: seluruh halaman publik, komponen `MatchRow`, `PlayerCard`, `ArticleCard`, `AssetCard`, `PartnerPlate`, `ContactForm`, `Hero`, `LiveBar`, `StatTrio`, serta seluruh area internal.

@@ -60,6 +60,7 @@ Mockup itu bukan kode produksi. Ia memakai CSS biasa, sementara implementasi mem
 | `accent-soft` | `#FFD166` | Teks emas ukuran kecil |
 | `danger` | `#FF6369` | Teks dan ikon peringatan, saldo minus, pengeluaran |
 | `danger-solid` | `#C62828` | Latar tombol aksi merusak, dipasangkan teks putih |
+| `danger-strong` | `#9E1F1F` | Latar tombol aksi merusak saat hover, dipasangkan teks putih |
 
 Rasio kontras di atas `surface-raised` sudah dihitung, bukan diperkirakan: `accent` 8,6:1, `accent-soft` 11,2:1, `accent-strong` 5,4:1, `content-secondary` 8,5:1, `content-muted` 5,8:1, `danger` 5,6:1. Teks putih di atas `danger-solid` memberi 5,6:1. Semuanya lolos WCAG AA untuk teks ukuran normal.
 
