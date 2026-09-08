@@ -47,6 +47,16 @@ describe('unionMatrices', () => {
   it('input kosong mengembalikan emptyMatrix', () => {
     expect(unionMatrices([])).toEqual(emptyMatrix())
   })
+
+  it('aksi tulis tanpa lihat tidak bocor lewat unionMatrices/can', () => {
+    const matrix = unionMatrices([
+      { ...emptyMatrix(), news: { view: false, create: true, update: true, delete: true } },
+    ])
+    expect(can(matrix, 'news', 'view')).toBe(false)
+    expect(can(matrix, 'news', 'create')).toBe(false)
+    expect(can(matrix, 'news', 'update')).toBe(false)
+    expect(can(matrix, 'news', 'delete')).toBe(false)
+  })
 })
 
 describe('isAdminMatrixReduced', () => {

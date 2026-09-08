@@ -74,7 +74,7 @@ export function unionMatrices(matrices: GrantMatrix[]): GrantMatrix {
 
   for (const matrix of matrices) {
     for (const { id } of ACCESS_MODULES) {
-      const grant = matrix[id]
+      const grant = clampGrant(matrix[id])
       result[id] = {
         view: result[id].view || grant.view,
         create: result[id].create || grant.create,
@@ -84,11 +84,19 @@ export function unionMatrices(matrices: GrantMatrix[]): GrantMatrix {
     }
   }
 
+  for (const { id } of ACCESS_MODULES) {
+    result[id] = clampGrant(result[id])
+  }
+
   return result
 }
 
 export function can(matrix: GrantMatrix, module: AccessModule, action: AccessAction): boolean {
-  return matrix[module][action]
+  const grant = matrix[module]
+  if (action !== 'view' && !grant.view) {
+    return false
+  }
+  return grant[action]
 }
 
 export function editorTemplate(): GrantMatrix {
