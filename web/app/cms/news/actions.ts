@@ -7,11 +7,8 @@ import { requireCmsUser } from '@/lib/auth/require'
 import { fromDatetimeLocal } from '@/lib/datetime'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
+import { slugify } from '@/lib/content/slug'
 import { releaseMediaPath } from '@/lib/media/store'
-
-function slugify(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
 
 export async function saveNews(formData: FormData): Promise<void> {
   const user = await requireCmsUser()

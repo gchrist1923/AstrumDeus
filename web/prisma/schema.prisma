@@ -61,6 +61,7 @@ model NewsCategory {
   name        String
   slug        String     @unique
   description String
+  isActive    Boolean    @default(true)
   posts       NewsPost[]
 }
 
@@ -100,6 +101,7 @@ model Tournament {
   organizer String
   season    String
   year      Int
+  isActive  Boolean      @default(true)
   matches   Match[]
   stats     PlayerStat[]
 }

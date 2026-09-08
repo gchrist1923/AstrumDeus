@@ -98,7 +98,7 @@ async function main() {
   for (const item of turnamen) {
     const ada = await prisma.tournament.findFirst({ where: { name: item.name } })
     if (!ada) {
-      await prisma.tournament.create({ data: item })
+      await prisma.tournament.create({ data: { ...item, isActive: true } })
     }
   }
 
@@ -108,7 +108,7 @@ async function main() {
     await prisma.newsCategory.upsert({
       where: { slug },
       update: { name },
-      create: { name, slug, description: name },
+      create: { name, slug, description: name, isActive: true },
     })
   }
 
