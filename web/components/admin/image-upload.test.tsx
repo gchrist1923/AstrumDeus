@@ -68,6 +68,24 @@ describe('ImageUpload', () => {
     expect(screen.getByRole('img', { name: 'Pratinjau Foto' })).toHaveAttribute('src', '/media/abcd.jpg')
   })
 
+  it('memanggil onPathChange setelah unggah berhasil', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({ path: '/media/abcd.jpg' }),
+    } as Response)
+    const onPathChange = vi.fn()
+    const user = userEvent.setup()
+    render(<ImageUpload name="photo" label="Foto" onPathChange={onPathChange} />)
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    const jpeg = new File([Uint8Array.from([0xff, 0xd8, 0xff, 0xe0])], 'a.jpg', { type: 'image/jpeg' })
+    await user.upload(input, jpeg)
+    await waitFor(() => {
+      expect(onPathChange).toHaveBeenCalledWith('/media/abcd.jpg')
+    })
+    expect(screen.getByDisplayValue('/media/abcd.jpg')).toHaveAttribute('name', 'photo')
+  })
+
   it('menampilkan error gagal saat unggahan ditolak server', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: false,

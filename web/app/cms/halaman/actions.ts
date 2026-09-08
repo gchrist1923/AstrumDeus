@@ -6,9 +6,11 @@ import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 import { checked, teks } from '@/lib/form'
 import { applyBuiltinToggle, BUILTIN_PAGES } from '@/lib/pages/builtins'
+import { assertValidLayout } from '@/lib/pages/grid'
 import { customSlugError } from '@/lib/pages/public-visibility'
 import { normalizeSlug } from '@/lib/pages/reserved'
 import { syncBuiltinEnabled } from '@/lib/pages/sync-builtin-enabled'
+import type { PageRow } from '@/lib/pages/types'
 import type { NavKey } from '@/lib/nav'
 
 export async function toggleBuiltinEnabled(formData: FormData): Promise<void> {
@@ -94,9 +96,10 @@ export async function updateCustomPage(formData: FormData): Promise<void> {
   }
 
   const title = teks(formData, 'title') || page.title
-  const status = teks(formData, 'status') === 'draft' ? 'draft' : 'published'
-  const showInNav = checked(formData, 'showInNav')
-  const isEnabled = teks(formData, 'isEnabled') === '1' || checked(formData, 'isEnabled')
+  const statusRaw = teks(formData, 'status')
+  const status = statusRaw === 'draft' || statusRaw === 'published' ? statusRaw : page.status
+  const showInNav = checkboxAtauTetap(formData, 'showInNav', page.showInNav)
+  const isEnabled = checkboxAtauTetap(formData, 'isEnabled', page.isEnabled)
 
   await prisma.sitePage.update({
     where: { id: page.id },
@@ -105,4 +108,41 @@ export async function updateCustomPage(formData: FormData): Promise<void> {
 
   revalidateHalamanPublik(page.slug)
   redirect('/cms/halaman')
+}
+
+function checkboxAtauTetap(formData: FormData, kunci: string, sekarang: boolean): boolean {
+  const nilai = formData.getAll(kunci)
+  if (nilai.length === 0) return sekarang
+  return nilai.some((item) => item === 'on' || item === 'true' || item === '1')
+}
+
+export async function saveLayout(formData: FormData): Promise<void> {
+  const user = await requireCmsUser()
+  requireGrant(user, 'halaman', 'update')
+
+  const id = teks(formData, 'id')
+  const page = id ? await prisma.sitePage.findUnique({ where: { id } }) : null
+  if (!page || page.kind !== 'custom') {
+    redirect('/cms/halaman')
+  }
+
+  let rows: PageRow[]
+  try {
+    const parsed: unknown = JSON.parse(teks(formData, 'layout') || '[]')
+    if (!Array.isArray(parsed)) {
+      throw new Error('layout')
+    }
+    rows = parsed as PageRow[]
+    assertValidLayout(rows)
+  } catch {
+    redirect(`/cms/halaman/${page.id}?kesalahan=layout`)
+  }
+
+  await prisma.sitePage.update({
+    where: { id: page.id },
+    data: { layout: JSON.stringify(rows) },
+  })
+
+  revalidateHalamanPublik(page.slug)
+  redirect(`/cms/halaman/${page.id}`)
 }

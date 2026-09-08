@@ -92,3 +92,26 @@ describe('buat halaman custom', () => {
     expect(page).not.toMatch(/rounded-/)
   })
 })
+
+describe('saveLayout', () => {
+  it('memvalidasi kisi dan memerlukan grant update', () => {
+    const actions = baca('actions.ts')
+    expect(actions).toMatch(/export async function saveLayout/)
+    expect(actions).toMatch(/requireGrant\(user, 'halaman', 'update'\)/)
+    expect(actions).toMatch(/assertValidLayout/)
+  })
+})
+
+describe('halaman [id]', () => {
+  it('bawaan bukan kanvas; kustom memakai PageCanvas', () => {
+    const page = baca(path.join('[id]', 'page.tsx'))
+    expect(page).toMatch(/shouldEditOnCanvas/)
+    expect(page).toMatch(/Isi halaman ini diubah lewat form CMS, bukan kanvas\./)
+    expect(page).toMatch(/Ubah isi/)
+    expect(page).toMatch(/PageCanvas/)
+    expect(page).toMatch(/saveLayout/)
+    expect(page).toMatch(/updateCustomPage/)
+    expect(page).toMatch(/defaultChecked/)
+    expect(page).not.toMatch(/rounded-/)
+  })
+})

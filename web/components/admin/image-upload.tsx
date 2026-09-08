@@ -26,11 +26,13 @@ export function ImageUpload({
   label,
   defaultValue = '',
   required = false,
+  onPathChange,
 }: {
   name: string
   label: string
   defaultValue?: string
   required?: boolean
+  onPathChange?: (path: string) => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
   const uploadingRef = useRef(false)
@@ -90,6 +92,7 @@ export function ImageUpload({
           return
         }
         setPath(data.path)
+        onPathChange?.(data.path)
         setError(null)
       } catch {
         tampilkanError('gagal')
