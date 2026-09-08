@@ -6,6 +6,7 @@ import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 import { teks } from '@/lib/form'
 import { applyBuiltinToggle, BUILTIN_PAGES } from '@/lib/pages/builtins'
+import { syncBuiltinEnabled } from '@/lib/pages/sync-builtin-enabled'
 import type { NavKey } from '@/lib/nav'
 
 export async function toggleBuiltinEnabled(formData: FormData): Promise<void> {
@@ -26,14 +27,7 @@ export async function toggleBuiltinEnabled(formData: FormData): Promise<void> {
     redirect('/cms/halaman?kesalahan=wajib')
   }
 
-  await prisma.menuItem.update({
-    where: { key: menuKey },
-    data: { isEnabled: enabled },
-  })
-  await prisma.sitePage.update({
-    where: { menuKey },
-    data: { isEnabled: enabled },
-  })
+  await syncBuiltinEnabled(prisma, menuKey, enabled)
 
   revalidatePath('/', 'layout')
   revalidatePath('/cms/halaman')

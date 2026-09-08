@@ -5,6 +5,7 @@ import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { applyMenuToggle } from '@/lib/content/menu'
 import { checked } from '@/lib/form'
 import { prisma } from '@/lib/db'
+import { syncBuiltinEnabled } from '@/lib/pages/sync-builtin-enabled'
 
 export async function saveMenuFlags(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
@@ -19,13 +20,11 @@ export async function saveMenuFlags(formData: FormData): Promise<void> {
 
     const result = applyMenuToggle(item, checked(formData, item.key))
     if (result.ok) {
-      await prisma.menuItem.update({
-        where: { key: item.key },
-        data: { isEnabled: result.isEnabled },
-      })
+      await syncBuiltinEnabled(prisma, item.key, result.isEnabled)
     }
   }
 
   revalidatePath('/', 'layout')
   revalidatePath('/cms/menu')
+  revalidatePath('/cms/halaman')
 }
