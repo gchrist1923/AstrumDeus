@@ -1,9 +1,17 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getVisibleNavItems, type MenuFlags } from '@/lib/nav'
+import { getVisibleNavItems, mergeNav, type ExtraNavItem, type MenuFlags } from '@/lib/nav'
 
-export function SiteFooter({ flags, logoSrc = '/logo-astrum-deus.png' }: { flags?: MenuFlags; logoSrc?: string }) {
-  const items = getVisibleNavItems(flags)
+export function SiteFooter({
+  flags,
+  extra = [],
+  logoSrc = '/logo-astrum-deus.png',
+}: {
+  flags?: MenuFlags
+  extra?: ExtraNavItem[]
+  logoSrc?: string
+}) {
+  const items = mergeNav(getVisibleNavItems(flags), extra)
 
   return (
     <footer className="mt-24 border-t border-border bg-surface-raised">
@@ -14,7 +22,7 @@ export function SiteFooter({ flags, logoSrc = '/logo-astrum-deus.png' }: { flags
           <nav aria-label="Navigasi footer" className="ml-auto">
             <ul className="grid grid-cols-2 gap-x-12 gap-y-3">
               {items.map((item) => (
-                <li key={item.key}>
+                <li key={item.href}>
                   <Link
                     href={item.href}
                     className="font-display text-label uppercase text-content-secondary hover:text-content-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"

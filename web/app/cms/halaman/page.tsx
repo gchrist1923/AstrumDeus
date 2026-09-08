@@ -16,6 +16,7 @@ export default async function CmsHalamanPage({
   requireGrant(user, 'halaman', 'view')
   const params = await searchParams
   const bisaToggle = can(user.matrix, 'menu', 'update')
+  const bisaBuat = can(user.matrix, 'halaman', 'create')
 
   const pages = await prisma.sitePage.findMany()
   const byMenuKey = new Map(pages.map((page) => [page.menuKey, page]))
@@ -27,12 +28,22 @@ export default async function CmsHalamanPage({
 
   return (
     <div className="flex flex-col gap-16">
-      <header>
-        <h2 className="font-display text-section uppercase">Halaman</h2>
-        <p className="mt-3 max-w-2xl text-body text-content-secondary">
-          Isi tujuh rute bawaan diubah lewat form CMS, bukan kanvas. Home, News, dan Contact wajib
-          tetap nyala.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="font-display text-section uppercase">Halaman</h2>
+          <p className="mt-3 max-w-2xl text-body text-content-secondary">
+            Isi tujuh rute bawaan diubah lewat form CMS, bukan kanvas. Home, News, dan Contact wajib
+            tetap nyala.
+          </p>
+        </div>
+        {bisaBuat ? (
+          <Link
+            href="/cms/halaman/new"
+            className={`inline-flex min-h-11 items-center bg-accent px-6 font-display text-label uppercase text-surface-raised ${KELAS_FOKUS}`}
+          >
+            Halaman baru
+          </Link>
+        ) : null}
       </header>
 
       {params.kesalahan === 'wajib' ? (

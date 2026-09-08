@@ -32,3 +32,15 @@ export function isMenuEnabled(key: NavKey, flags: MenuFlags = {}): boolean {
 
   return item.mandatory || flags[key] === true
 }
+
+export interface ExtraNavItem {
+  label: string
+  href: string
+}
+
+export function mergeNav(base: NavItem[], extra: ExtraNavItem[] = []): ExtraNavItem[] {
+  return [
+    ...base.map(({ label, href }) => ({ label, href })),
+    ...extra,
+  ]
+}

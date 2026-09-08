@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import type { NavItem } from '@/lib/nav'
+import type { ExtraNavItem } from '@/lib/nav'
 
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
-export function MobileMenu({ items, pathname }: { items: NavItem[]; pathname: string }) {
+export function MobileMenu({ items, pathname }: { items: ExtraNavItem[]; pathname: string }) {
   const [terbuka, setTerbuka] = useState(false)
   const tombolRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -134,7 +134,7 @@ export function MobileMenu({ items, pathname }: { items: NavItem[]; pathname: st
                     const aktif = item.href === pathname
 
                     return (
-                      <li key={item.key}>
+                      <li key={item.href}>
                         <Link
                           href={item.href}
                           aria-current={aktif ? 'page' : undefined}

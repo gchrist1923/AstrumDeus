@@ -57,3 +57,38 @@ describe('toggleBuiltinEnabled', () => {
     expect(actions).toMatch(/syncBuiltinEnabled/)
   })
 })
+
+describe('buat halaman custom', () => {
+  it('menawarkan Halaman baru hanya dengan grant create', () => {
+    const page = baca('page.tsx')
+    expect(page).toMatch(/can\(user.matrix, 'halaman', 'create'\)/)
+    expect(page).toMatch(/Halaman baru/)
+    expect(page).toMatch(/\/cms\/halaman\/new/)
+  })
+
+  it('createPage menolak slug terlarang dan memakai slug ternormalisasi', () => {
+    const actions = baca('actions.ts')
+    expect(actions).toMatch(/export async function createPage/)
+    expect(actions).toMatch(/requireGrant\(user, 'halaman', 'create'\)/)
+    expect(actions).toMatch(/customSlugError/)
+    expect(actions).toMatch(/Slug tidak tersedia\./)
+    expect(actions).toMatch(/normalizeSlug/)
+    expect(actions).toMatch(/kind:\s*['"]custom['"]/)
+    expect(actions).toMatch(/layout:\s*['"]\[]['"]/)
+  })
+
+  it('form baru meminta judul, slug, status, dan nav', () => {
+    const page = baca(path.join('new', 'page.tsx'))
+    expect(page).toMatch(/requireGrant\(user, 'halaman', 'create'\)/)
+    expect(page).toMatch(/createPage/)
+    expect(page).toMatch(/Field/)
+    expect(page).toMatch(/KELAS_KONTROL/)
+    expect(page).toMatch(/name="title"/)
+    expect(page).toMatch(/name="slug"/)
+    expect(page).toMatch(/name="status"/)
+    expect(page).toMatch(/name="showInNav"/)
+    expect(page).toMatch(/Draf|draf/)
+    expect(page).toMatch(/Terbit|terbit/)
+    expect(page).not.toMatch(/rounded-/)
+  })
+})
