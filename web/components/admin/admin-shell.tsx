@@ -29,6 +29,7 @@ function cmsLinks(roles: Role[]): NavLink[] {
       { href: '/cms/media-kit', label: 'Media Kit' },
       { href: '/cms/partners', label: 'Partners' },
       { href: '/cms/inbox', label: 'Kotak masuk' },
+      { href: '/cms/kategori', label: 'Kategori' },
     )
   }
 
