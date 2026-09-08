@@ -83,14 +83,12 @@ export async function createRole(formData: FormData): Promise<void> {
   await createNamedRole(teks(formData, 'name'), emptyMatrix())
 }
 
-export async function copyTemplate(formData: FormData): Promise<void> {
+export async function copyTemplate(template: TemplateKey, formData: FormData): Promise<void> {
   await requirePeran('create')
-  const key = teks(formData, 'template')
-  if (key !== 'editor' && key !== 'team' && key !== 'finance') {
+  if (template !== 'editor' && template !== 'team' && template !== 'finance') {
     redirect('/cms/peran')
   }
 
-  const template = key as TemplateKey
   await createNamedRole(teks(formData, 'name'), TEMPLATES[template]())
 }
 

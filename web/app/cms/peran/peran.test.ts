@@ -15,7 +15,8 @@ describe('UI peran', () => {
     expect(page).toMatch(/Salin Editor/)
     expect(page).toMatch(/Salin Team/)
     expect(page).toMatch(/Salin Finance/)
-    expect(page).toMatch(/template/)
+    expect(page).toMatch(/copyTemplate\.bind\(null, 'editor'\)/)
+    expect(page).not.toMatch(/name="template"/)
   })
 
   it('daftar menampilkan slug di samping nama', () => {

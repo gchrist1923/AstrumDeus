@@ -84,13 +84,13 @@ export default async function CmsPeranPage({
             </Field>
             <Button type="submit">Tambah peran</Button>
             <div className="flex flex-wrap gap-3">
-              <Button type="submit" formAction={copyTemplate} name="template" value="editor" variant="secondary">
+              <Button type="submit" formAction={copyTemplate.bind(null, 'editor')} variant="secondary">
                 Salin Editor
               </Button>
-              <Button type="submit" formAction={copyTemplate} name="template" value="team" variant="secondary">
+              <Button type="submit" formAction={copyTemplate.bind(null, 'team')} variant="secondary">
                 Salin Team
               </Button>
-              <Button type="submit" formAction={copyTemplate} name="template" value="finance" variant="secondary">
+              <Button type="submit" formAction={copyTemplate.bind(null, 'finance')} variant="secondary">
                 Salin Finance
               </Button>
             </div>
