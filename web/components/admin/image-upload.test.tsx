@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { axe } from 'vitest-axe'
+import { KELAS_FOKUS } from '@/components/admin/form-field'
 import { ImageUpload } from '@/components/admin/image-upload'
 
 describe('ImageUpload', () => {
@@ -113,5 +114,53 @@ describe('ImageUpload', () => {
   it('tidak punya pelanggaran aksesibilitas', async () => {
     const { container } = render(<ImageUpload name="photo" label="Foto" defaultValue="/portrait.jpg" />)
     expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('tidak memanggil fetch dua kali saat file kedua dipilih selama unggah', async () => {
+    let selesai: (value: Response) => void = () => {}
+    vi.mocked(fetch).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          selesai = resolve
+        }),
+    )
+    const user = userEvent.setup()
+    render(<ImageUpload name="photo" label="Foto" />)
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    const jpeg1 = new File([Uint8Array.from([0xff, 0xd8, 0xff, 0xe0])], 'satu.jpg', { type: 'image/jpeg' })
+    const jpeg2 = new File([Uint8Array.from([0xff, 0xd8, 0xff, 0xe0, 0x01])], 'dua.jpg', { type: 'image/jpeg' })
+    await user.upload(input, jpeg1)
+    expect(await screen.findByRole('button', { name: 'Mengunggah…' })).toBeDisabled()
+    expect(fetch).toHaveBeenCalledTimes(1)
+    await user.upload(input, jpeg2)
+    expect(fetch).toHaveBeenCalledTimes(1)
+    selesai({
+      ok: true,
+      status: 201,
+      json: async () => ({ path: '/media/abcd.jpg' }),
+    } as Response)
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('/media/abcd.jpg')).toHaveAttribute('name', 'photo')
+    })
+  })
+
+  it('menampilkan fokus tampak dan aria-invalid pada kontrol terlihat setelah error PDF', async () => {
+    const user = userEvent.setup({ applyAccept: false })
+    render(<ImageUpload name="photo" label="Foto" />)
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    const pdf = new File([Uint8Array.from([0x25, 0x50, 0x44, 0x46])], 'x.pdf', { type: 'application/pdf' })
+    await user.upload(input, pdf)
+    expect(await screen.findByText('Pilih file JPG, PNG, atau WebP.')).toBeInTheDocument()
+    expect(document.activeElement).toBe(input)
+    expect(input).not.toHaveClass('sr-only')
+    const pembungkus = input.parentElement
+    expect(pembungkus).toBeTruthy()
+    for (const kelas of KELAS_FOKUS.split(' ')) {
+      expect(pembungkus).toHaveClass(kelas)
+    }
+    expect(pembungkus).toHaveClass('focus-within:outline-2')
+    const tombol = screen.getByRole('button', { name: 'Pilih gambar' })
+    expect(tombol).toHaveAttribute('aria-invalid', 'true')
+    expect(tombol).toHaveAttribute('aria-describedby', 'photo-error')
   })
 })
