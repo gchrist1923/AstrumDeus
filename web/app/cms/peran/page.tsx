@@ -58,6 +58,7 @@ export default async function CmsPeranPage({
                   >
                     {role.name}
                   </Link>
+                  <span className="text-small text-content-muted">{role.slug}</span>
                   {role.isAdmin ? <span className="text-small text-content-muted">Admin</span> : null}
                 </div>
                 {!role.isAdmin && bisaHapus ? (

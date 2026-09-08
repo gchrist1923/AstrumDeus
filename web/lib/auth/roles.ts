@@ -20,3 +20,11 @@ export function parseRoles(raw: string): Role[] {
 export function hasRole(roles: Role[], role: Role): boolean {
   return roles.includes(role)
 }
+
+function isLegacySlug(slug: string): slug is Role {
+  return ROLE_SET.has(slug)
+}
+
+export function legacyRolesJsonFromSlugs(slugs: string[]): string {
+  return JSON.stringify(slugs.filter(isLegacySlug))
+}

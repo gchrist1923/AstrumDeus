@@ -2,18 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { hashPassword } from '@/lib/auth/password'
-import { ROLES, type Role } from '@/lib/auth/roles'
+import { legacyRolesJsonFromSlugs } from '@/lib/auth/roles'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
-
-function isLegacySlug(slug: string): slug is Role {
-  return (ROLES as readonly string[]).includes(slug)
-}
-
-function legacyRolesJson(slugs: string[]): string {
-  return JSON.stringify(slugs.filter(isLegacySlug))
-}
 
 async function selectedAccessRoles(formData: FormData) {
   const catalog = await prisma.accessRole.findMany()
@@ -34,7 +26,7 @@ export async function saveUser(formData: FormData): Promise<void> {
       email,
       name,
       passwordHash: await hashPassword(password),
-      roles: legacyRolesJson(selected.map((role) => role.slug)),
+      roles: legacyRolesJsonFromSlugs(selected.map((role) => role.slug)),
     },
   })
 
@@ -68,7 +60,7 @@ export async function saveUserRoles(formData: FormData): Promise<void> {
     }
     await tx.user.update({
       where: { id },
-      data: { roles: legacyRolesJson(selected.map((role) => role.slug)) },
+      data: { roles: legacyRolesJsonFromSlugs(selected.map((role) => role.slug)) },
     })
   })
 

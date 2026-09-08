@@ -14,6 +14,7 @@ import { ACCESS_MODULES } from '@/lib/auth/modules'
 import { assertAdminRoleMutation } from '@/lib/auth/protect-admin'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { slugify } from '@/lib/content/slug'
+import { rewriteLegacyRolesForUsers } from '@/lib/auth/rewrite-legacy-roles'
 import { prisma } from '@/lib/db'
 import { checked, teks } from '@/lib/form'
 
@@ -137,7 +138,13 @@ export async function deleteRole(formData: FormData): Promise<void> {
     redirect(`/cms/peran?kesalahan=${verdict}`)
   }
 
+  const assigned = await prisma.userAccessRole.findMany({
+    where: { roleId: id },
+    select: { userId: true },
+  })
+
   await prisma.accessRole.delete({ where: { id } })
+  await rewriteLegacyRolesForUsers(assigned.map((row) => row.userId))
   revalidatePeran()
   redirect('/cms/peran')
 }

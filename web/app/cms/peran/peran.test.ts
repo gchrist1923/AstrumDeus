@@ -18,6 +18,12 @@ describe('UI peran', () => {
     expect(page).toMatch(/template/)
   })
 
+  it('daftar menampilkan slug di samping nama', () => {
+    const page = baca('page.tsx')
+    expect(page).toMatch(/role\.slug/)
+    expect(page).toMatch(/text-small text-content-muted/)
+  })
+
   it('tidak menawarkan Hapus pada peran Admin', () => {
     const page = baca('page.tsx')
     const detail = baca('[id]/page.tsx')
@@ -47,5 +53,13 @@ describe('UI penugasan pengguna', () => {
     expect(page).not.toMatch(/ROLES\.map/)
     expect(page).toMatch(/accessRole/)
     expect(page).toMatch(/saveUserRoles/)
+  })
+})
+
+describe('hapus peran', () => {
+  it('sinkron JSON leftover setelah hapus AccessRole', () => {
+    const actions = baca('actions.ts')
+    expect(actions).toMatch(/userAccessRole\.findMany/)
+    expect(actions).toMatch(/rewriteLegacyRolesForUsers/)
   })
 })
