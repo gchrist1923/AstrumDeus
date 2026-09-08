@@ -1,17 +1,21 @@
 import { notFound } from 'next/navigation'
-import { getNewsBySlug, getPublishedNews } from '@/lib/content/dummy'
+import { getNewsBySlug, getPublishedNews } from '@/lib/content/cms'
 import { formatNewsDate } from '@/lib/content/format'
 import { requirePage } from '@/lib/content/require-page'
 
-export function generateStaticParams() {
-  return getPublishedNews().map((post) => ({ slug: post.slug }))
+export async function generateStaticParams() {
+  try {
+    return (await getPublishedNews()).map((post) => ({ slug: post.slug }))
+  } catch {
+    return []
+  }
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   requirePage('news')
 
   const { slug } = await params
-  const post = getNewsBySlug(slug)
+  const post = await getNewsBySlug(slug)
 
   if (!post) {
     notFound()

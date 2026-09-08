@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArticleCard } from '@/components/public/article-card'
-import { getPublishedNews } from '@/lib/content/dummy'
+import { getPublishedNews } from '@/lib/content/cms'
 import { requirePage } from '@/lib/content/require-page'
 
 const PER_HALAMAN = 9
@@ -20,7 +20,7 @@ export default async function NewsPage({
   requirePage('news')
 
   const { halaman } = await searchParams
-  const semua = getPublishedNews()
+  const semua = await getPublishedNews()
   const totalHalaman = Math.max(1, Math.ceil(semua.length / PER_HALAMAN))
   const aktif = Math.min(nomorHalaman(halaman), totalHalaman)
   const mulai = (aktif - 1) * PER_HALAMAN

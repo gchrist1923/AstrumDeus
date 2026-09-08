@@ -320,3 +320,20 @@ export function getSiteContact(): { email: string; note: string } {
     note: 'Pilih tujuan di form supaya pesan sponsor tidak tercampur dengan tryout.',
   }
 }
+
+export const DUMMY_PLAYERS = PEMANIN
+export const DUMMY_MATCHES = PERTANDINGAN
+export const DUMMY_NEWS = BERITA
+export const DUMMY_PARTNERS = MITRA
+export const DUMMY_ASSETS = ASET
+
+export function getHomeContent() {
+  return {
+    live: getLiveEvent(),
+    stats: getSiteStats(),
+    matches: getCompletedMatches(),
+    players: getActivePlayers(),
+    news: getPublishedNews(),
+    partners: getPartners(),
+  }
+}

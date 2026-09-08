@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMatchDate, formatNewsDate } from '@/lib/content/format'
+import { formatMatchDate, formatNewsDate, formatRupiah } from '@/lib/content/format'
 
 describe('formatMatchDate', () => {
   it('menulis tanggal Indonesia tanpa menghilangkan tahun', () => {
@@ -11,5 +11,12 @@ describe('formatMatchDate', () => {
 describe('formatNewsDate', () => {
   it('menghasilkan string non-kosong untuk tanggal terbit', () => {
     expect(formatNewsDate('2026-09-04T09:00:00+07:00').trim().length).toBeGreaterThan(0)
+  })
+})
+
+describe('formatRupiah', () => {
+  it('menulis IDR tanpa desimal', () => {
+    expect(formatRupiah(15000)).toMatch(/15.?000/)
+    expect(formatRupiah(15000)).not.toMatch(/,00/)
   })
 })

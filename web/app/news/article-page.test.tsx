@@ -34,8 +34,8 @@ describe('halaman artikel', () => {
     expect(notFound).toHaveBeenCalled()
   })
 
-  it('generateStaticParams hanya dari berita terbit', () => {
-    const params = generateStaticParams()
+  it('generateStaticParams hanya dari berita terbit', async () => {
+    const params = await generateStaticParams()
 
     expect(params).toEqual(
       expect.arrayContaining([{ slug: 'lolos-grand-final-pmnc-2026' }]),

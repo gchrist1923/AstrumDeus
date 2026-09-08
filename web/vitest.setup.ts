@@ -2,6 +2,17 @@ import '@testing-library/jest-dom/vitest'
 import * as axeMatchers from 'vitest-axe/matchers'
 import { expect, vi } from 'vitest'
 
+vi.mock('@/lib/content/cms', async () => await import('@/lib/content/dummy'))
+
+vi.mock('next/navigation', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/navigation')>()
+  return {
+    ...actual,
+    usePathname: () => '/',
+    useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }),
+  }
+})
+
 vi.mock('next/font/google', () => ({
   Chakra_Petch: (options: { variable: string }) => ({
     variable: options.variable,

@@ -1,13 +1,14 @@
 import { PlayerCard } from '@/components/public/player-card'
 import { SectionHeading } from '@/components/public/section-heading'
-import { getActivePlayers, getFormerPlayers } from '@/lib/content/dummy'
+import { getActivePlayers, getFormerPlayers } from '@/lib/content/cms'
+import { getMenuFlags } from '@/lib/content/flags'
 import { requirePage } from '@/lib/content/require-page'
 
-export default function RosterPage() {
-  requirePage('roster')
+export default async function RosterPage() {
+  requirePage('roster', await getMenuFlags())
 
-  const aktif = getActivePlayers()
-  const mantan = getFormerPlayers()
+  const aktif = await getActivePlayers()
+  const mantan = await getFormerPlayers()
 
   return (
     <main>

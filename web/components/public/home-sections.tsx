@@ -6,21 +6,23 @@ import { PartnerPlate } from '@/components/public/partner-plate'
 import { PlayerCard } from '@/components/public/player-card'
 import { SectionHeading } from '@/components/public/section-heading'
 import { StatTrio } from '@/components/public/stat-trio'
-import {
-  getActivePlayers,
-  getCompletedMatches,
-  getLiveEvent,
-  getPartners,
-  getPublishedNews,
-  getSiteStats,
-} from '@/lib/content/dummy'
+import type { LiveEvent, Match, NewsPost, Partner, Player, SiteStats } from '@/lib/content/types'
 import { isMenuEnabled, type MenuFlags } from '@/lib/nav'
+
+export interface HomeContent {
+  live: LiveEvent | null
+  stats: SiteStats
+  matches: Match[]
+  players: Player[]
+  news: NewsPost[]
+  partners: Partner[]
+}
 
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 const KELAS_CTA =
   'inline-flex min-h-11 min-w-11 items-center justify-center px-6 py-3 font-display text-label uppercase tracking-[0.12em]'
 
-export function HomeSections({ flags }: { flags: MenuFlags }) {
+export function HomeSections({ flags, content }: { flags: MenuFlags; content: HomeContent }) {
   const rosterNyala = isMenuEnabled('roster', flags)
   const pertandinganNyala = isMenuEnabled('matches', flags)
   const partnerNyala = isMenuEnabled('partners', flags)
@@ -28,7 +30,7 @@ export function HomeSections({ flags }: { flags: MenuFlags }) {
 
   return (
     <>
-      <LiveBar event={getLiveEvent()} />
+      <LiveBar event={content.live} />
       <main>
         <section className="relative flex min-h-[min(80vh,700px)] items-center overflow-hidden [clip-path:polygon(0_0,100%_0,100%_94%,0_100%)]">
           <img
@@ -68,7 +70,7 @@ export function HomeSections({ flags }: { flags: MenuFlags }) {
                 </Link>
               ) : null}
             </div>
-            <StatTrio stats={getSiteStats()} />
+            <StatTrio stats={content.stats} />
           </div>
         </section>
 
@@ -77,7 +79,7 @@ export function HomeSections({ flags }: { flags: MenuFlags }) {
             <section className="py-24">
               <SectionHeading title="Hasil" href="/matches" linkLabel="Semua pertandingan" />
               <div className="grid gap-3">
-                {getCompletedMatches()
+                {content.matches
                   .slice(0, 3)
                   .map((match) => (
                     <MatchRow
@@ -94,7 +96,7 @@ export function HomeSections({ flags }: { flags: MenuFlags }) {
             <section className="py-24">
               <SectionHeading title="Roster" href="/roster" linkLabel="Profil lengkap" />
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {getActivePlayers().map((player) => (
+                {content.players.map((player) => (
                   <PlayerCard key={player.slug} player={player} />
                 ))}
               </div>
@@ -104,7 +106,7 @@ export function HomeSections({ flags }: { flags: MenuFlags }) {
           <section className="py-24">
             <SectionHeading title="Berita" href="/news" linkLabel="Arsip" />
             <div className="grid grid-cols-2 gap-5 md:grid-cols-3">
-              {getPublishedNews()
+              {content.news
                 .slice(0, 3)
                 .map((post) => (
                   <ArticleCard key={post.slug} post={post} />
@@ -116,7 +118,7 @@ export function HomeSections({ flags }: { flags: MenuFlags }) {
             <section className="py-24">
               <SectionHeading title="Partner" href="/partners" linkLabel="Kerja sama" />
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                {getPartners().map((partner) => (
+                {content.partners.map((partner) => (
                   <PartnerPlate key={partner.slug} partner={partner} />
                 ))}
               </div>

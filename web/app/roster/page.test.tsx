@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import RosterPage from '@/app/roster/page'
 
 describe('Roster', () => {
-  it('menampilkan Reza sebagai IGL di roster aktif', () => {
-    render(<RosterPage />)
+  it('menampilkan Reza sebagai IGL di roster aktif', async () => {
+    render(await RosterPage())
 
     expect(screen.getByRole('heading', { name: 'Roster' })).toBeInTheDocument()
 
@@ -13,8 +13,8 @@ describe('Roster', () => {
     expect(within(reza).getByText('IGL')).toBeInTheDocument()
   })
 
-  it('menampilkan Gilang di section Mantan pemain', () => {
-    render(<RosterPage />)
+  it('menampilkan Gilang di section Mantan pemain', async () => {
+    render(await RosterPage())
 
     const judul = screen.getByRole('heading', { name: 'Mantan pemain' })
     const section = judul.closest('section')
