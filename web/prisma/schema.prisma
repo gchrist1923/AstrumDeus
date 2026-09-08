@@ -76,6 +76,18 @@ model MenuItem {
   sortOrder    Int
 }
 
+model SitePage {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  title     String
+  kind      String
+  menuKey   String? @unique
+  status    String  @default("published")
+  showInNav Boolean @default(true)
+  isEnabled Boolean @default(true)
+  layout    String  @default("[]")
+}
+
 model NewsCategory {
   id          String     @id @default(cuid())
   name        String

@@ -7,6 +7,7 @@ import {
   teamTemplate,
 } from '../lib/auth/grants'
 import { DUMMY_ASSETS, DUMMY_MATCHES, DUMMY_NEWS, DUMMY_PARTNERS, DUMMY_PLAYERS } from '../lib/content/dummy'
+import { BUILTIN_PAGES } from '../lib/pages/builtins'
 
 const prisma = new PrismaClient()
 
@@ -87,6 +88,28 @@ async function main() {
       where: { key: menu.key },
       update: { isEnabled: menu.isEnabled },
       create: menu,
+    })
+  }
+
+  for (const page of BUILTIN_PAGES) {
+    await prisma.sitePage.upsert({
+      where: { slug: page.slug },
+      update: {
+        title: page.title,
+        kind: page.kind,
+        menuKey: page.menuKey,
+        status: 'published',
+      },
+      create: {
+        slug: page.slug,
+        title: page.title,
+        kind: page.kind,
+        menuKey: page.menuKey,
+        status: 'published',
+        showInNav: true,
+        isEnabled: true,
+        layout: '[]',
+      },
     })
   }
 
