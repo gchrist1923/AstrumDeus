@@ -44,3 +44,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# uploaded media (not in git)
+/uploads/*
+!/uploads/.gitkeep
