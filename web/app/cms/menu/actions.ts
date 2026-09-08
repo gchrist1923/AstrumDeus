@@ -1,19 +1,14 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { canToggleMenu } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { applyMenuToggle } from '@/lib/content/menu'
 import { checked } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
 export async function saveMenuFlags(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-
-  if (!canToggleMenu(user.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(user, 'menu', 'update')
 
   const items = await prisma.menuItem.findMany()
 

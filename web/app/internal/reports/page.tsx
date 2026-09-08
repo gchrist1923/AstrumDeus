@@ -1,5 +1,4 @@
-import { canReadReports } from '@/lib/auth/roles'
-import { requireInternalUser } from '@/lib/auth/require'
+import { requireGrant, requireInternalUser } from '@/lib/auth/require'
 import { formatRupiah } from '@/lib/content/format'
 import { cashEntriesToCsv } from '@/lib/finance/csv'
 import { computeBalance, reportForPeriod } from '@/lib/finance/report'
@@ -25,9 +24,7 @@ export default async function ReportsPage({
   searchParams: Promise<{ buku?: string; hari?: string; bulan?: string }>
 }) {
   const user = await requireInternalUser()
-  if (!canReadReports(user.roles)) {
-    return <p className="text-content-secondary">Laporan hanya untuk Finance dan Admin.</p>
-  }
+  requireGrant(user, 'laporan', 'view')
 
   const params = await searchParams
   const books = await prisma.cashBook.findMany({ orderBy: { name: 'asc' } })

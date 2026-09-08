@@ -21,9 +21,13 @@ interface MatchFormValues {
 export function MatchForm({
   match,
   tournaments,
+  canSave = true,
+  canDelete = false,
 }: {
   match?: MatchFormValues
   tournaments: { id: string; name: string }[]
+  canSave?: boolean
+  canDelete?: boolean
 }) {
   return (
     <form action={saveMatch} className="flex max-w-2xl flex-col gap-6">
@@ -79,8 +83,8 @@ export function MatchForm({
         <input id="recapSlug" name="recapSlug" defaultValue={match?.recapSlug} className={KELAS_KONTROL} />
       </Field>
       <div className="flex flex-wrap gap-3">
-        <Button type="submit">Simpan</Button>
-        {match?.id ? (
+        {canSave ? <Button type="submit">Simpan</Button> : null}
+        {match?.id && canDelete ? (
           <Button formAction={deleteMatch} variant="destructive" type="submit">
             Hapus
           </Button>

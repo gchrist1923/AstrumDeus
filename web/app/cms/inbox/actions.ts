@@ -1,16 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { canWriteContent } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
 export async function updateInboxStatus(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    return
-  }
+  requireGrant(user, 'inbox', 'update')
 
   const id = teks(formData, 'id')
   const status = teks(formData, 'status')

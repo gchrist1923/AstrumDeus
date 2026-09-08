@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { canWriteSchedule } from '@/lib/auth/roles'
+import { canWriteSchedule } from '@/lib/auth/permissions'
 import { requireInternalUser } from '@/lib/auth/require'
 import { fromDatetimeLocal } from '@/lib/datetime'
 import { checked, teks } from '@/lib/form'
@@ -14,11 +14,11 @@ export async function saveEvent(formData: FormData): Promise<void> {
   const id = teks(formData, 'id')
   const existing = id ? await prisma.scheduleEvent.findUnique({ where: { id } }) : null
 
-  if (existing && !canWriteSchedule(user.roles, existing.ownerId, user.id)) {
+  if (existing && !canWriteSchedule(user.matrix, existing.ownerId, user.id)) {
     redirect('/internal/schedule')
   }
 
-  if (!existing && !canWriteSchedule(user.roles, user.id, user.id)) {
+  if (!existing && !canWriteSchedule(user.matrix, user.id, user.id)) {
     redirect('/internal/schedule')
   }
 
@@ -54,7 +54,7 @@ export async function deleteEvent(formData: FormData): Promise<void> {
   const id = teks(formData, 'id')
   const existing = await prisma.scheduleEvent.findUnique({ where: { id } })
 
-  if (!existing || !canWriteSchedule(user.roles, existing.ownerId, user.id)) {
+  if (!existing || !canWriteSchedule(user.matrix, existing.ownerId, user.id)) {
     return
   }
 

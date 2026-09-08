@@ -1,8 +1,8 @@
 import { reverseCashEntry, saveCashEntry } from '@/app/internal/cash/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
-import { canReadCashBook, canWriteCashBook } from '@/lib/auth/roles'
-import { requireInternalUser } from '@/lib/auth/require'
+import { canReadCashBook, canWriteCashBook } from '@/lib/auth/permissions'
+import { requireCashView, requireInternalUser } from '@/lib/auth/require'
 import { formatRupiah } from '@/lib/content/format'
 import { toDateInput } from '@/lib/datetime'
 import { computeBalance } from '@/lib/finance/report'
@@ -14,9 +14,10 @@ export default async function CashPage({
   searchParams: Promise<{ buku?: string }>
 }) {
   const user = await requireInternalUser()
+  requireCashView(user)
   const params = await searchParams
   const books = await prisma.cashBook.findMany({ orderBy: { name: 'asc' } })
-  const visible = books.filter((book) => canReadCashBook(user.roles, book.type as 'operasional' | 'tim'))
+  const visible = books.filter((book) => canReadCashBook(user.matrix, book.type as 'operasional' | 'tim'))
   const selected = visible.find((book) => book.id === params.buku) ?? visible[0]
 
   if (!selected) {
@@ -36,7 +37,7 @@ export default async function CashPage({
     selected.openingBalance,
     entries.map((entry) => ({ direction: entry.direction, amount: entry.amount })),
   )
-  const bisaTulis = canWriteCashBook(user.roles, selected.type as 'operasional' | 'tim', user.id, user.id)
+  const bisaTulis = canWriteCashBook(user.matrix, selected.type as 'operasional' | 'tim', user.id, user.id)
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_20rem]">

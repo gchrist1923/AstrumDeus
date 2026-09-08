@@ -1,18 +1,15 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { hashPassword } from '@/lib/auth/password'
-import { canManageSettings, parseRoles, ROLES } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { parseRoles, ROLES } from '@/lib/auth/roles'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
 export async function saveUser(formData: FormData): Promise<void> {
   const actor = await requireCmsUser()
-  if (!canManageSettings(actor.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(actor, 'users', 'update')
 
   const email = teks(formData, 'email').toLowerCase()
   const name = teks(formData, 'name')
@@ -33,9 +30,7 @@ export async function saveUser(formData: FormData): Promise<void> {
 
 export async function toggleUserActive(formData: FormData): Promise<void> {
   const actor = await requireCmsUser()
-  if (!canManageSettings(actor.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(actor, 'users', 'update')
 
   const id = teks(formData, 'id')
   const user = await prisma.user.findUnique({ where: { id } })

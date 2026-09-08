@@ -1,15 +1,15 @@
 import { saveUser, toggleUserActive } from '@/app/cms/users/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
-import { canManageSettings, parseRoles, ROLES } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { can } from '@/lib/auth/grants'
+import { parseRoles, ROLES } from '@/lib/auth/roles'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
 export default async function UsersPage() {
   const actor = await requireCmsUser()
-  if (!canManageSettings(actor.roles)) {
-    return <p className="text-content-secondary">Hanya Admin yang mengelola pengguna.</p>
-  }
+  requireGrant(actor, 'users', 'view')
+  const bisaUbah = can(actor.matrix, 'users', 'update')
 
   const users = await prisma.user.findMany({ orderBy: { email: 'asc' } })
 
@@ -26,7 +26,7 @@ export default async function UsersPage() {
                   {user.email} · {parseRoles(user.roles).join(', ')} · {user.isActive ? 'aktif' : 'nonaktif'}
                 </p>
               </div>
-              {user.email !== actor.email ? (
+              {bisaUbah && user.email !== actor.email ? (
                 <form action={toggleUserActive}>
                   <input type="hidden" name="id" value={user.id} />
                   <Button type="submit" variant="secondary">
@@ -38,6 +38,7 @@ export default async function UsersPage() {
           ))}
         </ul>
       </div>
+      {bisaUbah ? (
       <form action={saveUser} className="flex flex-col gap-4">
         <h3 className="font-display text-label uppercase text-accent">Pengguna baru</h3>
         <Field id="name" label="Nama">
@@ -60,6 +61,7 @@ export default async function UsersPage() {
         </fieldset>
         <Button type="submit">Tambah pengguna</Button>
       </form>
+      ) : null}
     </div>
   )
 }

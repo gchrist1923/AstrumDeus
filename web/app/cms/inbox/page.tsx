@@ -1,8 +1,13 @@
 import { updateInboxStatus } from '@/app/cms/inbox/actions'
 import { Button } from '@/components/ui/button'
+import { can } from '@/lib/auth/grants'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
 export default async function InboxPage() {
+  const user = await requireCmsUser()
+  requireGrant(user, 'inbox', 'view')
+  const bisaUbah = can(user.matrix, 'inbox', 'update')
   const messages = await prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' } })
 
   return (
@@ -20,15 +25,17 @@ export default async function InboxPage() {
                 {message.name} · {message.email}
               </p>
               <p className="mt-3 text-body text-pretty">{message.message}</p>
-              <form action={updateInboxStatus} className="mt-4 flex flex-wrap gap-2">
-                <input type="hidden" name="id" value={message.id} />
-                <Button type="submit" name="status" value="dibaca" variant="secondary">
-                  Dibaca
-                </Button>
-                <Button type="submit" name="status" value="selesai" variant="secondary">
-                  Selesai
-                </Button>
-              </form>
+              {bisaUbah ? (
+                <form action={updateInboxStatus} className="mt-4 flex flex-wrap gap-2">
+                  <input type="hidden" name="id" value={message.id} />
+                  <Button type="submit" name="status" value="dibaca" variant="secondary">
+                    Dibaca
+                  </Button>
+                  <Button type="submit" name="status" value="selesai" variant="secondary">
+                    Selesai
+                  </Button>
+                </form>
+              ) : null}
             </li>
           ))}
         </ul>

@@ -21,7 +21,15 @@ interface PlayerFormValues {
   sortOrder: number
 }
 
-export function PlayerForm({ player }: { player?: PlayerFormValues }) {
+export function PlayerForm({
+  player,
+  canSave = true,
+  canDelete = false,
+}: {
+  player?: PlayerFormValues
+  canSave?: boolean
+  canDelete?: boolean
+}) {
   const socials = player ? parseSocials(player.socials).map((item) => `${item.label}|${item.href}`).join('\n') : ''
 
   return (
@@ -63,8 +71,8 @@ export function PlayerForm({ player }: { player?: PlayerFormValues }) {
         <input id="sortOrder" name="sortOrder" type="number" defaultValue={player?.sortOrder ?? 0} className={KELAS_KONTROL} />
       </Field>
       <div className="flex flex-wrap gap-3">
-        <Button type="submit">Simpan</Button>
-        {player?.id ? (
+        {canSave ? <Button type="submit">Simpan</Button> : null}
+        {player?.id && canDelete ? (
           <Button formAction={deletePlayer} variant="destructive" type="submit">
             Hapus
           </Button>

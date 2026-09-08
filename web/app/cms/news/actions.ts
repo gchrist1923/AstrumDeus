@@ -2,8 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { canWriteContent } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { fromDatetimeLocal } from '@/lib/datetime'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
@@ -13,11 +12,8 @@ import { releaseMediaPath } from '@/lib/media/store'
 
 export async function saveNews(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
-
   const id = teks(formData, 'id')
+  requireGrant(user, 'news', id ? 'update' : 'create')
   const title = teks(formData, 'title')
   const slug = teks(formData, 'slug') || slugify(title)
   const categoryId = teks(formData, 'categoryId')
@@ -62,9 +58,7 @@ export async function saveNews(formData: FormData): Promise<void> {
 
 export async function deleteNews(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(user, 'news', 'delete')
 
   const id = teks(formData, 'id')
   if (id) {

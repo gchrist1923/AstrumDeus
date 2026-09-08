@@ -1,11 +1,17 @@
 import { redirect } from 'next/navigation'
-import { canAccessCms, canAccessInternal, type Role } from '@/lib/auth/roles'
+import { can, type AccessAction, type AccessModule } from '@/lib/auth/grants'
+import {
+  canAccessCms,
+  canAccessInternal,
+  canReadCashBook,
+  redirectForModule,
+} from '@/lib/auth/permissions'
 import { getCurrentUser, type AuthUser } from '@/lib/auth/session'
 
 export async function requireCmsUser(): Promise<AuthUser> {
   const user = await getCurrentUser()
 
-  if (!user || !canAccessCms(user.roles)) {
+  if (!user || !canAccessCms(user.matrix)) {
     redirect('/login?next=/cms')
   }
 
@@ -15,15 +21,21 @@ export async function requireCmsUser(): Promise<AuthUser> {
 export async function requireInternalUser(): Promise<AuthUser> {
   const user = await getCurrentUser()
 
-  if (!user || !canAccessInternal(user.roles)) {
+  if (!user || !canAccessInternal(user.matrix)) {
     redirect('/login?next=/internal')
   }
 
   return user
 }
 
-export function assertRoles(user: AuthUser, allowed: Role[]): void {
-  if (!allowed.some((role) => user.roles.includes(role))) {
-    redirect('/cms')
+export function requireGrant(user: AuthUser, module: AccessModule, action: AccessAction): void {
+  if (!can(user.matrix, module, action)) {
+    redirect(redirectForModule(module))
+  }
+}
+
+export function requireCashView(user: AuthUser): void {
+  if (!canReadCashBook(user.matrix, 'operasional') && !canReadCashBook(user.matrix, 'tim')) {
+    redirect('/internal')
   }
 }

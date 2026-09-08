@@ -2,17 +2,14 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { canWriteContent } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { slugify } from '@/lib/content/slug'
 import { prisma } from '@/lib/db'
 import { angka, teks } from '@/lib/form'
 
-async function requireWriter(): Promise<void> {
+async function requireKategori(action: 'create' | 'update'): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(user, 'kategori', action)
 }
 
 function revalidateKategori(): void {
@@ -23,7 +20,7 @@ function revalidateKategori(): void {
 }
 
 export async function createTournament(formData: FormData): Promise<void> {
-  await requireWriter()
+  await requireKategori('create')
 
   const name = teks(formData, 'name')
   const organizer = teks(formData, 'organizer')
@@ -42,7 +39,7 @@ export async function createTournament(formData: FormData): Promise<void> {
 }
 
 export async function deactivateTournament(formData: FormData): Promise<void> {
-  await requireWriter()
+  await requireKategori('update')
 
   const id = teks(formData, 'id')
   if (id) {
@@ -54,7 +51,7 @@ export async function deactivateTournament(formData: FormData): Promise<void> {
 }
 
 export async function createCashCategory(formData: FormData): Promise<void> {
-  await requireWriter()
+  await requireKategori('create')
 
   const name = teks(formData, 'name')
   const direction = teks(formData, 'direction') === 'keluar' ? 'keluar' : 'masuk'
@@ -71,7 +68,7 @@ export async function createCashCategory(formData: FormData): Promise<void> {
 }
 
 export async function deactivateCashCategory(formData: FormData): Promise<void> {
-  await requireWriter()
+  await requireKategori('update')
 
   const id = teks(formData, 'id')
   if (id) {
@@ -83,7 +80,7 @@ export async function deactivateCashCategory(formData: FormData): Promise<void> 
 }
 
 export async function createNewsCategory(formData: FormData): Promise<void> {
-  await requireWriter()
+  await requireKategori('create')
 
   const name = teks(formData, 'name')
   const slug = slugify(name)
@@ -105,7 +102,7 @@ export async function createNewsCategory(formData: FormData): Promise<void> {
 }
 
 export async function deactivateNewsCategory(formData: FormData): Promise<void> {
-  await requireWriter()
+  await requireKategori('update')
 
   const id = teks(formData, 'id')
   if (id) {

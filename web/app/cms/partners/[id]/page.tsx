@@ -3,15 +3,22 @@ import { deletePartner, savePartner } from '@/app/cms/partners/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
+import { can } from '@/lib/auth/grants'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
 export default async function EditPartnerPage({ params }: { params: Promise<{ id: string }> }) {
+  const user = await requireCmsUser()
+  requireGrant(user, 'partners', 'view')
   const { id } = await params
   const partner = await prisma.partner.findUnique({ where: { id } })
 
   if (!partner) {
     notFound()
   }
+
+  const bisaUbah = can(user.matrix, 'partners', 'update')
+  const bisaHapus = can(user.matrix, 'partners', 'delete')
 
   return (
     <form action={savePartner} className="flex max-w-xl flex-col gap-4">
@@ -36,10 +43,12 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
         <input id="sortOrder" name="sortOrder" type="number" defaultValue={partner.sortOrder} className={KELAS_KONTROL} />
       </Field>
       <div className="flex flex-wrap gap-3">
-        <Button type="submit">Simpan</Button>
-        <Button formAction={deletePartner} variant="destructive" type="submit">
-          Hapus
-        </Button>
+        {bisaUbah ? <Button type="submit">Simpan</Button> : null}
+        {bisaHapus ? (
+          <Button formAction={deletePartner} variant="destructive" type="submit">
+            Hapus
+          </Button>
+        ) : null}
       </div>
     </form>
   )

@@ -2,19 +2,15 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { canWriteContent } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 import { releaseMediaPath } from '@/lib/media/store'
 
 export async function savePartner(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
-
   const id = teks(formData, 'id')
+  requireGrant(user, 'partners', id ? 'update' : 'create')
   const nextLogo = teks(formData, 'logo') || null
   let prevLogo: string | null = null
   if (id) {
@@ -48,9 +44,7 @@ export async function savePartner(formData: FormData): Promise<void> {
 
 export async function deletePartner(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(user, 'partners', 'delete')
 
   const id = teks(formData, 'id')
   if (id) {

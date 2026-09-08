@@ -20,9 +20,13 @@ interface NewsFormValues {
 export function NewsForm({
   post,
   categories,
+  canSave = true,
+  canDelete = false,
 }: {
   post?: NewsFormValues
   categories: { id: string; name: string }[]
+  canSave?: boolean
+  canDelete?: boolean
 }) {
   return (
     <form action={saveNews} className="flex max-w-2xl flex-col gap-6">
@@ -69,8 +73,8 @@ export function NewsForm({
         </select>
       </Field>
       <div className="flex flex-wrap gap-3">
-        <Button type="submit">Simpan</Button>
-        {post?.id ? (
+        {canSave ? <Button type="submit">Simpan</Button> : null}
+        {post?.id && canDelete ? (
           <Button formAction={deleteNews} variant="destructive" type="submit">
             Hapus
           </Button>

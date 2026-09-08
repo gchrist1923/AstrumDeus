@@ -8,8 +8,8 @@ import {
 } from '@/app/cms/kategori/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
-import { canWriteContent } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { can } from '@/lib/auth/grants'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
 export default async function CmsKategoriPage({
@@ -18,8 +18,9 @@ export default async function CmsKategoriPage({
   searchParams: Promise<{ kesalahan?: string }>
 }) {
   const user = await requireCmsUser()
+  requireGrant(user, 'kategori', 'view')
   const params = await searchParams
-  const bisaTulis = canWriteContent(user.roles)
+  const bisaTulis = can(user.matrix, 'kategori', 'create') || can(user.matrix, 'kategori', 'update')
 
   const [tournaments, cashCategories, newsCategories] = await Promise.all([
     prisma.tournament.findMany({ orderBy: { name: 'asc' } }),

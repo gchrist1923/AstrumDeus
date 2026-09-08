@@ -1,7 +1,8 @@
 import { deleteEvent, saveEvent } from '@/app/internal/schedule/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
-import { requireInternalUser } from '@/lib/auth/require'
+import { canWriteSchedule } from '@/lib/auth/permissions'
+import { requireGrant, requireInternalUser } from '@/lib/auth/require'
 import { formatMatchDate } from '@/lib/content/format'
 import { toDatetimeLocal } from '@/lib/datetime'
 import { prisma } from '@/lib/db'
@@ -12,6 +13,8 @@ export default async function SchedulePage({
   searchParams: Promise<{ bulan?: string; peringatan?: string }>
 }) {
   const user = await requireInternalUser()
+  requireGrant(user, 'jadwal', 'view')
+  const bisaTambah = canWriteSchedule(user.matrix, user.id, user.id)
   const params = await searchParams
   const now = new Date()
   const bulan = params.bulan ?? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
@@ -59,17 +62,20 @@ export default async function SchedulePage({
                   {formatMatchDate(event.startAt.toISOString())} · {event.location || 'Tanpa lokasi'} · {event.owner.name}
                 </p>
                 {event.notes ? <p className="mt-2 text-body">{event.notes}</p> : null}
+                {canWriteSchedule(user.matrix, event.ownerId, user.id) ? (
                 <form action={deleteEvent} className="mt-3">
                   <input type="hidden" name="id" value={event.id} />
                   <Button type="submit" variant="destructive">
                     Hapus
                   </Button>
                 </form>
+                ) : null}
               </li>
             ))}
           </ul>
         )}
       </div>
+      {bisaTambah ? (
       <form action={saveEvent} className="flex flex-col gap-4">
         <h3 className="font-display text-label uppercase text-accent">Event baru</h3>
         <p className="text-small text-content-secondary">{user.name} sebagai pemilik.</p>
@@ -90,6 +96,7 @@ export default async function SchedulePage({
         </Field>
         <Button type="submit">Simpan event</Button>
       </form>
+      ) : null}
     </div>
   )
 }

@@ -2,15 +2,14 @@ import { saveSettings } from '@/app/cms/settings/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
-import { canManageSettings } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { can } from '@/lib/auth/grants'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
 export default async function SettingsPage() {
   const user = await requireCmsUser()
-  if (!canManageSettings(user.roles)) {
-    return <p className="text-content-secondary">Hanya Admin yang mengubah pengaturan situs.</p>
-  }
+  requireGrant(user, 'situs', 'view')
+  const bisaUbah = can(user.matrix, 'situs', 'update')
 
   const setting = await prisma.siteSetting.findUnique({ where: { id: 'default' } })
 
@@ -50,7 +49,7 @@ export default async function SettingsPage() {
       <Field id="wwcd" label="WWCD">
         <input id="wwcd" name="wwcd" type="number" defaultValue={setting.wwcd} className={KELAS_KONTROL} />
       </Field>
-      <Button type="submit">Simpan pengaturan</Button>
+      {bisaUbah ? <Button type="submit">Simpan pengaturan</Button> : null}
     </form>
   )
 }

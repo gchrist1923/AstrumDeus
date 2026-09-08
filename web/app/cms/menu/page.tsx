@@ -1,15 +1,13 @@
 import { Button } from '@/components/ui/button'
-import { canToggleMenu } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { can } from '@/lib/auth/grants'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 import { saveMenuFlags } from '@/app/cms/menu/actions'
 
 export default async function MenuPage() {
   const user = await requireCmsUser()
-
-  if (!canToggleMenu(user.roles)) {
-    return <p className="text-content-secondary">Hanya Admin yang mengubah tampilan menu.</p>
-  }
+  requireGrant(user, 'menu', 'view')
+  const bisaUbah = can(user.matrix, 'menu', 'update')
 
   const items = await prisma.menuItem.findMany({ orderBy: { sortOrder: 'asc' } })
 
@@ -26,7 +24,7 @@ export default async function MenuPage() {
               name={item.key}
               type="checkbox"
               defaultChecked={item.isEnabled}
-              disabled={item.isMandatory}
+              disabled={item.isMandatory || !bisaUbah}
               className="size-5 accent-accent"
             />
             <label htmlFor={`menu-${item.key}`} className="font-display text-label uppercase">
@@ -36,7 +34,7 @@ export default async function MenuPage() {
           </li>
         ))}
       </ul>
-      <Button type="submit">Simpan menu</Button>
+      {bisaUbah ? <Button type="submit">Simpan menu</Button> : null}
     </form>
   )
 }

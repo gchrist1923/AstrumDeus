@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { canWriteContent } from '@/lib/auth/roles'
+import { canUploadMedia } from '@/lib/auth/permissions'
 import { getCurrentUser } from '@/lib/auth/session'
 import { saveImageBuffer } from '@/lib/media/store'
 import { validateImageBuffer } from '@/lib/media/validate'
 
 export async function POST(request: Request) {
   const user = await getCurrentUser()
-  if (!user || !canWriteContent(user.roles)) {
+  if (!user || !canUploadMedia(user.matrix)) {
     return NextResponse.json({ error: 'gagal' }, { status: 401 })
   }
 

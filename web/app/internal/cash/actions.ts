@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { canWriteCashBook } from '@/lib/auth/roles'
+import { canWriteCashBook } from '@/lib/auth/permissions'
 import { requireInternalUser } from '@/lib/auth/require'
 import { fromDateInput } from '@/lib/datetime'
 import { angka, teks } from '@/lib/form'
@@ -13,7 +13,7 @@ export async function saveCashEntry(formData: FormData): Promise<void> {
   const cashBookId = teks(formData, 'cashBookId')
   const book = await prisma.cashBook.findUnique({ where: { id: cashBookId } })
 
-  if (!book || !canWriteCashBook(user.roles, book.type as 'operasional' | 'tim', user.id, user.id)) {
+  if (!book || !canWriteCashBook(user.matrix, book.type as 'operasional' | 'tim', user.id, user.id)) {
     return
   }
 
@@ -45,7 +45,7 @@ export async function reverseCashEntry(formData: FormData): Promise<void> {
     return
   }
 
-  if (!canWriteCashBook(user.roles, entry.cashBook.type as 'operasional' | 'tim', entry.recordedById, user.id)) {
+  if (!canWriteCashBook(user.matrix, entry.cashBook.type as 'operasional' | 'tim', entry.recordedById, user.id)) {
     return
   }
 

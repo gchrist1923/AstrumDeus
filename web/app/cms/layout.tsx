@@ -6,7 +6,7 @@ export default async function CmsLayout({ children }: { children: ReactNode }) {
   const user = await requireCmsUser()
 
   return (
-    <AdminShell title="Konten publik" area="cms" roles={user.roles} name={user.name}>
+    <AdminShell title="Konten publik" area="cms" matrix={user.matrix} name={user.name}>
       {children}
     </AdminShell>
   )
