@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { MatchForm } from '@/app/cms/matches/match-form'
+import { activePlusCurrent } from '@/lib/content/active-options'
 import { prisma } from '@/lib/db'
 
 export default async function EditMatchPage({ params }: { params: Promise<{ id: string }> }) {
@@ -15,7 +16,7 @@ export default async function EditMatchPage({ params }: { params: Promise<{ id: 
 
   return (
     <MatchForm
-      tournaments={tournaments}
+      tournaments={activePlusCurrent(tournaments, match.tournamentId)}
       match={{
         id: match.id,
         tournamentId: match.tournamentId,

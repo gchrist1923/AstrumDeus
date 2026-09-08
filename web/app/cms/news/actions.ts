@@ -7,6 +7,7 @@ import { requireCmsUser } from '@/lib/auth/require'
 import { fromDatetimeLocal } from '@/lib/datetime'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
+import { assertSelectableCategory } from '@/lib/content/active-options'
 import { slugify } from '@/lib/content/slug'
 import { releaseMediaPath } from '@/lib/media/store'
 
@@ -19,18 +20,19 @@ export async function saveNews(formData: FormData): Promise<void> {
   const id = teks(formData, 'id')
   const title = teks(formData, 'title')
   const slug = teks(formData, 'slug') || slugify(title)
-  const categoryName = teks(formData, 'category') || 'Umum'
+  const categoryId = teks(formData, 'categoryId')
   const nextCover = teks(formData, 'cover') || null
   let prevCover: string | null = null
+  let previousCategoryId: string | undefined
   if (id) {
     const existing = await prisma.newsPost.findUnique({ where: { id } })
     prevCover = existing?.cover ?? null
+    previousCategoryId = existing?.categoryId
   }
-  const category = await prisma.newsCategory.upsert({
-    where: { slug: slugify(categoryName) },
-    update: { name: categoryName },
-    create: { name: categoryName, slug: slugify(categoryName), description: categoryName },
-  })
+  const category = await prisma.newsCategory.findUnique({ where: { id: categoryId } })
+  if (!category || !assertSelectableCategory(category, id ? 'update' : 'create', previousCategoryId)) {
+    redirect('/cms/news')
+  }
 
   const data = {
     slug,

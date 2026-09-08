@@ -11,13 +11,19 @@ interface NewsFormValues {
   excerpt: string
   body: string
   cover: string
-  category: string
+  categoryId: string
   author: string
   publishedAt: Date
   status: string
 }
 
-export function NewsForm({ post }: { post?: NewsFormValues }) {
+export function NewsForm({
+  post,
+  categories,
+}: {
+  post?: NewsFormValues
+  categories: { id: string; name: string }[]
+}) {
   return (
     <form action={saveNews} className="flex max-w-2xl flex-col gap-6">
       {post?.id ? <input type="hidden" name="id" value={post.id} /> : null}
@@ -34,8 +40,14 @@ export function NewsForm({ post }: { post?: NewsFormValues }) {
         <textarea id="body" name="body" rows={10} required defaultValue={post?.body} className={KELAS_KONTROL} />
       </Field>
       <ImageUpload name="cover" label="Cover" defaultValue={post?.cover} />
-      <Field id="category" label="Kategori">
-        <input id="category" name="category" required defaultValue={post?.category ?? 'Turnamen'} className={KELAS_KONTROL} />
+      <Field id="categoryId" label="Kategori">
+        <select id="categoryId" name="categoryId" required defaultValue={post?.categoryId} className={KELAS_KONTROL}>
+          {categories.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
       </Field>
       <Field id="author" label="Penulis">
         <input id="author" name="author" defaultValue={post?.author} className={KELAS_KONTROL} />

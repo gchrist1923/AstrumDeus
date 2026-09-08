@@ -1,10 +1,14 @@
 import { notFound } from 'next/navigation'
 import { NewsForm } from '@/app/cms/news/news-form'
+import { activePlusCurrent } from '@/lib/content/active-options'
 import { prisma } from '@/lib/db'
 
 export default async function EditNewsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const post = await prisma.newsPost.findUnique({ where: { id }, include: { category: true } })
+  const [post, categories] = await Promise.all([
+    prisma.newsPost.findUnique({ where: { id } }),
+    prisma.newsCategory.findMany({ orderBy: { name: 'asc' } }),
+  ])
 
   if (!post) {
     notFound()
@@ -12,6 +16,7 @@ export default async function EditNewsPage({ params }: { params: Promise<{ id: s
 
   return (
     <NewsForm
+      categories={activePlusCurrent(categories, post.categoryId)}
       post={{
         id: post.id,
         title: post.title,
@@ -19,7 +24,7 @@ export default async function EditNewsPage({ params }: { params: Promise<{ id: s
         excerpt: post.excerpt,
         body: post.body,
         cover: post.cover ?? '',
-        category: post.category.name,
+        categoryId: post.categoryId,
         author: post.author,
         publishedAt: post.publishedAt,
         status: post.status,
