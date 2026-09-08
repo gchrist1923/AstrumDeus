@@ -117,6 +117,7 @@ export function mapPartner(row: {
   name: string
   tier: string
   logoText: string
+  logo: string | null
   href: string | null
 }): Partner {
   return {
@@ -124,6 +125,7 @@ export function mapPartner(row: {
     name: row.name,
     tier: row.tier,
     logoText: row.logoText,
+    logo: row.logo,
     href: row.href,
   }
 }

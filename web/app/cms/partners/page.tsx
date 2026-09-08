@@ -1,5 +1,6 @@
 import { savePartner } from '@/app/cms/partners/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/db'
 
@@ -35,6 +36,7 @@ export default async function CmsPartnersPage() {
         <Field id="tier" label="Tier">
           <input id="tier" name="tier" required defaultValue="Official" className={KELAS_KONTROL} />
         </Field>
+        <ImageUpload name="logo" label="Logo" />
         <Field id="logoText" label="Teks logo">
           <input id="logoText" name="logoText" required className={KELAS_KONTROL} />
         </Field>

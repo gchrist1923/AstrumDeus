@@ -8,7 +8,7 @@ import { getVisibleNavItems, type MenuFlags } from '@/lib/nav'
 
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
-export function SiteHeader({ flags }: { flags?: MenuFlags }) {
+export function SiteHeader({ flags, logoSrc = '/logo-astrum-deus.png' }: { flags?: MenuFlags; logoSrc?: string }) {
   const pathname = usePathname()
   const items = getVisibleNavItems(flags)
 
@@ -16,7 +16,14 @@ export function SiteHeader({ flags }: { flags?: MenuFlags }) {
     <header className="sticky top-0 z-40 border-b border-border bg-surface-base/85 backdrop-blur">
       <div className="mx-auto flex h-20 max-w-page items-center gap-8 px-5 md:px-8">
         <Link href="/" className={`flex items-center ${KELAS_FOKUS}`}>
-          <Image src="/logo-astrum-deus.png" alt="Astrum Deus" width={40} height={40} priority />
+          <Image
+            src={logoSrc}
+            alt="Astrum Deus"
+            width={40}
+            height={40}
+            priority
+            unoptimized={logoSrc.startsWith('/media/')}
+          />
         </Link>
 
         <nav aria-label="Navigasi utama" className="ml-auto hidden md:block">

@@ -1,5 +1,6 @@
 import { saveSettings } from '@/app/cms/settings/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { canManageSettings } from '@/lib/auth/roles'
 import { requireCmsUser } from '@/lib/auth/require'
@@ -23,6 +24,8 @@ export default async function SettingsPage() {
       <Field id="siteName" label="Nama situs">
         <input id="siteName" name="siteName" defaultValue={setting.siteName} className={KELAS_KONTROL} />
       </Field>
+      <ImageUpload name="logo" label="Logo" defaultValue={setting.logo} />
+      <ImageUpload name="favicon" label="Favicon" defaultValue={setting.favicon} />
       <Field id="defaultMetaTitle" label="Judul meta">
         <input id="defaultMetaTitle" name="defaultMetaTitle" defaultValue={setting.defaultMetaTitle} className={KELAS_KONTROL} />
       </Field>

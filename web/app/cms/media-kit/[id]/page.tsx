@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { deleteAsset, saveAsset } from '@/app/cms/media-kit/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/db'
 
@@ -29,9 +30,7 @@ export default async function EditAssetPage({ params }: { params: Promise<{ id: 
           <option value="tipografi">Tipografi</option>
         </select>
       </Field>
-      <Field id="href" label="Berkas">
-        <input id="href" name="href" required defaultValue={asset.href} className={KELAS_KONTROL} />
-      </Field>
+      <ImageUpload name="href" label="Berkas" defaultValue={asset.href} required />
       <Field id="fileType" label="Jenis">
         <input id="fileType" name="fileType" defaultValue={asset.fileType} className={KELAS_KONTROL} />
       </Field>

@@ -1,5 +1,6 @@
 import { deletePlayer, savePlayer } from '@/app/cms/players/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { parseSocials } from '@/lib/content/map'
 import { toDateInput } from '@/lib/datetime'
@@ -44,9 +45,7 @@ export function PlayerForm({ player }: { player?: PlayerFormValues }) {
           ))}
         </select>
       </Field>
-      <Field id="photo" label="Foto">
-        <input id="photo" name="photo" defaultValue={player?.photo ?? '/portrait.jpg'} className={KELAS_KONTROL} />
-      </Field>
+      <ImageUpload name="photo" label="Foto" defaultValue={player?.photo ?? '/portrait.jpg'} />
       <Field id="joinedAt" label="Bergabung">
         <input id="joinedAt" name="joinedAt" type="date" required defaultValue={toDateInput(player?.joinedAt ?? new Date())} className={KELAS_KONTROL} />
       </Field>

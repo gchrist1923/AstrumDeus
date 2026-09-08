@@ -6,6 +6,7 @@ import { canWriteContent } from '@/lib/auth/roles'
 import { requireCmsUser } from '@/lib/auth/require'
 import { angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
+import { releaseMediaPath } from '@/lib/media/store'
 
 export async function saveAsset(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
@@ -14,11 +15,17 @@ export async function saveAsset(formData: FormData): Promise<void> {
   }
 
   const id = teks(formData, 'id')
+  const nextHref = teks(formData, 'href')
+  let prevHref: string | null = null
+  if (id) {
+    const existing = await prisma.mediaKitAsset.findUnique({ where: { id } })
+    prevHref = existing?.href ?? null
+  }
   const data = {
     name: teks(formData, 'name'),
     description: teks(formData, 'description'),
     groupName: teks(formData, 'groupName'),
-    href: teks(formData, 'href'),
+    href: nextHref,
     fileType: teks(formData, 'fileType'),
     fileSize: teks(formData, 'fileSize'),
     sortOrder: angka(formData, 'sortOrder') ?? 0,
@@ -29,6 +36,8 @@ export async function saveAsset(formData: FormData): Promise<void> {
   } else {
     await prisma.mediaKitAsset.create({ data })
   }
+
+  await releaseMediaPath(prevHref, nextHref)
 
   revalidatePath('/media-kit')
   revalidatePath('/cms/media-kit')
@@ -43,7 +52,9 @@ export async function deleteAsset(formData: FormData): Promise<void> {
 
   const id = teks(formData, 'id')
   if (id) {
+    const existing = await prisma.mediaKitAsset.findUnique({ where: { id } })
     await prisma.mediaKitAsset.delete({ where: { id } })
+    await releaseMediaPath(existing?.href, '')
   }
 
   revalidatePath('/media-kit')

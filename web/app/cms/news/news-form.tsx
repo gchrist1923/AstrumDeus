@@ -1,5 +1,6 @@
 import { deleteNews, saveNews } from '@/app/cms/news/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { toDatetimeLocal } from '@/lib/datetime'
 
@@ -32,9 +33,7 @@ export function NewsForm({ post }: { post?: NewsFormValues }) {
       <Field id="body" label="Isi" hint="Pisahkan paragraf dengan baris kosong.">
         <textarea id="body" name="body" rows={10} required defaultValue={post?.body} className={KELAS_KONTROL} />
       </Field>
-      <Field id="cover" label="Cover">
-        <input id="cover" name="cover" defaultValue={post?.cover} className={KELAS_KONTROL} />
-      </Field>
+      <ImageUpload name="cover" label="Cover" defaultValue={post?.cover} />
       <Field id="category" label="Kategori">
         <input id="category" name="category" required defaultValue={post?.category ?? 'Turnamen'} className={KELAS_KONTROL} />
       </Field>

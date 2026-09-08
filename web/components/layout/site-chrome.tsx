@@ -10,7 +10,15 @@ function isBarePath(path: string): boolean {
   return path.startsWith('/cms') || path.startsWith('/internal') || path.startsWith('/login')
 }
 
-export function SiteChrome({ flags, children }: { flags: MenuFlags; children: ReactNode }) {
+export function SiteChrome({
+  flags,
+  logoSrc = '/logo-astrum-deus.png',
+  children,
+}: {
+  flags: MenuFlags
+  logoSrc?: string
+  children: ReactNode
+}) {
   const path = usePathname()
 
   if (isBarePath(path)) {
@@ -19,9 +27,9 @@ export function SiteChrome({ flags, children }: { flags: MenuFlags; children: Re
 
   return (
     <>
-      <SiteHeader flags={flags} />
+      <SiteHeader flags={flags} logoSrc={logoSrc} />
       {children}
-      <SiteFooter flags={flags} />
+      <SiteFooter flags={flags} logoSrc={logoSrc} />
     </>
   )
 }

@@ -75,15 +75,16 @@ export async function deleteMediaFile(urlPath: string): Promise<void> {
 }
 
 export async function countMediaPathUses(urlPath: string): Promise<number> {
-  const [players, posts, assets, settings] = await Promise.all([
+  const [players, posts, assets, settings, partners] = await Promise.all([
     prisma.player.count({ where: { photo: urlPath } }),
     prisma.newsPost.count({ where: { cover: urlPath } }),
     prisma.mediaKitAsset.count({ where: { href: urlPath } }),
     prisma.siteSetting.count({
       where: { OR: [{ logo: urlPath }, { favicon: urlPath }] },
     }),
+    prisma.partner.count({ where: { logo: urlPath } }),
   ])
-  return players + posts + assets + settings
+  return players + posts + assets + settings + partners
 }
 
 export async function releaseMediaPath(

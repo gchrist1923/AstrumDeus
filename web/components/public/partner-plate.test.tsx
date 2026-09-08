@@ -10,6 +10,7 @@ const TANPA_TAUTAN: Partner = {
   tier: 'Official',
   logoText: 'GEAR',
   href: null,
+  logo: null,
 }
 
 const DENGAN_TAUTAN: Partner = {
@@ -18,6 +19,25 @@ const DENGAN_TAUTAN: Partner = {
   tier: 'Title',
   logoText: 'TITLE',
   href: 'https://example.com',
+  logo: null,
+}
+
+const DENGAN_LOGO: Partner = {
+  slug: 'peralatan',
+  name: 'Peralatan',
+  tier: 'Official',
+  logoText: 'GEAR',
+  href: null,
+  logo: '/media/x.png',
+}
+
+const DENGAN_LOGO_DAN_TAUTAN: Partner = {
+  slug: 'sponsor-utama',
+  name: 'Sponsor Utama',
+  tier: 'Title',
+  logoText: 'TITLE',
+  href: 'https://example.com',
+  logo: '/media/x.png',
 }
 
 describe('PartnerPlate', () => {
@@ -32,6 +52,23 @@ describe('PartnerPlate', () => {
     render(<PartnerPlate partner={DENGAN_TAUTAN} />)
 
     expect(screen.getByRole('link', { name: 'TITLE' })).toHaveAttribute('href', 'https://example.com')
+  })
+
+  it('menampilkan img dengan alt nama partner bila logo ada, tanpa logoText', () => {
+    render(<PartnerPlate partner={DENGAN_LOGO} />)
+
+    const img = screen.getByRole('img', { name: 'Peralatan' })
+    expect(img).toHaveAttribute('src', '/media/x.png')
+    expect(screen.queryByText('GEAR')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
+  })
+
+  it('menampilkan img di dalam tautan bila logo dan href ada', () => {
+    render(<PartnerPlate partner={DENGAN_LOGO_DAN_TAUTAN} />)
+
+    expect(screen.getByRole('link', { name: 'Sponsor Utama' })).toHaveAttribute('href', 'https://example.com')
+    expect(screen.getByRole('img', { name: 'Sponsor Utama' })).toHaveAttribute('src', '/media/x.png')
+    expect(screen.queryByText('TITLE')).not.toBeInTheDocument()
   })
 
   it('tidak punya pelanggaran aksesibilitas tanpa tautan', async () => {

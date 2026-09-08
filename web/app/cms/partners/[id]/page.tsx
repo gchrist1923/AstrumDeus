@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { deletePartner, savePartner } from '@/app/cms/partners/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/db'
 
@@ -24,6 +25,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
       <Field id="tier" label="Tier">
         <input id="tier" name="tier" required defaultValue={partner.tier} className={KELAS_KONTROL} />
       </Field>
+      <ImageUpload name="logo" label="Logo" defaultValue={partner.logo ?? ''} />
       <Field id="logoText" label="Teks logo">
         <input id="logoText" name="logoText" required defaultValue={partner.logoText} className={KELAS_KONTROL} />
       </Field>

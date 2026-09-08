@@ -1,5 +1,6 @@
 import { saveAsset } from '@/app/cms/media-kit/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/db'
 
@@ -38,9 +39,7 @@ export default async function CmsMediaKitPage() {
             <option value="tipografi">Tipografi</option>
           </select>
         </Field>
-        <Field id="href" label="Berkas">
-          <input id="href" name="href" required defaultValue="/logo-astrum-deus.png" className={KELAS_KONTROL} />
-        </Field>
+        <ImageUpload name="href" label="Berkas" defaultValue="/logo-astrum-deus.png" required />
         <Field id="fileType" label="Jenis">
           <input id="fileType" name="fileType" defaultValue="PNG" className={KELAS_KONTROL} />
         </Field>

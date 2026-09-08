@@ -9,11 +9,18 @@ vi.mock('@/lib/db', () => ({
     newsPost: { count: vi.fn() },
     mediaKitAsset: { count: vi.fn() },
     siteSetting: { count: vi.fn() },
+    partner: { count: vi.fn() },
   },
 }))
 
 import { prisma } from '@/lib/db'
-import { saveImageBuffer, readMediaFile, releaseMediaPath, isManagedMediaPath } from '@/lib/media/store'
+import {
+  countMediaPathUses,
+  saveImageBuffer,
+  readMediaFile,
+  releaseMediaPath,
+  isManagedMediaPath,
+} from '@/lib/media/store'
 
 const JPEG = Uint8Array.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46])
 
@@ -27,6 +34,7 @@ describe('store media', () => {
     vi.mocked(prisma.newsPost.count).mockResolvedValue(0)
     vi.mocked(prisma.mediaKitAsset.count).mockResolvedValue(0)
     vi.mocked(prisma.siteSetting.count).mockResolvedValue(0)
+    vi.mocked(prisma.partner.count).mockResolvedValue(0)
   })
 
   afterEach(async () => {
@@ -60,5 +68,11 @@ describe('store media', () => {
   it('tidak menghapus path seed di public/', async () => {
     expect(isManagedMediaPath('/portrait.jpg')).toBe(false)
     await expect(releaseMediaPath('/portrait.jpg', '/media/x.jpg')).resolves.toBeUndefined()
+  })
+
+  it('menghitung pemakaian path pada partner.logo', async () => {
+    vi.mocked(prisma.partner.count).mockResolvedValue(1)
+    await expect(countMediaPathUses('/media/x.png')).resolves.toBe(1)
+    expect(prisma.partner.count).toHaveBeenCalledWith({ where: { logo: '/media/x.png' } })
   })
 })

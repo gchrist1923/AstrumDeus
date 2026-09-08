@@ -149,6 +149,7 @@ model Partner {
   name        String
   tier        String
   logoText    String
+  logo        String?
   href        String?
   description String  @default("")
   sortOrder   Int
