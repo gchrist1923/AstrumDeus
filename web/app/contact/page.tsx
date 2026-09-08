@@ -1,12 +1,12 @@
 import { ContactForm } from '@/components/public/contact-form'
-import { getSiteContact } from '@/lib/content/dummy'
+import { getSiteContact } from '@/lib/content/cms'
 import { requirePage } from '@/lib/content/require-page'
 
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
-export default function ContactPage() {
+export default async function ContactPage() {
   requirePage('contact')
-  const kontak = getSiteContact()
+  const kontak = await getSiteContact()
 
   return (
     <main>

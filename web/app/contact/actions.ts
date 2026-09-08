@@ -1,5 +1,7 @@
 'use server'
 
+import { prisma } from '@/lib/db'
+
 const TUJUAN = new Set(['sponsor', 'media', 'tryout', 'lainnya'])
 
 function teks(formData: FormData, kunci: string): string {
@@ -35,6 +37,16 @@ export async function kirimPesan(
   if (Object.keys(errors).length > 0) {
     return { ok: false, errors }
   }
+
+  await prisma.contactMessage.create({
+    data: {
+      name: nama,
+      email,
+      subject: tujuan,
+      message: pesan,
+      status: 'baru',
+    },
+  })
 
   return { ok: true }
 }

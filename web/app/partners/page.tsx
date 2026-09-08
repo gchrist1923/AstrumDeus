@@ -1,6 +1,7 @@
 import { PartnerPlate } from '@/components/public/partner-plate'
 import { SectionHeading } from '@/components/public/section-heading'
-import { getPartners } from '@/lib/content/dummy'
+import { getPartners } from '@/lib/content/cms'
+import { getMenuFlags } from '@/lib/content/flags'
 import { requirePage } from '@/lib/content/require-page'
 import type { Partner } from '@/lib/content/types'
 
@@ -13,10 +14,10 @@ function kelompokkanMitra(mitra: Partner[]): { tier: string; items: Partner[] }[
   }))
 }
 
-export default function PartnersPage() {
-  requirePage('partners')
+export default async function PartnersPage() {
+  requirePage('partners', await getMenuFlags())
 
-  const kelompok = kelompokkanMitra(getPartners())
+  const kelompok = kelompokkanMitra(await getPartners())
 
   return (
     <main>

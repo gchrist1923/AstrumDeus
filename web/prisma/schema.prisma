@@ -1,0 +1,228 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  roles        String
+  isActive     Boolean  @default(true)
+  avatar       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  sessions     Session[]
+  ownedEvents  ScheduleEvent[] @relation("EventOwner")
+  attending    EventAttendee[]
+  cashEntries  CashEntry[]     @relation("RecordedBy")
+  handledMail  ContactMessage[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SiteSetting {
+  id               String @id @default("default")
+  siteName         String
+  logo             String
+  favicon          String
+  defaultMetaTitle String
+  defaultMetaDesc  String
+  contactAddress   String
+  contactEmail     String
+  contactPhone     String
+  socialLinks      String
+  titles           Int    @default(0)
+  tournaments      Int    @default(0)
+  wwcd             Int    @default(0)
+}
+
+model MenuItem {
+  key          String  @id
+  label        String
+  path         String
+  isMandatory  Boolean
+  isEnabled    Boolean
+  sortOrder    Int
+}
+
+model NewsCategory {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String
+  posts       NewsPost[]
+}
+
+model NewsPost {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  excerpt     String
+  body        String
+  cover       String?
+  categoryId  String
+  category    NewsCategory  @relation(fields: [categoryId], references: [id])
+  author      String
+  publishedAt DateTime
+  status      String
+  recaps      Match[]
+}
+
+model Player {
+  id        String       @id @default(cuid())
+  slug      String       @unique
+  ign       String
+  realName  String
+  role      String
+  photo     String
+  joinedAt  DateTime
+  leftAt    DateTime?
+  isActive  Boolean
+  socials   String
+  sortOrder Int
+  stats     PlayerStat[]
+}
+
+model Tournament {
+  id        String       @id @default(cuid())
+  name      String
+  organizer String
+  season    String
+  year      Int
+  matches   Match[]
+  stats     PlayerStat[]
+}
+
+model Match {
+  id           String      @id @default(cuid())
+  tournamentId String
+  tournament   Tournament  @relation(fields: [tournamentId], references: [id])
+  stage        String
+  scheduledAt  DateTime
+  status       String
+  placement    Int?
+  points       Int?
+  wwcdCount    Int?
+  location     String
+  recapId      String?
+  recap        NewsPost?   @relation(fields: [recapId], references: [id])
+  map          String?
+  streamUrl    String?
+}
+
+model PlayerStat {
+  id               String     @id @default(cuid())
+  playerId         String
+  player           Player     @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  tournamentId     String
+  tournament       Tournament @relation(fields: [tournamentId], references: [id])
+  matchesPlayed    Int
+  kills            Int
+  averagePlacement Float
+}
+
+model MediaKitAsset {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  groupName   String
+  href        String
+  fileType    String
+  fileSize    String
+  sortOrder   Int
+}
+
+model Partner {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  tier        String
+  logoText    String
+  href        String?
+  description String  @default("")
+  sortOrder   Int
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    String   @default("baru")
+  ipAddress String?
+  handledById String?
+  handledBy User?    @relation(fields: [handledById], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model ScheduleEvent {
+  id        String          @id @default(cuid())
+  title     String
+  startAt   DateTime
+  endAt     DateTime
+  isAllDay  Boolean         @default(false)
+  location  String
+  notes     String
+  ownerId   String
+  owner     User            @relation("EventOwner", fields: [ownerId], references: [id])
+  attendees EventAttendee[]
+}
+
+model EventAttendee {
+  eventId String
+  userId  String
+  event   ScheduleEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, userId])
+}
+
+model CashBook {
+  id             String      @id @default(cuid())
+  name           String
+  type           String
+  openingBalance Int
+  currency       String      @default("IDR")
+  entries        CashEntry[]
+}
+
+model ExpenseCategory {
+  id        String      @id @default(cuid())
+  name      String
+  direction String
+  isActive  Boolean     @default(true)
+  entries   CashEntry[]
+}
+
+model CashEntry {
+  id              String           @id @default(cuid())
+  cashBookId      String
+  cashBook        CashBook         @relation(fields: [cashBookId], references: [id])
+  date            DateTime
+  direction       String
+  amount          Int
+  categoryId      String
+  category        ExpenseCategory  @relation(fields: [categoryId], references: [id])
+  description     String
+  attachment      String?
+  recordedById    String
+  recordedBy      User             @relation("RecordedBy", fields: [recordedById], references: [id])
+  correctsEntryId String?
+  correctsEntry   CashEntry?       @relation("Correction", fields: [correctsEntryId], references: [id])
+  corrections     CashEntry[]      @relation("Correction")
+  isCorrected     Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { HomeSections } from '@/components/public/home-sections'
+import { getHomeContent } from '@/lib/content/dummy'
 import type { MenuFlags } from '@/lib/nav'
 
 const FLAGS_TANPA_HASIL_DAN_PARTNER: MenuFlags = {
@@ -12,7 +13,7 @@ const FLAGS_TANPA_HASIL_DAN_PARTNER: MenuFlags = {
 
 describe('HomeSections toggle menu', () => {
   it('menyembunyikan heading Hasil dan Partner saat matches dan partners mati', () => {
-    render(<HomeSections flags={FLAGS_TANPA_HASIL_DAN_PARTNER} />)
+    render(<HomeSections flags={FLAGS_TANPA_HASIL_DAN_PARTNER} content={getHomeContent()} />)
 
     expect(screen.queryByRole('heading', { name: 'Hasil' })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Partner' })).not.toBeInTheDocument()

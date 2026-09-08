@@ -19,3 +19,13 @@ export function formatMatchDate(iso: string): string {
 export function formatNewsDate(iso: string): string {
   return WAKTU_BERITA.format(new Date(iso))
 }
+
+const RUPIAH = new Intl.NumberFormat('id-ID', {
+  style: 'currency',
+  currency: 'IDR',
+  maximumFractionDigits: 0,
+})
+
+export function formatRupiah(amount: number): string {
+  return RUPIAH.format(amount)
+}

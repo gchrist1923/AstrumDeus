@@ -1,6 +1,7 @@
 import { AssetCard } from '@/components/public/asset-card'
 import { SectionHeading } from '@/components/public/section-heading'
-import { getMediaAssets } from '@/lib/content/dummy'
+import { getMediaAssets } from '@/lib/content/cms'
+import { getMenuFlags } from '@/lib/content/flags'
 import { requirePage } from '@/lib/content/require-page'
 import type { MediaAsset } from '@/lib/content/types'
 
@@ -20,10 +21,10 @@ function kelompokkanAset(aset: MediaAsset[]): { group: MediaAsset['group']; item
   })).filter((bagian) => bagian.items.length > 0)
 }
 
-export default function MediaKitPage() {
-  requirePage('media-kit')
+export default async function MediaKitPage() {
+  requirePage('media-kit', await getMenuFlags())
 
-  const kelompok = kelompokkanAset(getMediaAssets())
+  const kelompok = kelompokkanAset(await getMediaAssets())
 
   return (
     <main>

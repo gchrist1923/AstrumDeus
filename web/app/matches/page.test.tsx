@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import MatchesPage from '@/app/matches/page'
 
 describe('Matches', () => {
-  it('menampilkan PMSL SEA Week 4 di jadwal dan PMNC 2026 di hasil', () => {
-    render(<MatchesPage />)
+  it('menampilkan PMSL SEA Week 4 di jadwal dan PMNC 2026 di hasil', async () => {
+    render(await MatchesPage())
 
     expect(screen.getByRole('heading', { name: 'Matches' })).toBeInTheDocument()
 
@@ -18,8 +18,8 @@ describe('Matches', () => {
     expect(within(hasil as HTMLElement).getByText(/PMNC 2026/)).toBeInTheDocument()
   })
 
-  it('tetap menampilkan teks 1 pada baris juara', () => {
-    render(<MatchesPage />)
+  it('tetap menampilkan teks 1 pada baris juara', async () => {
+    render(await MatchesPage())
 
     const hasil = screen.getByRole('heading', { name: 'Hasil' }).closest('section') as HTMLElement
 

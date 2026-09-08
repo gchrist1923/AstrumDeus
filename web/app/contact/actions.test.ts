@@ -1,5 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { kirimPesan } from '@/app/contact/actions'
+
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    contactMessage: {
+      create: vi.fn().mockResolvedValue({ id: 'pesan-1' }),
+    },
+  },
+}))
 
 function data(fields: Record<string, string>): FormData {
   const form = new FormData()

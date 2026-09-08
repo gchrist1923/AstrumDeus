@@ -51,8 +51,8 @@ describe('halaman detail pemain', () => {
     expect(notFound).toHaveBeenCalled()
   })
 
-  it('generateStaticParams mencakup pemain aktif dan mantan', () => {
-    const params = generateStaticParams()
+  it('generateStaticParams mencakup pemain aktif dan mantan', async () => {
+    const params = await generateStaticParams()
 
     expect(params).toEqual(expect.arrayContaining([{ slug: 'reza' }, { slug: 'gilang' }]))
   })

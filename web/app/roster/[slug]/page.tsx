@@ -1,19 +1,25 @@
 import { notFound } from 'next/navigation'
-import { getActivePlayers, getFormerPlayers, getPlayerBySlug } from '@/lib/content/dummy'
+import { getActivePlayers, getFormerPlayers, getPlayerBySlug } from '@/lib/content/cms'
 import { formatMatchDate } from '@/lib/content/format'
+import { getMenuFlags } from '@/lib/content/flags'
 import { requirePage } from '@/lib/content/require-page'
 
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
-export function generateStaticParams() {
-  return [...getActivePlayers(), ...getFormerPlayers()].map((player) => ({ slug: player.slug }))
+export async function generateStaticParams() {
+  try {
+    const [aktif, mantan] = await Promise.all([getActivePlayers(), getFormerPlayers()])
+    return [...aktif, ...mantan].map((player) => ({ slug: player.slug }))
+  } catch {
+    return []
+  }
 }
 
 export default async function PlayerPage({ params }: { params: Promise<{ slug: string }> }) {
-  requirePage('roster')
+  requirePage('roster', await getMenuFlags())
 
   const { slug } = await params
-  const player = getPlayerBySlug(slug)
+  const player = await getPlayerBySlug(slug)
 
   if (!player) {
     notFound()

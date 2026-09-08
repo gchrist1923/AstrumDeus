@@ -3,14 +3,14 @@ import { describe, expect, it } from 'vitest'
 import PartnersPage from '@/app/partners/page'
 
 describe('Partners', () => {
-  it('menampilkan judul halaman', () => {
-    render(<PartnersPage />)
+  it('menampilkan judul halaman', async () => {
+    render(await PartnersPage())
 
     expect(screen.getByRole('heading', { name: 'Partners' })).toBeInTheDocument()
   })
 
-  it('mengelompokkan mitra per tier dengan plat putih', () => {
-    render(<PartnersPage />)
+  it('mengelompokkan mitra per tier dengan plat putih', async () => {
+    render(await PartnersPage())
 
     const title = screen.getByRole('heading', { name: 'Title' }).closest('section')
     expect(title).not.toBeNull()
