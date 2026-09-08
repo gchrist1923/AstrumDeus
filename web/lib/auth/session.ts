@@ -1,4 +1,6 @@
 import { cookies } from 'next/headers'
+import type { GrantMatrix } from '@/lib/auth/grants'
+import { getUserMatrix } from '@/lib/auth/load-matrix'
 import { parseRoles, type Role } from '@/lib/auth/roles'
 import { prisma } from '@/lib/db'
 
@@ -10,6 +12,7 @@ export interface AuthUser {
   email: string
   name: string
   roles: Role[]
+  matrix: GrantMatrix
 }
 
 export async function createSession(userId: string): Promise<void> {
@@ -62,5 +65,6 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     email: session.user.email,
     name: session.user.name,
     roles: parseRoles(session.user.roles),
+    matrix: await getUserMatrix(session.user.id),
   }
 }

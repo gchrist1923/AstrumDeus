@@ -7,6 +7,7 @@ vi.mock('@/lib/auth/session', () => ({
   getCurrentUser: vi.fn(),
 }))
 
+import { matrixFromLegacyRoles } from '@/lib/auth/load-matrix'
 import { getCurrentUser } from '@/lib/auth/session'
 import { POST } from '@/app/api/media/route'
 
@@ -47,6 +48,7 @@ describe('POST /api/media', () => {
       email: 'team@x.id',
       name: 'Team',
       roles: ['team'],
+      matrix: matrixFromLegacyRoles(['team']),
     })
     const res = await POST(body(JPEG, 'foto.jpg'))
     expect(res.status).toBe(401)
@@ -58,6 +60,7 @@ describe('POST /api/media', () => {
       email: 'ed@x.id',
       name: 'Ed',
       roles: ['editor'],
+      matrix: matrixFromLegacyRoles(['editor']),
     })
     const res = await POST(body(JPEG, 'foto.jpg'))
     expect(res.status).toBe(201)
@@ -71,6 +74,7 @@ describe('POST /api/media', () => {
       email: 'ed@x.id',
       name: 'Ed',
       roles: ['editor'],
+      matrix: matrixFromLegacyRoles(['editor']),
     })
     const res = await POST(body(PDF, 'dokumen.pdf'))
     expect(res.status).toBe(400)

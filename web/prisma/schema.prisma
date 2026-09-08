@@ -22,6 +22,26 @@ model User {
   attending    EventAttendee[]
   cashEntries  CashEntry[]     @relation("RecordedBy")
   handledMail  ContactMessage[]
+  accessRoles  UserAccessRole[]
+}
+
+model AccessRole {
+  id        String           @id @default(cuid())
+  name      String           @unique
+  slug      String           @unique
+  isAdmin   Boolean          @default(false)
+  grants    String
+  createdAt DateTime         @default(now())
+  users     UserAccessRole[]
+}
+
+model UserAccessRole {
+  userId String
+  roleId String
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   AccessRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
 }
 
 model Session {

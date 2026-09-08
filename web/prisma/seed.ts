@@ -1,5 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 import { hashSync } from 'bcryptjs'
+import {
+  adminTemplate,
+  editorTemplate,
+  financeTemplate,
+  teamTemplate,
+} from '../lib/auth/grants'
 import { DUMMY_ASSETS, DUMMY_MATCHES, DUMMY_NEWS, DUMMY_PARTNERS, DUMMY_PLAYERS } from '../lib/content/dummy'
 
 const prisma = new PrismaClient()
@@ -11,7 +17,7 @@ function slugify(value: string): string {
 async function main() {
   const passwordHash = hashSync('astrum-cms-dev', 10)
 
-  await prisma.user.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: 'admin@astrumdeus.id' },
     update: {},
     create: {
@@ -21,6 +27,30 @@ async function main() {
       roles: JSON.stringify(['admin', 'editor', 'finance']),
     },
   })
+
+  const systemRoles = [
+    { name: 'Admin', slug: 'admin', isAdmin: true, grants: JSON.stringify(adminTemplate()) },
+    { name: 'Editor', slug: 'editor', isAdmin: false, grants: JSON.stringify(editorTemplate()) },
+    { name: 'Team', slug: 'team', isAdmin: false, grants: JSON.stringify(teamTemplate()) },
+    { name: 'Finance', slug: 'finance', isAdmin: false, grants: JSON.stringify(financeTemplate()) },
+  ]
+
+  for (const role of systemRoles) {
+    await prisma.accessRole.upsert({
+      where: { slug: role.slug },
+      update: { name: role.name, isAdmin: role.isAdmin, grants: role.grants },
+      create: role,
+    })
+  }
+
+  const adminRole = await prisma.accessRole.findUnique({ where: { slug: 'admin' } })
+  if (adminRole) {
+    await prisma.userAccessRole.upsert({
+      where: { userId_roleId: { userId: adminUser.id, roleId: adminRole.id } },
+      update: {},
+      create: { userId: adminUser.id, roleId: adminRole.id },
+    })
+  }
 
   await prisma.siteSetting.upsert({
     where: { id: 'default' },
