@@ -2,12 +2,29 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
+function baca(rel: string): string {
+  return readFileSync(path.join(process.cwd(), 'app', 'cms', 'kategori', rel), 'utf8')
+}
+
 describe('UI kategori', () => {
-  it('tidak menawarkan hapus keras', () => {
-    const dir = path.join(process.cwd(), 'app', 'cms', 'kategori')
-    const page = readFileSync(path.join(dir, 'page.tsx'), 'utf8')
-    const actions = readFileSync(path.join(dir, 'actions.ts'), 'utf8')
-    expect(page).not.toMatch(/Hapus/)
-    expect(actions).not.toMatch(/\.delete\(/)
+  it('hub hanya tiga tautan jenis, tanpa daftar item', () => {
+    const hub = baca('page.tsx')
+    expect(hub).toMatch(/\/cms\/kategori\/turnamen/)
+    expect(hub).toMatch(/\/cms\/kategori\/kas/)
+    expect(hub).toMatch(/\/cms\/kategori\/berita/)
+    expect(hub).not.toMatch(/deactivateTournament/)
+    expect(hub).not.toMatch(/prisma\.tournament\.findMany/)
+  })
+
+  it('hapus ditolak jika masih ada relasi', () => {
+    const actions = baca('actions.ts')
+    expect(actions).toMatch(/deleteTournament/)
+    expect(actions).toMatch(/playerStat\.count/)
+    expect(actions).toMatch(/match\.count/)
+    expect(actions).toMatch(/cashEntry\.count/)
+    expect(actions).toMatch(/newsPost\.count/)
+    expect(baca('turnamen/page.tsx')).toMatch(/Hapus turnamen ini\?/)
+    expect(baca('kas/page.tsx')).toMatch(/Hapus kategori ini\?/)
+    expect(baca('berita/page.tsx')).toMatch(/Hapus kategori ini\?/)
   })
 })
