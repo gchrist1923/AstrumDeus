@@ -7,13 +7,10 @@ import {
   teamTemplate,
 } from '../lib/auth/grants'
 import { DUMMY_ASSETS, DUMMY_MATCHES, DUMMY_NEWS, DUMMY_PARTNERS, DUMMY_PLAYERS } from '../lib/content/dummy'
+import { slugify } from '../lib/content/slug'
 import { BUILTIN_PAGES } from '../lib/pages/builtins'
 
 const prisma = new PrismaClient()
-
-function slugify(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
 
 async function main() {
   const passwordHash = hashSync('astrum-cms-dev', 10)

@@ -33,7 +33,7 @@ export function MatchForm({
     <form action={saveMatch} className="flex max-w-2xl flex-col gap-6">
       {match?.id ? <input type="hidden" name="id" value={match.id} /> : null}
       <Field id="tournamentId" label="Turnamen">
-        <select id="tournamentId" name="tournamentId" required defaultValue={match?.tournamentId} className={KELAS_KONTROL}>
+        <select id="tournamentId" name="tournamentId" required defaultValue={match?.tournamentId} disabled={!canSave} className={KELAS_KONTROL}>
           {tournaments.map((item) => (
             <option key={item.id} value={item.id}>
               {item.name}
@@ -42,7 +42,7 @@ export function MatchForm({
         </select>
       </Field>
       <Field id="stage" label="Babak">
-        <input id="stage" name="stage" required defaultValue={match?.stage} className={KELAS_KONTROL} />
+        <input id="stage" name="stage" required defaultValue={match?.stage} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="scheduledAt" label="Jadwal">
         <input
@@ -51,36 +51,37 @@ export function MatchForm({
           type="datetime-local"
           required
           defaultValue={toDatetimeLocal(match?.scheduledAt ?? new Date())}
+          disabled={!canSave}
           className={KELAS_KONTROL}
         />
       </Field>
       <Field id="status" label="Status">
-        <select id="status" name="status" defaultValue={match?.status ?? 'scheduled'} className={KELAS_KONTROL}>
+        <select id="status" name="status" defaultValue={match?.status ?? 'scheduled'} disabled={!canSave} className={KELAS_KONTROL}>
           <option value="scheduled">Terjadwal</option>
           <option value="live">Live</option>
           <option value="completed">Selesai</option>
         </select>
       </Field>
       <Field id="location" label="Lokasi">
-        <input id="location" name="location" defaultValue={match?.location ?? 'Online'} className={KELAS_KONTROL} />
+        <input id="location" name="location" defaultValue={match?.location ?? 'Online'} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="placement" label="Placement">
-        <input id="placement" name="placement" type="number" defaultValue={match?.placement ?? ''} className={KELAS_KONTROL} />
+        <input id="placement" name="placement" type="number" defaultValue={match?.placement ?? ''} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="points" label="Poin">
-        <input id="points" name="points" type="number" defaultValue={match?.points ?? ''} className={KELAS_KONTROL} />
+        <input id="points" name="points" type="number" defaultValue={match?.points ?? ''} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="wwcdCount" label="WWCD">
-        <input id="wwcdCount" name="wwcdCount" type="number" defaultValue={match?.wwcdCount ?? ''} className={KELAS_KONTROL} />
+        <input id="wwcdCount" name="wwcdCount" type="number" defaultValue={match?.wwcdCount ?? ''} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="map" label="Map">
-        <input id="map" name="map" defaultValue={match?.map} className={KELAS_KONTROL} />
+        <input id="map" name="map" defaultValue={match?.map} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="streamUrl" label="Tautan siaran">
-        <input id="streamUrl" name="streamUrl" defaultValue={match?.streamUrl} className={KELAS_KONTROL} />
+        <input id="streamUrl" name="streamUrl" defaultValue={match?.streamUrl} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="recapSlug" label="Slug recap">
-        <input id="recapSlug" name="recapSlug" defaultValue={match?.recapSlug} className={KELAS_KONTROL} />
+        <input id="recapSlug" name="recapSlug" defaultValue={match?.recapSlug} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <div className="flex flex-wrap gap-3">
         {canSave ? <Button type="submit">Simpan</Button> : null}

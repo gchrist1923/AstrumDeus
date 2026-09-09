@@ -24,28 +24,28 @@ export default async function EditAssetPage({ params }: { params: Promise<{ id: 
     <form action={saveAsset} className="flex max-w-xl flex-col gap-4">
       <input type="hidden" name="id" value={asset.id} />
       <Field id="name" label="Nama">
-        <input id="name" name="name" required defaultValue={asset.name} className={KELAS_KONTROL} />
+        <input id="name" name="name" required defaultValue={asset.name} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="description" label="Deskripsi">
-        <textarea id="description" name="description" rows={3} defaultValue={asset.description} className={KELAS_KONTROL} />
+        <textarea id="description" name="description" rows={3} defaultValue={asset.description} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="groupName" label="Grup">
-        <select id="groupName" name="groupName" defaultValue={asset.groupName} className={KELAS_KONTROL}>
+        <select id="groupName" name="groupName" defaultValue={asset.groupName} disabled={!bisaUbah} className={KELAS_KONTROL}>
           <option value="logo">Logo</option>
           <option value="warna">Warna</option>
           <option value="foto">Foto</option>
           <option value="tipografi">Tipografi</option>
         </select>
       </Field>
-      <ImageUpload name="href" label="Berkas" defaultValue={asset.href} required />
+      <ImageUpload name="href" label="Berkas" defaultValue={asset.href} required disabled={!bisaUbah} />
       <Field id="fileType" label="Jenis">
-        <input id="fileType" name="fileType" defaultValue={asset.fileType} className={KELAS_KONTROL} />
+        <input id="fileType" name="fileType" defaultValue={asset.fileType} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="fileSize" label="Ukuran">
-        <input id="fileSize" name="fileSize" defaultValue={asset.fileSize} className={KELAS_KONTROL} />
+        <input id="fileSize" name="fileSize" defaultValue={asset.fileSize} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="sortOrder" label="Urutan">
-        <input id="sortOrder" name="sortOrder" type="number" defaultValue={asset.sortOrder} className={KELAS_KONTROL} />
+        <input id="sortOrder" name="sortOrder" type="number" defaultValue={asset.sortOrder} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <div className="flex flex-wrap gap-3">
         {bisaUbah ? <Button type="submit">Simpan</Button> : null}

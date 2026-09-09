@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { verifyPassword } from '@/lib/auth/password'
 import { getUserMatrix } from '@/lib/auth/load-matrix'
-import { canAccessCms, canAccessInternal } from '@/lib/auth/permissions'
+import { postLoginPath } from '@/lib/auth/permissions'
 import { createSession, destroySession } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
 
@@ -34,16 +34,7 @@ export async function loginAction(formData: FormData): Promise<{ error: string }
   await createSession(user.id)
 
   const matrix = await getUserMatrix(user.id)
-
-  if (next.startsWith('/internal')) {
-    redirect(canAccessInternal(matrix) ? next : canAccessCms(matrix) ? '/cms' : '/login')
-  }
-
-  if (next.startsWith('/cms')) {
-    redirect(canAccessCms(matrix) ? next : canAccessInternal(matrix) ? '/internal' : '/login')
-  }
-
-  redirect(canAccessCms(matrix) ? '/cms' : '/internal')
+  redirect(postLoginPath(matrix, next))
 }
 
 export async function logoutAction(): Promise<void> {

@@ -21,33 +21,33 @@ export default async function SettingsPage() {
     <form action={saveSettings} className="flex max-w-xl flex-col gap-6">
       <h2 className="font-display text-section uppercase">Situs</h2>
       <Field id="siteName" label="Nama situs">
-        <input id="siteName" name="siteName" defaultValue={setting.siteName} className={KELAS_KONTROL} />
+        <input id="siteName" name="siteName" defaultValue={setting.siteName} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
-      <ImageUpload name="logo" label="Logo" defaultValue={setting.logo} />
-      <ImageUpload name="favicon" label="Favicon" defaultValue={setting.favicon} />
+      <ImageUpload name="logo" label="Logo" defaultValue={setting.logo} disabled={!bisaUbah} />
+      <ImageUpload name="favicon" label="Favicon" defaultValue={setting.favicon} disabled={!bisaUbah} />
       <Field id="defaultMetaTitle" label="Judul meta">
-        <input id="defaultMetaTitle" name="defaultMetaTitle" defaultValue={setting.defaultMetaTitle} className={KELAS_KONTROL} />
+        <input id="defaultMetaTitle" name="defaultMetaTitle" defaultValue={setting.defaultMetaTitle} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="defaultMetaDesc" label="Deskripsi meta">
-        <textarea id="defaultMetaDesc" name="defaultMetaDesc" rows={3} defaultValue={setting.defaultMetaDesc} className={KELAS_KONTROL} />
+        <textarea id="defaultMetaDesc" name="defaultMetaDesc" rows={3} defaultValue={setting.defaultMetaDesc} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="contactEmail" label="Email kontak">
-        <input id="contactEmail" name="contactEmail" defaultValue={setting.contactEmail} className={KELAS_KONTROL} />
+        <input id="contactEmail" name="contactEmail" defaultValue={setting.contactEmail} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="contactAddress" label="Alamat">
-        <input id="contactAddress" name="contactAddress" defaultValue={setting.contactAddress} className={KELAS_KONTROL} />
+        <input id="contactAddress" name="contactAddress" defaultValue={setting.contactAddress} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="contactPhone" label="Telepon">
-        <input id="contactPhone" name="contactPhone" defaultValue={setting.contactPhone} className={KELAS_KONTROL} />
+        <input id="contactPhone" name="contactPhone" defaultValue={setting.contactPhone} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="titles" label="Gelar">
-        <input id="titles" name="titles" type="number" defaultValue={setting.titles} className={KELAS_KONTROL} />
+        <input id="titles" name="titles" type="number" defaultValue={setting.titles} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="tournaments" label="Turnamen">
-        <input id="tournaments" name="tournaments" type="number" defaultValue={setting.tournaments} className={KELAS_KONTROL} />
+        <input id="tournaments" name="tournaments" type="number" defaultValue={setting.tournaments} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="wwcd" label="WWCD">
-        <input id="wwcd" name="wwcd" type="number" defaultValue={setting.wwcd} className={KELAS_KONTROL} />
+        <input id="wwcd" name="wwcd" type="number" defaultValue={setting.wwcd} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       {bisaUbah ? <Button type="submit">Simpan pengaturan</Button> : null}
     </form>

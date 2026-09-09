@@ -58,9 +58,10 @@ describe('UI penugasan pengguna', () => {
 })
 
 describe('hapus peran', () => {
-  it('sinkron JSON leftover setelah hapus AccessRole', () => {
+  it('sinkron JSON leftover setelah hapus AccessRole dalam satu transaksi', () => {
     const actions = baca('actions.ts')
     expect(actions).toMatch(/userAccessRole\.findMany/)
     expect(actions).toMatch(/rewriteLegacyRolesForUsers/)
+    expect(actions).toMatch(/\$transaction/)
   })
 })

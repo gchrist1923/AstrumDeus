@@ -181,4 +181,10 @@ describe('ImageUpload', () => {
     expect(tombol).toHaveAttribute('aria-invalid', 'true')
     expect(tombol).toHaveAttribute('aria-describedby', 'photo-error')
   })
+
+  it('menyembunyikan Pilih gambar saat disabled', () => {
+    render(<ImageUpload name="photo" label="Foto" defaultValue="/portrait.jpg" disabled />)
+    expect(screen.queryByRole('button', { name: 'Pilih gambar' })).not.toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Pratinjau Foto' })).toBeInTheDocument()
+  })
 })

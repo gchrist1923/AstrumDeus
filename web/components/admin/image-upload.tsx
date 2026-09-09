@@ -26,12 +26,14 @@ export function ImageUpload({
   label,
   defaultValue = '',
   required = false,
+  disabled = false,
   onPathChange,
 }: {
   name: string
   label: string
   defaultValue?: string
   required?: boolean
+  disabled?: boolean
   onPathChange?: (path: string) => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
@@ -106,7 +108,7 @@ export function ImageUpload({
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={fileId} className={`${KELAS_LABEL}${uploading ? ' pointer-events-none' : ''}`}>
+      <label htmlFor={disabled ? undefined : fileId} className={`${KELAS_LABEL}${uploading ? ' pointer-events-none' : ''}`}>
         {label}
       </label>
       {path ? (
@@ -117,6 +119,7 @@ export function ImageUpload({
         />
       ) : null}
       <input type="hidden" name={name} value={path} required={required} />
+      {disabled ? null : (
       <div
         className={`relative inline-flex ${KELAS_FOKUS} focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent`}
       >
@@ -143,7 +146,8 @@ export function ImageUpload({
           onChange={onChange}
         />
       </div>
-      <p className="text-small text-content-muted">{HINT}</p>
+      )}
+      {disabled ? null : <p className="text-small text-content-muted">{HINT}</p>}
       {error ? (
         <p id={errorId} role="alert" className="text-small text-danger">
           {error}

@@ -1,7 +1,7 @@
 import { reverseCashEntry, saveCashEntry } from '@/app/internal/cash/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
-import { canReadCashBook, canWriteCashBook } from '@/lib/auth/permissions'
+import { canReadCashBook, canReverseCashEntry, canWriteCashBook } from '@/lib/auth/permissions'
 import { requireCashView, requireInternalUser } from '@/lib/auth/require'
 import { formatRupiah } from '@/lib/content/format'
 import { toDateInput } from '@/lib/datetime'
@@ -67,7 +67,13 @@ export default async function CashPage({
                 {entry.isCorrected ? ' · dikoreksi' : ''}
               </p>
               <p className="mt-2 text-body">{entry.description}</p>
-              {bisaTulis && !entry.isCorrected ? (
+              {canReverseCashEntry(
+                user.matrix,
+                selected.type as 'operasional' | 'tim',
+                entry.recordedById,
+                user.id,
+                entry.isCorrected,
+              ) ? (
                 <form action={reverseCashEntry} className="mt-3">
                   <input type="hidden" name="id" value={entry.id} />
                   <Button type="submit" variant="secondary">

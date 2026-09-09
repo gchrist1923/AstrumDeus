@@ -136,13 +136,17 @@ export async function deleteRole(formData: FormData): Promise<void> {
     redirect(`/cms/peran?kesalahan=${verdict}`)
   }
 
-  const assigned = await prisma.userAccessRole.findMany({
-    where: { roleId: id },
-    select: { userId: true },
+  await prisma.$transaction(async (tx) => {
+    const assigned = await tx.userAccessRole.findMany({
+      where: { roleId: id },
+      select: { userId: true },
+    })
+    await tx.accessRole.delete({ where: { id } })
+    await rewriteLegacyRolesForUsers(
+      assigned.map((row) => row.userId),
+      tx,
+    )
   })
-
-  await prisma.accessRole.delete({ where: { id } })
-  await rewriteLegacyRolesForUsers(assigned.map((row) => row.userId))
   revalidatePeran()
   redirect('/cms/peran')
 }

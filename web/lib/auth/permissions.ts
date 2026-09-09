@@ -73,6 +73,40 @@ export function canWriteCashBook(
   return (can(matrix, 'kas-tim', 'create') || can(matrix, 'kas-tim', 'update')) && recordedById === actorId
 }
 
+export function canReverseCashEntry(
+  matrix: GrantMatrix,
+  bookType: 'operasional' | 'tim',
+  recordedById: string,
+  actorId: string,
+  isCorrected: boolean,
+): boolean {
+  if (isCorrected) {
+    return false
+  }
+
+  return canWriteCashBook(matrix, bookType, recordedById, actorId)
+}
+
+export function postLoginPath(matrix: GrantMatrix, next: string): string {
+  const tujuan = next.startsWith('/') && !next.startsWith('//') ? next : '/cms'
+
+  if (tujuan.startsWith('/internal')) {
+    if (canAccessInternal(matrix)) return tujuan
+    if (canAccessCms(matrix)) return '/cms'
+    return '/login'
+  }
+
+  if (tujuan.startsWith('/cms')) {
+    if (canAccessCms(matrix)) return tujuan
+    if (canAccessInternal(matrix)) return '/internal'
+    return '/login'
+  }
+
+  if (canAccessCms(matrix)) return '/cms'
+  if (canAccessInternal(matrix)) return '/internal'
+  return '/login'
+}
+
 export function canUploadMedia(matrix: GrantMatrix): boolean {
   return MEDIA_WRITE_MODULES.some((module) => can(matrix, module, 'create') || can(matrix, module, 'update'))
 }

@@ -12,10 +12,12 @@ import {
   canAccessCms,
   canAccessInternal,
   canReadCashBook,
+  canReverseCashEntry,
   canToggleMenu,
   canUploadMedia,
   canWriteCashBook,
   canWriteSchedule,
+  postLoginPath,
 } from '@/lib/auth/permissions'
 
 function laporanOnly() {
@@ -73,6 +75,9 @@ describe('teamTemplate', () => {
     expect(canWriteCashBook(matrix, 'tim', 'saya', 'saya')).toBe(true)
     expect(canWriteCashBook(matrix, 'tim', 'orang-lain', 'saya')).toBe(false)
     expect(canWriteCashBook(matrix, 'operasional', 'saya', 'saya')).toBe(false)
+    expect(canReverseCashEntry(matrix, 'tim', 'saya', 'saya', false)).toBe(true)
+    expect(canReverseCashEntry(matrix, 'tim', 'orang-lain', 'saya', false)).toBe(false)
+    expect(canReverseCashEntry(matrix, 'tim', 'saya', 'saya', true)).toBe(false)
     expect(canReadCashBook(matrix, 'operasional')).toBe(false)
     expect(canReadCashBook(matrix, 'tim')).toBe(true)
     expect(canUploadMedia(matrix)).toBe(false)
@@ -106,6 +111,14 @@ describe('clamp', () => {
     expect(can(matrix, 'news', 'create')).toBe(false)
     expect(canAccessCms(matrix)).toBe(false)
     expect(canWriteCashBook(matrix, 'operasional', 'saya', 'saya')).toBe(false)
+  })
+})
+
+describe('postLoginPath', () => {
+  it('tanpa CMS dan tanpa internal mendarat di /login, bukan /internal', () => {
+    expect(postLoginPath(emptyMatrix(), '/cms')).toBe('/login')
+    expect(postLoginPath(emptyMatrix(), '/internal')).toBe('/login')
+    expect(postLoginPath(emptyMatrix(), '/news')).toBe('/login')
   })
 })
 
