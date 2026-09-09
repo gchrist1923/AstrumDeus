@@ -9,6 +9,9 @@ import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 import { toDateInput } from '@/lib/datetime'
 
+const KELAS_SEL_INBOX =
+  'border-b border-border-strong px-4 py-3 max-md:block max-md:border-b-0 max-md:px-3 max-md:py-2 max-md:before:mb-1 max-md:before:block max-md:before:font-display max-md:before:text-label max-md:before:uppercase max-md:before:text-content-muted max-md:before:content-[attr(data-label)]'
+
 function hrefInbox(q: string, hal: number): string {
   const params = new URLSearchParams()
   if (q) params.set('q', q)
@@ -62,9 +65,9 @@ export default async function InboxPage({
       {messages.length === 0 ? (
         <p className="text-content-secondary">{q ? 'Tidak ada pesan yang cocok.' : 'Belum ada pesan.'}</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[60rem] border-2 border-border-strong text-left">
-            <thead>
+        <div>
+          <table className="w-full border-2 border-border-strong text-left max-md:block max-md:border-0">
+            <thead className="max-md:sr-only">
               <tr className="font-display text-label uppercase text-content-muted">
                 <th className="border-b-2 border-border-strong px-4 py-3">Status</th>
                 <th className="border-b-2 border-border-strong px-4 py-3">Subjek</th>
@@ -74,23 +77,28 @@ export default async function InboxPage({
                 <th className="border-b-2 border-border-strong px-4 py-3">Aksi</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="max-md:block">
               {messages.map((message) => (
-                <tr key={message.id} className="align-top">
-                  <td className="border-b border-border-strong px-4 py-3 font-display text-label uppercase text-accent">
+                <tr
+                  key={message.id}
+                  className="align-top max-md:mb-4 max-md:block max-md:border-2 max-md:border-border-strong"
+                >
+                  <td data-label="Status" className={`${KELAS_SEL_INBOX} font-display text-label uppercase text-accent`}>
                     {message.status}
                   </td>
-                  <td className="border-b border-border-strong px-4 py-3 font-display text-body font-semibold">
+                  <td data-label="Subjek" className={`${KELAS_SEL_INBOX} font-display text-body font-semibold`}>
                     {message.subject}
                   </td>
-                  <td className="border-b border-border-strong px-4 py-3 text-small text-content-muted">
+                  <td data-label="Pengirim" className={`${KELAS_SEL_INBOX} text-small text-content-muted`}>
                     {message.name} · {message.email}
                   </td>
-                  <td className="border-b border-border-strong px-4 py-3 text-small text-content-muted">
+                  <td data-label="Tanggal" className={`${KELAS_SEL_INBOX} text-small text-content-muted`}>
                     {toDateInput(message.createdAt)}
                   </td>
-                  <td className="border-b border-border-strong px-4 py-3 text-body text-pretty">{message.message}</td>
-                  <td className="border-b border-border-strong px-4 py-3">
+                  <td data-label="Pesan" className={`${KELAS_SEL_INBOX} text-body text-pretty`}>
+                    {message.message}
+                  </td>
+                  <td data-label="Aksi" className={KELAS_SEL_INBOX}>
                     <div className="flex flex-col gap-2">
                       {bisaUbah ? (
                         <form action={updateInboxStatus} className="flex flex-wrap gap-2">

@@ -18,6 +18,8 @@ describe('UI kotak masuk', () => {
     expect(page).not.toMatch(/message: \{ contains:/)
     expect(page).toMatch(/deleteInboxMessage/)
     expect(page).toMatch(/Hapus pesan ini\?/)
+    expect(page).toMatch(/max-md:block/)
+    expect(page).not.toMatch(/min-w-\[60rem\]/)
     const actions = baca('actions.ts')
     expect(actions).toMatch(/requireGrant\(user, 'inbox', 'delete'\)/)
     expect(actions).toMatch(/contactMessage\.delete/)
