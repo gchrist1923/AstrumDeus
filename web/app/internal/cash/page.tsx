@@ -1,6 +1,8 @@
 import { reverseCashEntry, saveCashEntry } from '@/app/internal/cash/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { Pager } from '@/components/admin/pager'
 import { Button } from '@/components/ui/button'
+import { pageFromQuery, paginate } from '@/lib/admin/paginate'
 import { canReadCashBook, canReverseCashEntry, canWriteCashBook } from '@/lib/auth/permissions'
 import { requireCashView, requireInternalUser } from '@/lib/auth/require'
 import { formatRupiah } from '@/lib/content/format'
@@ -11,7 +13,7 @@ import { prisma } from '@/lib/db'
 export default async function CashPage({
   searchParams,
 }: {
-  searchParams: Promise<{ buku?: string }>
+  searchParams: Promise<{ buku?: string; hal?: string }>
 }) {
   const user = await requireInternalUser()
   requireCashView(user)
@@ -24,19 +26,29 @@ export default async function CashPage({
     return <p className="text-content-secondary">Tidak ada buku kas yang bisa dibaca.</p>
   }
 
+  const kategoriPromise = prisma.expenseCategory.findMany({
+    where: { isActive: true },
+    orderBy: { name: 'asc' },
+  })
+  const entriesAll = await prisma.cashEntry.findMany({
+    where: { cashBookId: selected.id },
+    select: { direction: true, amount: true },
+    orderBy: { date: 'desc' },
+  })
+  const total = entriesAll.length
+  const paging = paginate({ total, page: pageFromQuery(params.hal) })
   const [entries, categories] = await Promise.all([
     prisma.cashEntry.findMany({
       where: { cashBookId: selected.id },
       include: { category: true, recordedBy: true },
       orderBy: { date: 'desc' },
+      skip: paging.skip,
+      take: paging.take,
     }),
-    prisma.expenseCategory.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+    kategoriPromise,
   ])
 
-  const saldo = computeBalance(
-    selected.openingBalance,
-    entries.map((entry) => ({ direction: entry.direction, amount: entry.amount })),
-  )
+  const saldo = computeBalance(selected.openingBalance, entriesAll)
   const bisaTulis = canWriteCashBook(user.matrix, selected.type as 'operasional' | 'tim', user.id, user.id)
 
   return (
@@ -84,6 +96,11 @@ export default async function CashPage({
             </li>
           ))}
         </ul>
+        <Pager
+          page={paging.page}
+          pageCount={paging.pageCount}
+          hrefFor={(hal) => `/internal/cash?buku=${selected.id}&hal=${hal}`}
+        />
       </div>
       {bisaTulis ? (
         <form action={saveCashEntry} className="flex flex-col gap-4">
