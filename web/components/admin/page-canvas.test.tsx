@@ -100,9 +100,32 @@ describe('PageCanvas', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Lebar 8' }))
     expect(bacaLayout()[0]?.blocks[0]?.width).toBe(8)
+    expect(screen.getByRole('button', { name: 'Lebar 8' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByRole('button', { name: 'Lebar 4' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Lebar 6' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Lebar 12' })).toBeInTheDocument()
+  })
+
+  it('menandai lebar aktif dengan aria-pressed', () => {
+    render(
+      <PageCanvas
+        pageId="p1"
+        initialRows={[
+          {
+            id: 'r1',
+            blocks: [{ id: 'b1', type: 'text', width: 6, payload: { text: 'Isi' } }],
+          },
+        ]}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Lebar 6' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'Lebar 4' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('form layout tiga kolom palet tampilan inspector', () => {
+    const { container } = render(<PageCanvas pageId="p1" initialRows={[]} />)
+    expect(container.querySelector('form')?.className).toMatch(/lg:grid-cols-/)
+    expect(screen.getByText('Pilih blok di tampilan.')).toBeInTheDocument()
   })
 
   it('memindah blok kiri dan kanan', () => {
@@ -120,9 +143,9 @@ describe('PageCanvas', () => {
         ]}
       />,
     )
-    fireEvent.click(screen.getAllByRole('button', { name: 'Pindah kanan' })[0]!)
+    fireEvent.click(screen.getByRole('button', { name: 'Pindah kanan' }))
     expect(bacaLayout()[0]?.blocks.map((block) => block.id)).toEqual(['b2', 'b1'])
-    fireEvent.click(screen.getAllByRole('button', { name: 'Pindah kiri' })[1]!)
+    fireEvent.click(screen.getByRole('button', { name: 'Pindah kiri' }))
     expect(bacaLayout()[0]?.blocks.map((block) => block.id)).toEqual(['b1', 'b2'])
   })
 
@@ -177,6 +200,7 @@ describe('PageCanvas', () => {
     const id = document.querySelector('input[name="id"]') as HTMLInputElement
     expect(id.value).toBe('hal-1')
     expect(JSON.parse(layout.value)[0].blocks[0].payload.src).toBe('/media/a.jpg')
+    fireEvent.click(screen.getByLabelText('Blok Logo'))
     expect(screen.getByRole('button', { name: 'Pilih gambar' })).toBeInTheDocument()
     expect(screen.getByDisplayValue('/media/a.jpg')).toBeInTheDocument()
   })
