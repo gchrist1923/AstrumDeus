@@ -307,6 +307,7 @@ export function PageCanvas({
         {terpilih ? (
           <>
             <BlockFields
+              key={terpilih.block.id}
               block={terpilih.block}
               onPayload={(payload) => setPayload(terpilih.row.id, terpilih.block.id, payload)}
             />

@@ -184,6 +184,36 @@ describe('PageCanvas', () => {
     expect(bacaLayout()[2]?.blocks[0]?.id).toBe('b1')
   })
 
+  it('inspector ImageUpload menampilkan src blok yang dipilih saat beralih antar blok gambar', () => {
+    render(
+      <PageCanvas
+        pageId="p1"
+        initialRows={[
+          {
+            id: 'r1',
+            blocks: [
+              { id: 'img1', type: 'image', width: 6, payload: { src: '/media/first.jpg', alt: 'Pertama' } },
+              { id: 'img2', type: 'image', width: 6, payload: { src: '/media/second.jpg', alt: 'Kedua' } },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    const hiddenPertama = document.querySelector('input[name="image-img1"]') as HTMLInputElement
+    expect(hiddenPertama).toBeInTheDocument()
+    expect(hiddenPertama.value).toBe('/media/first.jpg')
+    expect(document.querySelector('input[name="image-img2"]')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByLabelText('Blok Kedua'))
+
+    const hiddenKedua = document.querySelector('input[name="image-img2"]') as HTMLInputElement
+    expect(hiddenKedua).toBeInTheDocument()
+    expect(hiddenKedua.value).toBe('/media/second.jpg')
+    expect(document.querySelector('input[name="image-img1"]')).not.toBeInTheDocument()
+    expect(screen.getByAltText('Pratinjau Gambar')).toHaveAttribute('src', '/media/second.jpg')
+  })
+
   it('menyimpan layout JSON dan memakai ImageUpload pada blok gambar', () => {
     render(
       <PageCanvas
