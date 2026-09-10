@@ -22,6 +22,26 @@ model User {
   attending    EventAttendee[]
   cashEntries  CashEntry[]     @relation("RecordedBy")
   handledMail  ContactMessage[]
+  accessRoles  UserAccessRole[]
+}
+
+model AccessRole {
+  id        String           @id @default(cuid())
+  name      String           @unique
+  slug      String           @unique
+  isAdmin   Boolean          @default(false)
+  grants    String
+  createdAt DateTime         @default(now())
+  users     UserAccessRole[]
+}
+
+model UserAccessRole {
+  userId String
+  roleId String
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   AccessRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
 }
 
 model Session {
@@ -56,11 +76,24 @@ model MenuItem {
   sortOrder    Int
 }
 
+model SitePage {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  title     String
+  kind      String
+  menuKey   String? @unique
+  status    String  @default("published")
+  showInNav Boolean @default(true)
+  isEnabled Boolean @default(true)
+  layout    String  @default("[]")
+}
+
 model NewsCategory {
   id          String     @id @default(cuid())
   name        String
   slug        String     @unique
   description String
+  isActive    Boolean    @default(true)
   posts       NewsPost[]
 }
 
@@ -100,6 +133,7 @@ model Tournament {
   organizer String
   season    String
   year      Int
+  isActive  Boolean      @default(true)
   matches   Match[]
   stats     PlayerStat[]
 }
@@ -149,6 +183,7 @@ model Partner {
   name        String
   tier        String
   logoText    String
+  logo        String?
   href        String?
   description String  @default("")
   sortOrder   Int

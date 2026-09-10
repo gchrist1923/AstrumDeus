@@ -2,11 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { canWriteContent } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { fromDateInput } from '@/lib/datetime'
 import { angka, checked, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
+import { releaseMediaPath } from '@/lib/media/store'
 
 function parseSocialLines(raw: string): { label: string; href: string }[] {
   return raw
@@ -21,18 +21,21 @@ function parseSocialLines(raw: string): { label: string; href: string }[] {
 
 export async function savePlayer(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
-
   const id = teks(formData, 'id')
+  requireGrant(user, 'roster', id ? 'update' : 'create')
+  const nextPhoto = teks(formData, 'photo') || '/portrait.jpg'
+  let prevPhoto: string | null = null
+  if (id) {
+    const existing = await prisma.player.findUnique({ where: { id } })
+    prevPhoto = existing?.photo ?? null
+  }
   const left = teks(formData, 'leftAt')
   const data = {
     slug: teks(formData, 'slug'),
     ign: teks(formData, 'ign'),
     realName: teks(formData, 'realName'),
     role: teks(formData, 'role'),
-    photo: teks(formData, 'photo') || '/portrait.jpg',
+    photo: nextPhoto,
     joinedAt: fromDateInput(teks(formData, 'joinedAt')),
     leftAt: left ? fromDateInput(left) : null,
     isActive: checked(formData, 'isActive'),
@@ -46,6 +49,8 @@ export async function savePlayer(formData: FormData): Promise<void> {
     await prisma.player.create({ data })
   }
 
+  await releaseMediaPath(prevPhoto, nextPhoto)
+
   revalidatePath('/roster')
   revalidatePath('/')
   revalidatePath('/cms/players')
@@ -54,13 +59,13 @@ export async function savePlayer(formData: FormData): Promise<void> {
 
 export async function deletePlayer(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(user, 'roster', 'delete')
 
   const id = teks(formData, 'id')
   if (id) {
+    const existing = await prisma.player.findUnique({ where: { id } })
     await prisma.player.delete({ where: { id } })
+    await releaseMediaPath(existing?.photo, '')
   }
 
   revalidatePath('/roster')

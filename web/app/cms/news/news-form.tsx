@@ -1,5 +1,6 @@
 import { deleteNews, saveNews } from '@/app/cms/news/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { ImageUpload } from '@/components/admin/image-upload'
 import { Button } from '@/components/ui/button'
 import { toDatetimeLocal } from '@/lib/datetime'
 
@@ -10,36 +11,50 @@ interface NewsFormValues {
   excerpt: string
   body: string
   cover: string
-  category: string
+  categoryId: string
   author: string
   publishedAt: Date
   status: string
 }
 
-export function NewsForm({ post }: { post?: NewsFormValues }) {
+export function NewsForm({
+  post,
+  categories,
+  canSave = true,
+  canDelete = false,
+}: {
+  post?: NewsFormValues
+  categories: { id: string; name: string }[]
+  canSave?: boolean
+  canDelete?: boolean
+}) {
   return (
     <form action={saveNews} className="flex max-w-2xl flex-col gap-6">
       {post?.id ? <input type="hidden" name="id" value={post.id} /> : null}
       <Field id="title" label="Judul">
-        <input id="title" name="title" required defaultValue={post?.title} className={KELAS_KONTROL} />
+        <input id="title" name="title" required defaultValue={post?.title} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="slug" label="Slug" hint="Kosongkan saat membuat baru supaya diisi dari judul.">
-        <input id="slug" name="slug" defaultValue={post?.slug} className={KELAS_KONTROL} />
+        <input id="slug" name="slug" defaultValue={post?.slug} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="excerpt" label="Ringkasan">
-        <textarea id="excerpt" name="excerpt" rows={3} defaultValue={post?.excerpt} className={KELAS_KONTROL} />
+        <textarea id="excerpt" name="excerpt" rows={3} defaultValue={post?.excerpt} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="body" label="Isi" hint="Pisahkan paragraf dengan baris kosong.">
-        <textarea id="body" name="body" rows={10} required defaultValue={post?.body} className={KELAS_KONTROL} />
+        <textarea id="body" name="body" rows={10} required defaultValue={post?.body} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
-      <Field id="cover" label="Cover">
-        <input id="cover" name="cover" defaultValue={post?.cover} className={KELAS_KONTROL} />
-      </Field>
-      <Field id="category" label="Kategori">
-        <input id="category" name="category" required defaultValue={post?.category ?? 'Turnamen'} className={KELAS_KONTROL} />
+      <ImageUpload name="cover" label="Cover" defaultValue={post?.cover} disabled={!canSave} />
+      <Field id="categoryId" label="Kategori">
+        <select id="categoryId" name="categoryId" required defaultValue={post?.categoryId} disabled={!canSave} className={KELAS_KONTROL}>
+          {categories.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
       </Field>
       <Field id="author" label="Penulis">
-        <input id="author" name="author" defaultValue={post?.author} className={KELAS_KONTROL} />
+        <input id="author" name="author" defaultValue={post?.author} disabled={!canSave} className={KELAS_KONTROL} />
       </Field>
       <Field id="publishedAt" label="Jadwal terbit">
         <input
@@ -48,18 +63,19 @@ export function NewsForm({ post }: { post?: NewsFormValues }) {
           type="datetime-local"
           required
           defaultValue={toDatetimeLocal(post?.publishedAt ?? new Date())}
+          disabled={!canSave}
           className={KELAS_KONTROL}
         />
       </Field>
       <Field id="status" label="Status">
-        <select id="status" name="status" defaultValue={post?.status ?? 'published'} className={KELAS_KONTROL}>
+        <select id="status" name="status" defaultValue={post?.status ?? 'published'} disabled={!canSave} className={KELAS_KONTROL}>
           <option value="published">Terbit</option>
           <option value="draft">Draft</option>
         </select>
       </Field>
       <div className="flex flex-wrap gap-3">
-        <Button type="submit">Simpan</Button>
-        {post?.id ? (
+        {canSave ? <Button type="submit">Simpan</Button> : null}
+        {post?.id && canDelete ? (
           <Button formAction={deleteNews} variant="destructive" type="submit">
             Hapus
           </Button>

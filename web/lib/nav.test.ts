@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getVisibleNavItems, isMenuEnabled, NAV_ITEMS } from '@/lib/nav'
+import { getVisibleNavItems, isMenuEnabled, mergeNav, NAV_ITEMS } from '@/lib/nav'
 
 describe('NAV_ITEMS', () => {
   it('memuat tujuh menu sesuai spec', () => {
@@ -71,5 +71,33 @@ describe('isMenuEnabled', () => {
   it('mengikuti flag untuk menu opsional', () => {
     expect(isMenuEnabled('roster')).toBe(false)
     expect(isMenuEnabled('roster', { roster: true })).toBe(true)
+  })
+})
+
+describe('mergeNav', () => {
+  it('mengembalikan base saja jika extra kosong', () => {
+    const base = getVisibleNavItems()
+
+    expect(mergeNav(base, [])).toEqual(base.map(({ label, href }) => ({ label, href })))
+  })
+
+  it('menambahkan extra setelah tujuh menu bawaan', () => {
+    const base = getVisibleNavItems({ roster: true })
+    const merged = mergeNav(base, [{ label: 'Academy', href: '/academy' }])
+
+    expect(merged.map((item) => item.href)).toEqual([
+      '/',
+      '/roster',
+      '/news',
+      '/contact',
+      '/academy',
+    ])
+    expect(merged.at(-1)).toEqual({ label: 'Academy', href: '/academy' })
+  })
+
+  it('tidak mengubah NAV_ITEMS', () => {
+    expect(NAV_ITEMS).toHaveLength(7)
+    mergeNav(getVisibleNavItems(), [{ label: 'Academy', href: '/academy' }])
+    expect(NAV_ITEMS).toHaveLength(7)
   })
 })

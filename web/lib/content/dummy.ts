@@ -206,10 +206,10 @@ const BERITA: NewsPost[] = [
 ]
 
 const MITRA: Partner[] = [
-  { slug: 'sponsor-utama', name: 'Sponsor Utama', tier: 'Title', logoText: 'TITLE', href: 'https://example.com' },
-  { slug: 'peralatan', name: 'Peralatan', tier: 'Official', logoText: 'GEAR', href: null },
-  { slug: 'minuman', name: 'Minuman', tier: 'Official', logoText: 'DRINK', href: 'https://example.com' },
-  { slug: 'media', name: 'Media Partner', tier: 'Media', logoText: 'MEDIA', href: null },
+  { slug: 'sponsor-utama', name: 'Sponsor Utama', tier: 'Title', logoText: 'TITLE', logo: null, href: 'https://example.com' },
+  { slug: 'peralatan', name: 'Peralatan', tier: 'Official', logoText: 'GEAR', logo: null, href: null },
+  { slug: 'minuman', name: 'Minuman', tier: 'Official', logoText: 'DRINK', logo: null, href: 'https://example.com' },
+  { slug: 'media', name: 'Media Partner', tier: 'Media', logoText: 'MEDIA', logo: null, href: null },
 ]
 
 const ASET: MediaAsset[] = [

@@ -1,22 +1,53 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { SiteChrome } from '@/components/layout/site-chrome'
+import { getSiteBranding } from '@/lib/content/branding'
 import { getMenuFlags } from '@/lib/content/flags'
+import type { ExtraNavItem } from '@/lib/nav'
+import { extraNavFromPages } from '@/lib/pages/public-visibility'
 import { fontVariables } from './fonts'
 import './globals.css'
 
-export const metadata: Metadata = {
-  title: 'Astrum Deus',
-  description: 'Tim esports PUBG Mobile Astrum Deus, roster dan hasil pertandingannya.',
+async function getExtraNav(): Promise<ExtraNavItem[]> {
+  try {
+    const { prisma } = await import('@/lib/db')
+    const pages = await prisma.sitePage.findMany({
+      where: { kind: 'custom' },
+      select: {
+        title: true,
+        slug: true,
+        kind: true,
+        status: true,
+        isEnabled: true,
+        showInNav: true,
+      },
+    })
+    return extraNavFromPages(pages)
+  } catch {
+    return []
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const branding = await getSiteBranding()
+  return {
+    title: 'Astrum Deus',
+    description: 'Tim esports PUBG Mobile Astrum Deus, roster dan hasil pertandingannya.',
+    icons: { icon: branding.favicon },
+  }
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const flags = await getMenuFlags()
+  const branding = await getSiteBranding()
+  const extra = await getExtraNav()
 
   return (
     <html lang="id" className={fontVariables}>
       <body className="bg-surface-base font-text text-body text-content-primary antialiased">
-        <SiteChrome flags={flags}>{children}</SiteChrome>
+        <SiteChrome flags={flags} extra={extra} logoSrc={branding.logo}>
+          {children}
+        </SiteChrome>
       </body>
     </html>
   )

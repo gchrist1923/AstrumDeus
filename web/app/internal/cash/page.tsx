@@ -1,8 +1,10 @@
 import { reverseCashEntry, saveCashEntry } from '@/app/internal/cash/actions'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { Pager } from '@/components/admin/pager'
 import { Button } from '@/components/ui/button'
-import { canReadCashBook, canWriteCashBook } from '@/lib/auth/roles'
-import { requireInternalUser } from '@/lib/auth/require'
+import { pageFromQuery, paginate } from '@/lib/admin/paginate'
+import { canReadCashBook, canReverseCashEntry, canWriteCashBook } from '@/lib/auth/permissions'
+import { requireCashView, requireInternalUser } from '@/lib/auth/require'
 import { formatRupiah } from '@/lib/content/format'
 import { toDateInput } from '@/lib/datetime'
 import { computeBalance } from '@/lib/finance/report'
@@ -11,32 +13,43 @@ import { prisma } from '@/lib/db'
 export default async function CashPage({
   searchParams,
 }: {
-  searchParams: Promise<{ buku?: string }>
+  searchParams: Promise<{ buku?: string; hal?: string }>
 }) {
   const user = await requireInternalUser()
+  requireCashView(user)
   const params = await searchParams
   const books = await prisma.cashBook.findMany({ orderBy: { name: 'asc' } })
-  const visible = books.filter((book) => canReadCashBook(user.roles, book.type as 'operasional' | 'tim'))
+  const visible = books.filter((book) => canReadCashBook(user.matrix, book.type as 'operasional' | 'tim'))
   const selected = visible.find((book) => book.id === params.buku) ?? visible[0]
 
   if (!selected) {
     return <p className="text-content-secondary">Tidak ada buku kas yang bisa dibaca.</p>
   }
 
+  const kategoriPromise = prisma.expenseCategory.findMany({
+    where: { isActive: true },
+    orderBy: { name: 'asc' },
+  })
+  const entriesAll = await prisma.cashEntry.findMany({
+    where: { cashBookId: selected.id },
+    select: { direction: true, amount: true },
+    orderBy: { date: 'desc' },
+  })
+  const total = entriesAll.length
+  const paging = paginate({ total, page: pageFromQuery(params.hal) })
   const [entries, categories] = await Promise.all([
     prisma.cashEntry.findMany({
       where: { cashBookId: selected.id },
       include: { category: true, recordedBy: true },
       orderBy: { date: 'desc' },
+      skip: paging.skip,
+      take: paging.take,
     }),
-    prisma.expenseCategory.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+    kategoriPromise,
   ])
 
-  const saldo = computeBalance(
-    selected.openingBalance,
-    entries.map((entry) => ({ direction: entry.direction, amount: entry.amount })),
-  )
-  const bisaTulis = canWriteCashBook(user.roles, selected.type as 'operasional' | 'tim', user.id, user.id)
+  const saldo = computeBalance(selected.openingBalance, entriesAll)
+  const bisaTulis = canWriteCashBook(user.matrix, selected.type as 'operasional' | 'tim', user.id, user.id)
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_20rem]">
@@ -66,7 +79,13 @@ export default async function CashPage({
                 {entry.isCorrected ? ' · dikoreksi' : ''}
               </p>
               <p className="mt-2 text-body">{entry.description}</p>
-              {bisaTulis && !entry.isCorrected ? (
+              {canReverseCashEntry(
+                user.matrix,
+                selected.type as 'operasional' | 'tim',
+                entry.recordedById,
+                user.id,
+                entry.isCorrected,
+              ) ? (
                 <form action={reverseCashEntry} className="mt-3">
                   <input type="hidden" name="id" value={entry.id} />
                   <Button type="submit" variant="secondary">
@@ -77,6 +96,11 @@ export default async function CashPage({
             </li>
           ))}
         </ul>
+        <Pager
+          page={paging.page}
+          pageCount={paging.pageCount}
+          hrefFor={(hal) => `/internal/cash?buku=${selected.id}&hal=${hal}`}
+        />
       </div>
       {bisaTulis ? (
         <form action={saveCashEntry} className="flex flex-col gap-4">

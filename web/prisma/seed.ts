@@ -1,17 +1,21 @@
 import { PrismaClient } from '@prisma/client'
 import { hashSync } from 'bcryptjs'
+import {
+  adminTemplate,
+  editorTemplate,
+  financeTemplate,
+  teamTemplate,
+} from '../lib/auth/grants'
 import { DUMMY_ASSETS, DUMMY_MATCHES, DUMMY_NEWS, DUMMY_PARTNERS, DUMMY_PLAYERS } from '../lib/content/dummy'
+import { slugify } from '../lib/content/slug'
+import { BUILTIN_PAGES } from '../lib/pages/builtins'
 
 const prisma = new PrismaClient()
-
-function slugify(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
 
 async function main() {
   const passwordHash = hashSync('astrum-cms-dev', 10)
 
-  await prisma.user.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: 'admin@astrumdeus.id' },
     update: {},
     create: {
@@ -21,6 +25,30 @@ async function main() {
       roles: JSON.stringify(['admin', 'editor', 'finance']),
     },
   })
+
+  const systemRoles = [
+    { name: 'Admin', slug: 'admin', isAdmin: true, grants: JSON.stringify(adminTemplate()) },
+    { name: 'Editor', slug: 'editor', isAdmin: false, grants: JSON.stringify(editorTemplate()) },
+    { name: 'Team', slug: 'team', isAdmin: false, grants: JSON.stringify(teamTemplate()) },
+    { name: 'Finance', slug: 'finance', isAdmin: false, grants: JSON.stringify(financeTemplate()) },
+  ]
+
+  for (const role of systemRoles) {
+    await prisma.accessRole.upsert({
+      where: { slug: role.slug },
+      update: { name: role.name, isAdmin: role.isAdmin, grants: role.grants },
+      create: role,
+    })
+  }
+
+  const adminRole = await prisma.accessRole.findUnique({ where: { slug: 'admin' } })
+  if (adminRole) {
+    await prisma.userAccessRole.upsert({
+      where: { userId_roleId: { userId: adminUser.id, roleId: adminRole.id } },
+      update: {},
+      create: { userId: adminUser.id, roleId: adminRole.id },
+    })
+  }
 
   await prisma.siteSetting.upsert({
     where: { id: 'default' },
@@ -57,6 +85,28 @@ async function main() {
       where: { key: menu.key },
       update: { isEnabled: menu.isEnabled },
       create: menu,
+    })
+  }
+
+  for (const page of BUILTIN_PAGES) {
+    await prisma.sitePage.upsert({
+      where: { slug: page.slug },
+      update: {
+        title: page.title,
+        kind: page.kind,
+        menuKey: page.menuKey,
+        status: 'published',
+      },
+      create: {
+        slug: page.slug,
+        title: page.title,
+        kind: page.kind,
+        menuKey: page.menuKey,
+        status: 'published',
+        showInNav: true,
+        isEnabled: true,
+        layout: '[]',
+      },
     })
   }
 
@@ -98,7 +148,7 @@ async function main() {
   for (const item of turnamen) {
     const ada = await prisma.tournament.findFirst({ where: { name: item.name } })
     if (!ada) {
-      await prisma.tournament.create({ data: item })
+      await prisma.tournament.create({ data: { ...item, isActive: true } })
     }
   }
 
@@ -108,7 +158,7 @@ async function main() {
     await prisma.newsCategory.upsert({
       where: { slug },
       update: { name },
-      create: { name, slug, description: name },
+      create: { name, slug, description: name, isActive: true },
     })
   }
 

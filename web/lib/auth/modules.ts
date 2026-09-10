@@ -1,0 +1,18 @@
+export const ACCESS_MODULES = [
+  { id: 'news', label: 'Berita' },
+  { id: 'roster', label: 'Roster' },
+  { id: 'matches', label: 'Pertandingan' },
+  { id: 'media-kit', label: 'Media Kit' },
+  { id: 'partners', label: 'Partners' },
+  { id: 'inbox', label: 'Kotak masuk' },
+  { id: 'menu', label: 'Menu' },
+  { id: 'situs', label: 'Situs' },
+  { id: 'users', label: 'Pengguna' },
+  { id: 'kategori', label: 'Kategori' },
+  { id: 'peran', label: 'Peran' },
+  { id: 'halaman', label: 'Halaman' },
+  { id: 'jadwal', label: 'Jadwal' },
+  { id: 'kas-operasional', label: 'Kas operasional' },
+  { id: 'kas-tim', label: 'Kas tim' },
+  { id: 'laporan', label: 'Laporan' },
+] as const

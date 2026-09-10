@@ -1,22 +1,25 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { canManageSettings } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
+import { releaseMediaPath } from '@/lib/media/store'
 
 export async function saveSettings(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canManageSettings(user.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(user, 'situs', 'update')
+
+  const existing = await prisma.siteSetting.findUnique({ where: { id: 'default' } })
+  const nextLogo = teks(formData, 'logo') || '/logo-astrum-deus.png'
+  const nextFavicon = teks(formData, 'favicon') || '/logo-astrum-deus.png'
 
   await prisma.siteSetting.update({
     where: { id: 'default' },
     data: {
       siteName: teks(formData, 'siteName'),
+      logo: nextLogo,
+      favicon: nextFavicon,
       defaultMetaTitle: teks(formData, 'defaultMetaTitle'),
       defaultMetaDesc: teks(formData, 'defaultMetaDesc'),
       contactAddress: teks(formData, 'contactAddress'),
@@ -28,6 +31,10 @@ export async function saveSettings(formData: FormData): Promise<void> {
     },
   })
 
+  await releaseMediaPath(existing?.logo, nextLogo)
+  await releaseMediaPath(existing?.favicon, nextFavicon)
+
+  revalidatePath('/', 'layout')
   revalidatePath('/')
   revalidatePath('/contact')
   revalidatePath('/cms/settings')

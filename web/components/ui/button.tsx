@@ -12,7 +12,7 @@ const KELAS_DASAR = [
 
 const KELAS_VARIAN: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-surface-raised hover:bg-accent-strong',
-  secondary: 'border-2 border-border-strong text-content-primary hover:border-content-primary',
+  secondary: 'border-2 border-border-strong text-content-primary hover:border-content-primary active:bg-accent active:text-surface-raised',
   destructive: 'bg-danger-solid text-content-primary hover:bg-danger-strong',
 }
 

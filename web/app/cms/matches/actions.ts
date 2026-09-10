@@ -2,19 +2,15 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { canWriteContent } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { fromDatetimeLocal } from '@/lib/datetime'
 import { angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
 export async function saveMatch(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
-
   const id = teks(formData, 'id')
+  requireGrant(user, 'matches', id ? 'update' : 'create')
   const recapSlug = teks(formData, 'recapSlug')
   const recap = recapSlug ? await prisma.newsPost.findUnique({ where: { slug: recapSlug } }) : null
 
@@ -46,9 +42,7 @@ export async function saveMatch(formData: FormData): Promise<void> {
 
 export async function deleteMatch(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
-  if (!canWriteContent(user.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(user, 'matches', 'delete')
 
   const id = teks(formData, 'id')
   if (id) {

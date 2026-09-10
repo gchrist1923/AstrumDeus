@@ -49,6 +49,7 @@ export interface Partner {
   name: string
   tier: string
   logoText: string
+  logo: string | null
   href: string | null
 }
 

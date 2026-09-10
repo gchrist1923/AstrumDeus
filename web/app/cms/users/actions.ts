@@ -1,31 +1,67 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { hashPassword } from '@/lib/auth/password'
-import { canManageSettings, parseRoles, ROLES } from '@/lib/auth/roles'
-import { requireCmsUser } from '@/lib/auth/require'
+import { legacyRolesJsonFromSlugs } from '@/lib/auth/roles'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
+async function selectedAccessRoles(formData: FormData) {
+  const catalog = await prisma.accessRole.findMany()
+  return catalog.filter((role) => formData.get(`role-${role.id}`) === 'on')
+}
+
 export async function saveUser(formData: FormData): Promise<void> {
   const actor = await requireCmsUser()
-  if (!canManageSettings(actor.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(actor, 'users', 'update')
 
   const email = teks(formData, 'email').toLowerCase()
   const name = teks(formData, 'name')
   const password = typeof formData.get('password') === 'string' ? String(formData.get('password')) : ''
-  const roles = ROLES.filter((role) => formData.get(`role-${role}`) === 'on')
+  const selected = await selectedAccessRoles(formData)
 
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       name,
       passwordHash: await hashPassword(password),
-      roles: JSON.stringify(roles.length > 0 ? roles : parseRoles('["editor"]')),
+      roles: legacyRolesJsonFromSlugs(selected.map((role) => role.slug)),
     },
+  })
+
+  if (selected.length > 0) {
+    await prisma.userAccessRole.createMany({
+      data: selected.map((role) => ({ userId: user.id, roleId: role.id })),
+    })
+  }
+
+  revalidatePath('/cms/users')
+}
+
+export async function saveUserRoles(formData: FormData): Promise<void> {
+  const actor = await requireCmsUser()
+  requireGrant(actor, 'users', 'update')
+
+  const id = teks(formData, 'id')
+  const user = await prisma.user.findUnique({ where: { id } })
+  if (!user) {
+    return
+  }
+
+  const selected = await selectedAccessRoles(formData)
+
+  await prisma.$transaction(async (tx) => {
+    await tx.userAccessRole.deleteMany({ where: { userId: id } })
+    if (selected.length > 0) {
+      await tx.userAccessRole.createMany({
+        data: selected.map((role) => ({ userId: id, roleId: role.id })),
+      })
+    }
+    await tx.user.update({
+      where: { id },
+      data: { roles: legacyRolesJsonFromSlugs(selected.map((role) => role.slug)) },
+    })
   })
 
   revalidatePath('/cms/users')
@@ -33,9 +69,7 @@ export async function saveUser(formData: FormData): Promise<void> {
 
 export async function toggleUserActive(formData: FormData): Promise<void> {
   const actor = await requireCmsUser()
-  if (!canManageSettings(actor.roles)) {
-    redirect('/cms')
-  }
+  requireGrant(actor, 'users', 'update')
 
   const id = teks(formData, 'id')
   const user = await prisma.user.findUnique({ where: { id } })

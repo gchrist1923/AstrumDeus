@@ -1,8 +1,13 @@
 import { notFound } from 'next/navigation'
 import { MatchForm } from '@/app/cms/matches/match-form'
+import { can } from '@/lib/auth/grants'
+import { requireCmsUser, requireGrant } from '@/lib/auth/require'
+import { activePlusCurrent } from '@/lib/content/active-options'
 import { prisma } from '@/lib/db'
 
 export default async function EditMatchPage({ params }: { params: Promise<{ id: string }> }) {
+  const user = await requireCmsUser()
+  requireGrant(user, 'matches', 'view')
   const { id } = await params
   const [match, tournaments] = await Promise.all([
     prisma.match.findUnique({ where: { id }, include: { recap: true } }),
@@ -15,7 +20,9 @@ export default async function EditMatchPage({ params }: { params: Promise<{ id: 
 
   return (
     <MatchForm
-      tournaments={tournaments}
+      tournaments={activePlusCurrent(tournaments, match.tournamentId)}
+      canSave={can(user.matrix, 'matches', 'update')}
+      canDelete={can(user.matrix, 'matches', 'delete')}
       match={{
         id: match.id,
         tournamentId: match.tournamentId,

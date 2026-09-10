@@ -2,14 +2,8 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { logoutAction } from '@/app/login/actions'
 import { Button } from '@/components/ui/button'
-import {
-  canAccessCms,
-  canAccessInternal,
-  canManageSettings,
-  canReadReports,
-  canToggleMenu,
-  type Role,
-} from '@/lib/auth/roles'
+import { can, type AccessModule, type GrantMatrix } from '@/lib/auth/grants'
+import { canAccessCms, canAccessInternal } from '@/lib/auth/permissions'
 
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
@@ -18,45 +12,53 @@ interface NavLink {
   label: string
 }
 
-function cmsLinks(roles: Role[]): NavLink[] {
+const CMS_NAV: { href: string; label: string; module: AccessModule }[] = [
+  { href: '/cms/news', label: 'Berita', module: 'news' },
+  { href: '/cms/players', label: 'Roster', module: 'roster' },
+  { href: '/cms/matches', label: 'Pertandingan', module: 'matches' },
+  { href: '/cms/media-kit', label: 'Media Kit', module: 'media-kit' },
+  { href: '/cms/partners', label: 'Partners', module: 'partners' },
+  { href: '/cms/inbox', label: 'Kotak masuk', module: 'inbox' },
+  { href: '/cms/menu', label: 'Menu', module: 'menu' },
+  { href: '/cms/settings', label: 'Situs', module: 'situs' },
+  { href: '/cms/users', label: 'Pengguna', module: 'users' },
+  { href: '/cms/kategori', label: 'Kategori', module: 'kategori' },
+  { href: '/cms/peran', label: 'Peran', module: 'peran' },
+  { href: '/cms/halaman', label: 'Halaman', module: 'halaman' },
+]
+
+function cmsLinks(matrix: GrantMatrix): NavLink[] {
   const links: NavLink[] = [{ href: '/cms', label: 'Ringkasan' }]
 
-  if (canAccessCms(roles)) {
-    links.push(
-      { href: '/cms/news', label: 'Berita' },
-      { href: '/cms/players', label: 'Roster' },
-      { href: '/cms/matches', label: 'Pertandingan' },
-      { href: '/cms/media-kit', label: 'Media Kit' },
-      { href: '/cms/partners', label: 'Partners' },
-      { href: '/cms/inbox', label: 'Kotak masuk' },
-    )
+  for (const item of CMS_NAV) {
+    if (can(matrix, item.module, 'view')) {
+      links.push({ href: item.href, label: item.label })
+    }
   }
 
-  if (canToggleMenu(roles)) {
-    links.push({ href: '/cms/menu', label: 'Menu' })
-  }
-
-  if (canManageSettings(roles)) {
-    links.push({ href: '/cms/settings', label: 'Situs' }, { href: '/cms/users', label: 'Pengguna' })
-  }
-
-  if (canAccessInternal(roles)) {
+  if (canAccessInternal(matrix)) {
     links.push({ href: '/internal', label: 'Internal' })
   }
 
   return links
 }
 
-function internalLinks(roles: Role[]): NavLink[] {
-  const links: NavLink[] = [{ href: '/internal', label: 'Ringkasan' }, { href: '/internal/schedule', label: 'Jadwal' }]
+function internalLinks(matrix: GrantMatrix): NavLink[] {
+  const links: NavLink[] = [{ href: '/internal', label: 'Ringkasan' }]
 
-  links.push({ href: '/internal/cash', label: 'Kas' })
+  if (can(matrix, 'jadwal', 'view')) {
+    links.push({ href: '/internal/schedule', label: 'Jadwal' })
+  }
 
-  if (canReadReports(roles)) {
+  if (can(matrix, 'kas-operasional', 'view') || can(matrix, 'kas-tim', 'view')) {
+    links.push({ href: '/internal/cash', label: 'Kas' })
+  }
+
+  if (can(matrix, 'laporan', 'view')) {
     links.push({ href: '/internal/reports', label: 'Laporan' })
   }
 
-  if (canAccessCms(roles)) {
+  if (canAccessCms(matrix)) {
     links.push({ href: '/cms', label: 'CMS' })
   }
 
@@ -66,17 +68,17 @@ function internalLinks(roles: Role[]): NavLink[] {
 export function AdminShell({
   title,
   area,
-  roles,
+  matrix,
   name,
   children,
 }: {
   title: string
   area: 'cms' | 'internal'
-  roles: Role[]
+  matrix: GrantMatrix
   name: string
   children: ReactNode
 }) {
-  const links = area === 'cms' ? cmsLinks(roles) : internalLinks(roles)
+  const links = area === 'cms' ? cmsLinks(matrix) : internalLinks(matrix)
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary">
