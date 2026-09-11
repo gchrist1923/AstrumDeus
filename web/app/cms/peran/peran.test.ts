@@ -12,11 +12,27 @@ describe('UI peran', () => {
   it('daftar menautkan nama peran dan tombol salin templat', () => {
     const page = baca('page.tsx')
     expect(page).toMatch(/\/cms\/peran\/\$\{/)
+    expect(page).toMatch(/Ubah\s*<\/Link>/)
     expect(page).toMatch(/Salin Editor/)
     expect(page).toMatch(/Salin Team/)
     expect(page).toMatch(/Salin Finance/)
     expect(page).toMatch(/copyTemplate\.bind\(null, 'editor'\)/)
     expect(page).not.toMatch(/name="template"/)
+  })
+
+  it('buat peran membuka halaman Ubah', () => {
+    const actions = baca('actions.ts')
+    expect(actions).toMatch(/accessRole\.create/)
+    expect(actions).toMatch(/redirect\(`\/cms\/peran\/\$\{role\.id\}`\)/)
+  })
+
+  it('halaman Ubah mengelompokkan menu CMS dan Internal', () => {
+    const detail = baca('[id]/page.tsx')
+    expect(detail).toMatch(/PeranJudul/)
+    expect(detail).toMatch(/judul="CMS"/)
+    expect(detail).toMatch(/judul="Internal"/)
+    expect(detail).toMatch(/kas-operasional/)
+    expect(detail).toMatch(/jadwal/)
   })
 
   it('daftar menampilkan slug di samping nama', () => {

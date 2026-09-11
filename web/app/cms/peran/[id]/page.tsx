@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation'
 import { deleteRole, saveGrants } from '@/app/cms/peran/actions'
 import { KELAS_FOKUS } from '@/components/admin/form-field'
+import { PeranJudul } from '@/components/admin/peran-judul'
 import { Button } from '@/components/ui/button'
-import { can, type AccessAction, type GrantMatrix } from '@/lib/auth/grants'
+import { can, type AccessAction, type AccessModule, type GrantMatrix } from '@/lib/auth/grants'
 import { ACCESS_MODULES } from '@/lib/auth/modules'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
@@ -13,6 +14,67 @@ const GRANT_ACTIONS: { id: AccessAction; label: string }[] = [
   { id: 'update', label: 'Ubah' },
   { id: 'delete', label: 'Hapus' },
 ]
+
+const ID_INTERNAL = new Set<AccessModule>(['jadwal', 'kas-operasional', 'kas-tim', 'laporan'])
+const MODUL_CMS = ACCESS_MODULES.filter((modul) => !ID_INTERNAL.has(modul.id))
+const MODUL_INTERNAL = ACCESS_MODULES.filter((modul) => ID_INTERNAL.has(modul.id))
+
+function TabelHak({
+  judul,
+  modules,
+  matrix,
+  terkunci,
+}: {
+  judul: string
+  modules: typeof ACCESS_MODULES
+  matrix: GrantMatrix
+  terkunci: boolean
+}) {
+  return (
+    <section className="flex flex-col gap-4">
+      <h3 className="font-display text-card uppercase">{judul}</h3>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border-2 border-border-strong text-left">
+          <thead>
+            <tr className="border-b-2 border-border-strong">
+              <th className="px-4 py-3 font-display text-label uppercase">Modul</th>
+              {GRANT_ACTIONS.map((action) => (
+                <th key={action.id} className="px-4 py-3 font-display text-label uppercase">
+                  {action.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {modules.map((modul) => (
+              <tr key={modul.id} className="border-b border-border-strong">
+                <th scope="row" className="px-4 py-3 font-display text-body font-semibold">
+                  {modul.label}
+                </th>
+                {GRANT_ACTIONS.map((action) => (
+                  <td key={action.id} className="px-4 py-3">
+                    <label className="inline-flex min-h-11 min-w-11 items-center justify-center">
+                      <input
+                        type="checkbox"
+                        name={`${modul.id}-${action.id}`}
+                        defaultChecked={matrix[modul.id][action.id]}
+                        disabled={terkunci}
+                        className={`min-h-11 min-w-11 accent-accent ${KELAS_FOKUS}`}
+                      />
+                      <span className="sr-only">
+                        {action.label} {modul.label}
+                      </span>
+                    </label>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )
+}
 
 export default async function CmsPeranDetailPage({
   params,
@@ -38,14 +100,14 @@ export default async function CmsPeranDetailPage({
 
   return (
     <div className="flex flex-col gap-10">
-      <header>
-        <h2 className="font-display text-section uppercase">{role.name}</h2>
-        <p className="mt-3 max-w-2xl text-body text-content-secondary">
+      <div className="flex flex-col gap-3">
+        <PeranJudul>{role.name}</PeranJudul>
+        <p className="max-w-2xl text-body text-content-secondary">
           {terkunci
             ? 'Peran Admin tidak bisa dikurangi.'
-            : 'Centang hak per modul. Aksi tulis tanpa lihat diabaikan.'}
+            : 'Centang Lihat supaya menu muncul saat login. Tambah, Ubah, dan Hapus adalah aksi di dalam menu itu. Tulis tanpa lihat diabaikan.'}
         </p>
-      </header>
+      </div>
 
       {query.kesalahan === 'kurangi' ? (
         <p role="alert" className="text-body text-danger">
@@ -58,47 +120,10 @@ export default async function CmsPeranDetailPage({
         </p>
       ) : null}
 
-      <form action={saveGrants} className="flex flex-col gap-6">
+      <form action={saveGrants} className="flex flex-col gap-10">
         <input type="hidden" name="id" value={role.id} />
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border-2 border-border-strong text-left">
-            <thead>
-              <tr className="border-b-2 border-border-strong">
-                <th className="px-4 py-3 font-display text-label uppercase">Modul</th>
-                {GRANT_ACTIONS.map((action) => (
-                  <th key={action.id} className="px-4 py-3 font-display text-label uppercase">
-                    {action.label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ACCESS_MODULES.map((modul) => (
-                <tr key={modul.id} className="border-b border-border-strong">
-                  <th scope="row" className="px-4 py-3 font-display text-body font-semibold">
-                    {modul.label}
-                  </th>
-                  {GRANT_ACTIONS.map((action) => (
-                    <td key={action.id} className="px-4 py-3">
-                      <label className="inline-flex min-h-11 min-w-11 items-center justify-center">
-                        <input
-                          type="checkbox"
-                          name={`${modul.id}-${action.id}`}
-                          defaultChecked={matrix[modul.id][action.id]}
-                          disabled={terkunci}
-                          className={`min-h-11 min-w-11 accent-accent ${KELAS_FOKUS}`}
-                        />
-                        <span className="sr-only">
-                          {action.label} {modul.label}
-                        </span>
-                      </label>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <TabelHak judul="CMS" modules={MODUL_CMS} matrix={matrix} terkunci={terkunci} />
+        <TabelHak judul="Internal" modules={MODUL_INTERNAL} matrix={matrix} terkunci={terkunci} />
         {bisaUbah && !role.isAdmin ? <Button type="submit">Simpan hak</Button> : null}
       </form>
 
