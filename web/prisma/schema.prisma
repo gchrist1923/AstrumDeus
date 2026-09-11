@@ -65,6 +65,11 @@ model SiteSetting {
   titles           Int    @default(0)
   tournaments      Int    @default(0)
   wwcd             Int    @default(0)
+  heroEyebrow      String @default("PUBG Mobile · Indonesia")
+  heroTitle        String @default("Astrum Deus")
+  heroTagline      String @default("Tim PUBG Mobile yang berlatih terjadwal dan membuka hasilnya, dari klasemen sampai catatan scrim.")
+  heroImage        String @default("/hero.jpg")
+  heroImageAlt     String @default("")
 }
 
 model MenuItem {
