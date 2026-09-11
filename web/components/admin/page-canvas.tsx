@@ -455,6 +455,7 @@ function CanvasBlock({
           name={`image-${block.id}`}
           label="Gambar"
           defaultValue={src}
+          hidePreview
           onPathChange={(path) => onPayload({ ...block.payload, src: path })}
         />
         <label htmlFor={idAlt} className="font-display text-label uppercase text-content-muted">

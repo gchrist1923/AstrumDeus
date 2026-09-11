@@ -48,6 +48,15 @@ describe('SiteHeader', () => {
     expect(screen.getByRole('link', { name: 'Astrum Deus' })).toHaveAttribute('href', '/')
   })
 
+  it('logo dekoratif; nama situs jadi nama tautan Home', () => {
+    const { container } = render(<SiteHeader siteName="AD Esports" />)
+
+    expect(screen.getByRole('link', { name: 'AD Esports' })).toHaveAttribute('href', '/')
+    expect(container.querySelector('img')).toHaveAttribute('alt', '')
+    expect(screen.getByText('AD Esports')).toHaveClass('max-md:sr-only')
+    expect(screen.getByText('AD Esports')).toHaveClass('font-display')
+  })
+
   it('tidak punya pelanggaran aksesibilitas', async () => {
     const { container } = render(<SiteHeader flags={{ roster: true }} />)
 

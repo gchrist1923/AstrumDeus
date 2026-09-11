@@ -6,10 +6,12 @@ export function SiteFooter({
   flags,
   extra = [],
   logoSrc = '/logo-astrum-deus.png',
+  siteName = 'Astrum Deus',
 }: {
   flags?: MenuFlags
   extra?: ExtraNavItem[]
   logoSrc?: string
+  siteName?: string
 }) {
   const items = mergeNav(getVisibleNavItems(flags), extra)
 
@@ -17,7 +19,7 @@ export function SiteFooter({
     <footer className="mt-24 border-t border-border bg-surface-raised">
       <div className="mx-auto max-w-page px-5 py-16 md:px-8">
         <div className="flex flex-wrap items-start gap-12">
-          <Image src={logoSrc} alt="Astrum Deus" width={52} height={52} unoptimized={logoSrc.startsWith('/media/')} />
+          <Image src={logoSrc} alt="" width={52} height={52} unoptimized={logoSrc.startsWith('/media/')} />
 
           <nav aria-label="Navigasi footer" className="ml-auto">
             <ul className="grid grid-cols-2 gap-x-12 gap-y-3">
@@ -36,7 +38,7 @@ export function SiteFooter({
         </div>
 
         <p className="mt-14 border-t border-border pt-6 text-small text-content-muted">
-          Astrum Deus. Tim esports PUBG Mobile.
+          {siteName}. Tim esports PUBG Mobile.
         </p>
       </div>
     </footer>

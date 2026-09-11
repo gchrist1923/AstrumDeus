@@ -111,12 +111,3 @@ export async function getMediaAssets(): Promise<MediaAsset[]> {
   const rows = await prisma.mediaKitAsset.findMany({ orderBy: { sortOrder: 'asc' } })
   return rows.map(mapAsset)
 }
-
-export async function getSiteContact(): Promise<{ email: string; note: string }> {
-  const setting = await prisma.siteSetting.findUnique({ where: { id: 'default' } })
-
-  return {
-    email: setting?.contactEmail || 'halo@astrumdeus.id',
-    note: 'Pilih tujuan di form supaya pesan sponsor tidak tercampur dengan tryout.',
-  }
-}
