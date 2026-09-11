@@ -24,8 +24,8 @@ export default async function CmsPeranPage({
       <header>
         <h2 className="font-display text-section uppercase">Peran</h2>
         <p className="mt-3 max-w-2xl text-body text-content-secondary">
-          Hak pengguna adalah gabungan semua peran yang ditugaskan. Peran Admin tidak bisa dihapus
-          atau dikurangi.
+          Hak pengguna adalah gabungan semua peran yang ditugaskan. Ubah peran untuk memilih menu
+          CMS dan internal. Peran Admin tidak bisa dihapus atau dikurangi.
         </p>
       </header>
 
@@ -51,24 +51,29 @@ export default async function CmsPeranPage({
                 key={role.id}
                 className="flex flex-wrap items-center justify-between gap-3 border-2 border-border-strong px-4 py-3"
               >
-                <div className="flex flex-wrap items-baseline gap-3">
+                <div>
+                  <p className="font-display text-body font-semibold">{role.name}</p>
+                  <p className="text-small text-content-muted">
+                    {role.slug}
+                    {role.isAdmin ? ' · Admin' : ''}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
                   <Link
                     href={`/cms/peran/${role.id}`}
-                    className={`font-display text-body font-semibold text-accent underline ${KELAS_FOKUS}`}
+                    className={`inline-flex min-h-11 items-center text-accent underline ${KELAS_FOKUS}`}
                   >
-                    {role.name}
+                    Ubah
                   </Link>
-                  <span className="text-small text-content-muted">{role.slug}</span>
-                  {role.isAdmin ? <span className="text-small text-content-muted">Admin</span> : null}
+                  {!role.isAdmin && bisaHapus ? (
+                    <form action={deleteRole}>
+                      <input type="hidden" name="id" value={role.id} />
+                      <Button type="submit" variant="destructive">
+                        Hapus
+                      </Button>
+                    </form>
+                  ) : null}
                 </div>
-                {!role.isAdmin && bisaHapus ? (
-                  <form action={deleteRole}>
-                    <input type="hidden" name="id" value={role.id} />
-                    <Button type="submit" variant="destructive">
-                      Hapus
-                    </Button>
-                  </form>
-                ) : null}
               </li>
             ))}
           </ul>
