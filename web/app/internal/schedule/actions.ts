@@ -46,7 +46,16 @@ export async function saveEvent(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/internal/schedule')
-  redirect(overlap ? '/internal/schedule?peringatan=tumpang' : '/internal/schedule')
+  const bulan = teks(formData, 'bulan')
+  const qs = new URLSearchParams()
+  if (/^\d{4}-\d{2}$/.test(bulan)) {
+    qs.set('bulan', bulan)
+  }
+  if (overlap) {
+    qs.set('peringatan', 'tumpang')
+  }
+  const query = qs.toString()
+  redirect(query ? `/internal/schedule?${query}` : '/internal/schedule')
 }
 
 export async function deleteEvent(formData: FormData): Promise<void> {
@@ -60,4 +69,6 @@ export async function deleteEvent(formData: FormData): Promise<void> {
 
   await prisma.scheduleEvent.delete({ where: { id } })
   revalidatePath('/internal/schedule')
+  const bulan = teks(formData, 'bulan')
+  redirect(/^\d{4}-\d{2}$/.test(bulan) ? `/internal/schedule?bulan=${bulan}` : '/internal/schedule')
 }

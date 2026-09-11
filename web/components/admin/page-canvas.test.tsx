@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { PageCanvas } from '@/components/admin/page-canvas'
 import type { PageRow } from '@/lib/pages/types'
@@ -30,15 +30,16 @@ function bacaLayout(): PageRow[] {
 }
 
 const PALET: { label: string; type: string }[] = [
-  { label: 'Judul', type: 'heading' },
-  { label: 'Teks', type: 'text' },
-  { label: 'Gambar', type: 'image' },
+  { label: 'Teks', type: 'heading' },
+  { label: 'Long text', type: 'text' },
   { label: 'Tombol', type: 'button' },
-  { label: 'Daftar', type: 'list' },
+  { label: 'Gambar', type: 'image' },
+  { label: 'Video', type: 'video' },
+  { label: 'Garis', type: 'divider' },
 ]
 
 describe('PageCanvas', () => {
-  it('menampilkan palet lima jenis yang bisa diseret', () => {
+  it('menampilkan palet baru tanpa Daftar', () => {
     render(<PageCanvas pageId="p1" initialRows={[]} />)
 
     for (const item of PALET) {
@@ -46,11 +47,13 @@ describe('PageCanvas', () => {
       expect(el).toHaveAttribute('draggable', 'true')
       expect(el).toHaveAttribute('data-block-type', item.type)
     }
+    expect(screen.queryByRole('button', { name: 'Daftar' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Judul' })).not.toBeInTheDocument()
   })
 
   it('menambah blok saat palet dijatuhkan ke baris', () => {
     render(<PageCanvas pageId="p1" initialRows={[]} />)
-    seret(screen.getByRole('button', { name: 'Judul' }), screen.getByLabelText('Baris baru'))
+    seret(screen.getByRole('button', { name: 'Teks' }), screen.getByLabelText('Baris baru'))
 
     const rows = bacaLayout()
     expect(rows).toHaveLength(1)
@@ -61,7 +64,7 @@ describe('PageCanvas', () => {
 
   it('klik palet menambah blok di baris baru', () => {
     render(<PageCanvas pageId="p1" initialRows={[]} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Judul' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Teks' }))
     expect(bacaLayout()).toHaveLength(1)
     expect(bacaLayout()[0]?.blocks[0]?.type).toBe('heading')
   })
@@ -78,7 +81,7 @@ describe('PageCanvas', () => {
         ]}
       />,
     )
-    seret(screen.getByRole('button', { name: 'Teks' }), screen.getByLabelText('Baris 1'))
+    seret(screen.getByRole('button', { name: 'Long text' }), screen.getByLabelText('Baris 1'))
 
     const rows = bacaLayout()
     expect(rows).toHaveLength(1)
@@ -184,7 +187,7 @@ describe('PageCanvas', () => {
     expect(bacaLayout()[2]?.blocks[0]?.id).toBe('b1')
   })
 
-  it('inspector ImageUpload menampilkan src blok yang dipilih saat beralih antar blok gambar', () => {
+  it('gambar di kanvas menampilkan src dan unggah di dalam blok', () => {
     render(
       <PageCanvas
         pageId="p1"
@@ -200,18 +203,10 @@ describe('PageCanvas', () => {
       />,
     )
 
-    const hiddenPertama = document.querySelector('input[name="image-img1"]') as HTMLInputElement
-    expect(hiddenPertama).toBeInTheDocument()
-    expect(hiddenPertama.value).toBe('/media/first.jpg')
-    expect(document.querySelector('input[name="image-img2"]')).not.toBeInTheDocument()
-
+    expect(screen.getByAltText('Pertama')).toHaveAttribute('src', '/media/first.jpg')
+    expect(screen.getByAltText('Kedua')).toHaveAttribute('src', '/media/second.jpg')
     fireEvent.click(screen.getByLabelText('Blok Kedua'))
-
-    const hiddenKedua = document.querySelector('input[name="image-img2"]') as HTMLInputElement
-    expect(hiddenKedua).toBeInTheDocument()
-    expect(hiddenKedua.value).toBe('/media/second.jpg')
-    expect(document.querySelector('input[name="image-img1"]')).not.toBeInTheDocument()
-    expect(screen.getByAltText('Pratinjau Gambar')).toHaveAttribute('src', '/media/second.jpg')
+    expect(screen.getByDisplayValue('/media/second.jpg')).toBeInTheDocument()
   })
 
   it('menyimpan layout JSON dan memakai ImageUpload pada blok gambar', () => {
@@ -233,5 +228,55 @@ describe('PageCanvas', () => {
     fireEvent.click(screen.getByLabelText('Blok Logo'))
     expect(screen.getByRole('button', { name: 'Pilih gambar' })).toBeInTheDocument()
     expect(screen.getByDisplayValue('/media/a.jpg')).toBeInTheDocument()
+  })
+
+  it('ketik judul di blok masuk ke layout JSON', () => {
+    render(<PageCanvas pageId="p1" initialRows={[]} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Teks' }))
+    fireEvent.change(screen.getByLabelText('Judul blok'), { target: { value: 'Halo kanvas' } })
+    expect(bacaLayout()[0]?.blocks[0]?.payload.text).toBe('Halo kanvas')
+  })
+
+  it('cover YouTube tampil di kanvas video', () => {
+    render(
+      <PageCanvas
+        pageId="p1"
+        initialRows={[
+          {
+            id: 'r1',
+            blocks: [
+              {
+                id: 'v1',
+                type: 'video',
+                width: 12,
+                payload: { url: 'https://youtu.be/dQw4w9wgGcQ' },
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+    expect(screen.getByRole('img', { name: 'Cover video' })).toHaveAttribute(
+      'src',
+      'https://i.ytimg.com/vi/dQw4w9wgGcQ/hqdefault.jpg',
+    )
+  })
+
+  it('hapus blok setelah konfirmasi dialog', () => {
+    render(
+      <PageCanvas
+        pageId="p1"
+        initialRows={[
+          {
+            id: 'r1',
+            blocks: [{ id: 'b1', type: 'heading', width: 12, payload: { text: 'Buang', level: 2 } }],
+          },
+        ]}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Hapus' }))
+    expect(bacaLayout()[0]?.blocks).toHaveLength(1)
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Hapus' }))
+    expect(bacaLayout()).toEqual([])
   })
 })

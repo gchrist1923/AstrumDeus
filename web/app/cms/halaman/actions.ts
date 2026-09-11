@@ -146,3 +146,18 @@ export async function saveLayout(formData: FormData): Promise<void> {
   revalidateHalamanPublik(page.slug)
   redirect(`/cms/halaman/${page.id}`)
 }
+
+export async function deleteCustomPage(formData: FormData): Promise<void> {
+  const user = await requireCmsUser()
+  requireGrant(user, 'halaman', 'delete')
+
+  const id = teks(formData, 'id')
+  const page = id ? await prisma.sitePage.findUnique({ where: { id } }) : null
+  if (!page || page.kind !== 'custom') {
+    redirect('/cms/halaman')
+  }
+
+  await prisma.sitePage.delete({ where: { id: page.id } })
+  revalidateHalamanPublik(page.slug)
+  redirect('/cms/halaman')
+}

@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { toggleBuiltinEnabled } from '@/app/cms/halaman/actions'
+import { deleteCustomPage, toggleBuiltinEnabled } from '@/app/cms/halaman/actions'
+import { ConfirmSubmit } from '@/components/admin/confirm-submit'
 import { KELAS_FOKUS } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
 import { can } from '@/lib/auth/grants'
@@ -17,6 +18,7 @@ export default async function CmsHalamanPage({
   const params = await searchParams
   const bisaToggle = can(user.matrix, 'menu', 'update')
   const bisaBuat = can(user.matrix, 'halaman', 'create')
+  const bisaHapus = can(user.matrix, 'halaman', 'delete')
 
   const pages = await prisma.sitePage.findMany()
   const byMenuKey = new Map(pages.map((page) => [page.menuKey, page]))
@@ -122,14 +124,24 @@ export default async function CmsHalamanPage({
                       {page.isEnabled ? 'Y' : 'N'}
                     </td>
                     <td className="px-4 py-3">
-                      {page.kind === 'custom' ? (
-                        <Link
-                          href={`/cms/halaman/${page.id}`}
-                          className={`inline-flex min-h-11 items-center font-display text-label uppercase text-accent underline ${KELAS_FOKUS}`}
-                        >
-                          Kanvas
-                        </Link>
-                      ) : null}
+                      <div className="flex flex-wrap items-center gap-3">
+                        {page.kind === 'custom' ? (
+                          <Link
+                            href={`/cms/halaman/${page.id}`}
+                            className={`inline-flex min-h-11 items-center font-display text-label uppercase text-accent underline ${KELAS_FOKUS}`}
+                          >
+                            Kanvas
+                          </Link>
+                        ) : null}
+                        {page.kind === 'custom' && bisaHapus ? (
+                          <form action={deleteCustomPage}>
+                            <input type="hidden" name="id" value={page.id} />
+                            <ConfirmSubmit message="Hapus halaman ini?" variant="destructive">
+                              Hapus
+                            </ConfirmSubmit>
+                          </form>
+                        ) : null}
+                      </div>
                     </td>
                   </tr>
                 ))}
