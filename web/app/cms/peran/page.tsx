@@ -78,7 +78,7 @@ export default async function CmsPeranPage({
       {bisaTambah ? (
         <section className="flex flex-col gap-6">
           <h3 className="font-display text-card uppercase">Tambah peran</h3>
-          <form action={createRole} className="flex max-w-xl flex-col gap-4">
+          <form action={createRole} className="mx-auto flex w-full max-w-xl flex-col gap-4">
             <Field id="peran-name" label="Nama">
               <input id="peran-name" name="name" required className={KELAS_KONTROL} />
             </Field>
