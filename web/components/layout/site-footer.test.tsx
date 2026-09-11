@@ -17,6 +17,13 @@ describe('SiteFooter', () => {
     expect(screen.queryByRole('link', { name: 'Media Kit' })).not.toBeInTheDocument()
   })
 
+  it('baris kredit memakai nama situs; logo dekoratif', () => {
+    const { container } = render(<SiteFooter siteName="AD Esports" />)
+
+    expect(screen.getByText('AD Esports. Tim esports PUBG Mobile.')).toBeInTheDocument()
+    expect(container.querySelector('img')).toHaveAttribute('alt', '')
+  })
+
   it('tidak punya pelanggaran aksesibilitas', async () => {
     const { container } = render(<SiteFooter flags={{ roster: true }} />)
 

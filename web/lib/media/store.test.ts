@@ -75,4 +75,11 @@ describe('store media', () => {
     await expect(countMediaPathUses('/media/x.png')).resolves.toBe(1)
     expect(prisma.partner.count).toHaveBeenCalledWith({ where: { logo: '/media/x.png' } })
   })
+
+  it('menghitung pemakaian path pada siteSetting.heroImage', async () => {
+    await countMediaPathUses('/media/hero.png')
+    expect(prisma.siteSetting.count).toHaveBeenCalledWith({
+      where: { OR: [{ logo: '/media/hero.png' }, { favicon: '/media/hero.png' }, { heroImage: '/media/hero.png' }] },
+    })
+  })
 })
