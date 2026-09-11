@@ -78,7 +78,7 @@ export default async function CmsKategoriKasPage({
       )}
 
       {bisaTulis ? (
-        <form action={createCashCategory} className="flex max-w-xl flex-col gap-4">
+        <form action={createCashCategory} className="mx-auto flex w-full max-w-xl flex-col gap-4">
           <h3 className="font-display text-label uppercase text-accent">Tambah kategori kas</h3>
           <Field id="kas-name" label="Nama">
             <input id="kas-name" name="name" required className={KELAS_KONTROL} />

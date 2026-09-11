@@ -32,7 +32,7 @@ export default async function CmsMediaKitPage() {
         ))}
       </ul>
       {bisaTambah ? (
-        <form action={saveAsset} className="flex max-w-xl flex-col gap-4">
+        <form action={saveAsset} className="mx-auto flex w-full max-w-xl flex-col gap-4">
           <h3 className="font-display text-label uppercase text-accent">Tambah aset</h3>
           <Field id="name" label="Nama">
             <input id="name" name="name" required className={KELAS_KONTROL} />

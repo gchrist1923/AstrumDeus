@@ -18,7 +18,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <form action={saveSettings} className="flex max-w-xl flex-col gap-6">
+    <form action={saveSettings} className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <h2 className="font-display text-section uppercase">Situs</h2>
       <Field id="siteName" label="Nama situs">
         <input id="siteName" name="siteName" defaultValue={setting.siteName} disabled={!bisaUbah} className={KELAS_KONTROL} />

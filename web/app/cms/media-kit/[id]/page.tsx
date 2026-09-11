@@ -21,7 +21,7 @@ export default async function EditAssetPage({ params }: { params: Promise<{ id: 
   const bisaHapus = can(user.matrix, 'media-kit', 'delete')
 
   return (
-    <form action={saveAsset} className="flex max-w-xl flex-col gap-4">
+    <form action={saveAsset} className="mx-auto flex w-full max-w-xl flex-col gap-4">
       <input type="hidden" name="id" value={asset.id} />
       <Field id="name" label="Nama">
         <input id="name" name="name" required defaultValue={asset.name} disabled={!bisaUbah} className={KELAS_KONTROL} />

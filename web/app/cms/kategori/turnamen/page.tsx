@@ -78,7 +78,7 @@ export default async function CmsKategoriTurnamenPage({
       )}
 
       {bisaTulis ? (
-        <form action={createTournament} className="flex max-w-xl flex-col gap-4">
+        <form action={createTournament} className="mx-auto flex w-full max-w-xl flex-col gap-4">
           <h3 className="font-display text-label uppercase text-accent">Tambah turnamen</h3>
           <Field id="turnamen-name" label="Nama">
             <input id="turnamen-name" name="name" required className={KELAS_KONTROL} />
