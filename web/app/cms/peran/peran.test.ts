@@ -53,7 +53,8 @@ describe('UI penugasan pengguna', () => {
     const page = readFileSync(path.join(process.cwd(), 'app', 'cms', 'users', 'page.tsx'), 'utf8')
     expect(page).not.toMatch(/ROLES\.map/)
     expect(page).toMatch(/accessRole/)
-    expect(page).toMatch(/saveUserRoles/)
+    expect(page).toMatch(/saveUser/)
+    expect(page).not.toMatch(/saveUserRoles/)
   })
 })
 

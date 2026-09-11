@@ -1,46 +1,23 @@
-import { saveUser, saveUserRoles, toggleUserActive } from '@/app/cms/users/actions'
+import { saveUser, toggleUserActive } from '@/app/cms/users/actions'
 import { Field, KELAS_FOKUS, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
 import { can } from '@/lib/auth/grants'
-import { parseRoles, type Role } from '@/lib/auth/roles'
+import { parseRoles } from '@/lib/auth/roles'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
-function selectedRoleIds(
-  user: { accessRoles: { roleId: string }[]; roles: string },
-  catalog: { id: string; slug: string }[],
-): Set<string> {
-  if (user.accessRoles.length > 0) {
-    return new Set(user.accessRoles.map((row) => row.roleId))
-  }
-
-  const legacy = parseRoles(user.roles)
-  return new Set(
-    catalog.filter((role) => legacy.includes(role.slug as Role)).map((role) => role.id),
-  )
-}
-
-function PeranCheckboxes({
-  roles,
-  selectedIds,
-  idPrefix,
-}: {
-  roles: { id: string; name: string }[]
-  selectedIds?: Set<string>
-  idPrefix: string
-}) {
+function PeranCheckboxes({ roles }: { roles: { id: string; name: string }[] }) {
   return (
     <fieldset className="flex flex-col gap-2">
       <legend className="font-display text-label uppercase text-content-muted">Peran</legend>
       {roles.map((role) => {
-        const id = `${idPrefix}-role-${role.id}`
+        const id = `baru-role-${role.id}`
         return (
           <label key={role.id} htmlFor={id} className="flex min-h-11 items-center gap-3">
             <input
               id={id}
               type="checkbox"
               name={`role-${role.id}`}
-              defaultChecked={selectedIds?.has(role.id) ?? false}
               className={`min-h-11 min-w-11 accent-accent ${KELAS_FOKUS}`}
             />
             <span>{role.name}</span>
@@ -65,55 +42,10 @@ export default async function UsersPage() {
   ])
 
   return (
-    <div className="grid gap-10 lg:grid-cols-2">
-      <div>
-        <h2 className="mb-6 font-display text-section uppercase">Pengguna</h2>
-        <ul className="flex flex-col gap-3">
-          {users.map((user) => {
-            const namaPeran =
-              user.accessRoles.length > 0
-                ? user.accessRoles.map((row) => row.role.name).join(', ')
-                : parseRoles(user.roles).join(', ')
-
-            return (
-              <li key={user.id} className="flex flex-col gap-4 border-2 border-border-strong px-4 py-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="font-display text-body font-semibold">{user.name}</p>
-                    <p className="text-small text-content-muted">
-                      {user.email} · {namaPeran || 'tanpa peran'} · {user.isActive ? 'aktif' : 'nonaktif'}
-                    </p>
-                  </div>
-                  {bisaUbah && user.email !== actor.email ? (
-                    <form action={toggleUserActive}>
-                      <input type="hidden" name="id" value={user.id} />
-                      <Button type="submit" variant="secondary">
-                        {user.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                      </Button>
-                    </form>
-                  ) : null}
-                </div>
-                {bisaUbah ? (
-                  <form action={saveUserRoles} className="flex flex-col gap-3">
-                    <input type="hidden" name="id" value={user.id} />
-                    <PeranCheckboxes
-                      roles={roles}
-                      selectedIds={selectedRoleIds(user, roles)}
-                      idPrefix={user.id}
-                    />
-                    <Button type="submit" variant="secondary">
-                      Simpan peran
-                    </Button>
-                  </form>
-                ) : null}
-              </li>
-            )
-          })}
-        </ul>
-      </div>
+    <div className="flex flex-col gap-16">
       {bisaUbah ? (
-        <form action={saveUser} className="flex flex-col gap-4">
-          <h3 className="font-display text-label uppercase text-accent">Pengguna baru</h3>
+        <form action={saveUser} className="flex max-w-2xl flex-col gap-4">
+          <h2 className="font-display text-section uppercase">Pengguna baru</h2>
           <Field id="name" label="Nama">
             <input id="name" name="name" required className={KELAS_KONTROL} />
           </Field>
@@ -123,10 +55,46 @@ export default async function UsersPage() {
           <Field id="password" label="Kata sandi">
             <input id="password" name="password" type="password" required className={KELAS_KONTROL} />
           </Field>
-          <PeranCheckboxes roles={roles} idPrefix="baru" />
+          <PeranCheckboxes roles={roles} />
           <Button type="submit">Tambah pengguna</Button>
         </form>
-      ) : null}
+      ) : (
+        <h2 className="font-display text-section uppercase">Pengguna</h2>
+      )}
+
+      <section className="flex flex-col gap-6">
+        <h3 className="font-display text-card uppercase">Daftar pengguna</h3>
+        <ul className="flex flex-col gap-3">
+          {users.map((user) => {
+            const namaPeran =
+              user.accessRoles.length > 0
+                ? user.accessRoles.map((row) => row.role.name).join(', ')
+                : parseRoles(user.roles).join(', ')
+
+            return (
+              <li
+                key={user.id}
+                className="flex flex-wrap items-center justify-between gap-3 border-2 border-border-strong px-4 py-3"
+              >
+                <div>
+                  <p className="font-display text-body font-semibold">{user.name}</p>
+                  <p className="text-small text-content-muted">
+                    {user.email} · {namaPeran || 'tanpa peran'} · {user.isActive ? 'aktif' : 'nonaktif'}
+                  </p>
+                </div>
+                {bisaUbah && user.email !== actor.email ? (
+                  <form action={toggleUserActive}>
+                    <input type="hidden" name="id" value={user.id} />
+                    <Button type="submit" variant="secondary">
+                      {user.isActive ? 'Nonaktifkan' : 'Aktifkan'}
+                    </Button>
+                  </form>
+                ) : null}
+              </li>
+            )
+          })}
+        </ul>
+      </section>
     </div>
   )
 }
