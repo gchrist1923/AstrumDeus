@@ -76,7 +76,7 @@ export default async function CmsKategoriBeritaPage({
       )}
 
       {bisaTulis ? (
-        <form action={createNewsCategory} className="flex max-w-xl flex-col gap-4">
+        <form action={createNewsCategory} className="mx-auto flex w-full max-w-xl flex-col gap-4">
           <h3 className="font-display text-label uppercase text-accent">Tambah kategori berita</h3>
           {params.kesalahan === 'nama' ? (
             <p role="alert" className="text-body text-danger">

@@ -80,7 +80,7 @@ export async function countMediaPathUses(urlPath: string): Promise<number> {
     prisma.newsPost.count({ where: { cover: urlPath } }),
     prisma.mediaKitAsset.count({ where: { href: urlPath } }),
     prisma.siteSetting.count({
-      where: { OR: [{ logo: urlPath }, { favicon: urlPath }] },
+      where: { OR: [{ logo: urlPath }, { favicon: urlPath }, { heroImage: urlPath }] },
     }),
     prisma.partner.count({ where: { logo: urlPath } }),
   ])

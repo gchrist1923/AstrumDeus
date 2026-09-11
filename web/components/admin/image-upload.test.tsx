@@ -18,7 +18,54 @@ describe('ImageUpload', () => {
     expect(screen.getByDisplayValue('/portrait.jpg')).toHaveAttribute('name', 'photo')
     expect(screen.getByText('JPG, PNG, atau WebP. Maksimal 15 MB.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Pilih gambar' })).toBeEnabled()
-    expect(screen.getByRole('img', { name: 'Pratinjau Foto' })).toHaveAttribute('src', '/portrait.jpg')
+    const pratinjau = screen.getByRole('img', { name: 'Pratinjau Foto' })
+    expect(pratinjau).toHaveAttribute('src', '/portrait.jpg')
+    expect(pratinjau).toHaveClass('object-contain')
+    expect(pratinjau).toHaveClass('self-start')
+  })
+
+  it('menyembunyikan pratinjau jika hidePreview', () => {
+    render(<ImageUpload name="photo" label="Foto" defaultValue="/portrait.jpg" hidePreview />)
+    expect(screen.queryByRole('img', { name: 'Pratinjau Foto' })).not.toBeInTheDocument()
+    expect(screen.getByDisplayValue('/portrait.jpg')).toHaveAttribute('name', 'photo')
+  })
+
+  it('mengisi jenis dan ukuran readonly setelah unggah PNG', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({ path: '/media/logo.png' }),
+    } as Response)
+    const pngBytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+    const user = userEvent.setup()
+    render(
+      <ImageUpload
+        name="href"
+        label="Berkas"
+        meta={{
+          fileTypeName: 'fileType',
+          fileSizeName: 'fileSize',
+          defaultFileType: '—',
+          defaultFileSize: '—',
+        }}
+      />,
+    )
+    const jenis = screen.getByLabelText('Jenis')
+    const ukuran = screen.getByLabelText('Ukuran')
+    expect(jenis).toHaveAttribute('name', 'fileType')
+    expect(ukuran).toHaveAttribute('name', 'fileSize')
+    expect(jenis).toHaveAttribute('readOnly')
+    expect(ukuran).toHaveAttribute('readOnly')
+    expect(jenis).toHaveValue('—')
+    expect(screen.getAllByText('Diisi otomatis dari berkas.')).toHaveLength(2)
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    const png = new File([pngBytes], 'logo.png', { type: 'image/png' })
+    await user.upload(input, png)
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('/media/logo.png')).toHaveAttribute('name', 'href')
+    })
+    expect(jenis).toHaveValue('PNG')
+    expect(ukuran).toHaveValue('8 B')
   })
 
   it('menolak PDF di klien tanpa fetch', async () => {

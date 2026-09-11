@@ -44,7 +44,7 @@ export default async function UsersPage() {
   return (
     <div className="flex flex-col gap-16">
       {bisaUbah ? (
-        <form action={saveUser} className="flex max-w-2xl flex-col gap-4">
+        <form action={saveUser} className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <h2 className="font-display text-section uppercase">Pengguna baru</h2>
           <Field id="name" label="Nama">
             <input id="name" name="name" required className={KELAS_KONTROL} />

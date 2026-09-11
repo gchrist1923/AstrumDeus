@@ -13,7 +13,7 @@ export default async function NewHalamanPage({
   const params = await searchParams
 
   return (
-    <div className="flex max-w-2xl flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
       <header>
         <h2 className="font-display text-section uppercase">Halaman baru</h2>
         <p className="mt-3 text-body text-content-secondary">
