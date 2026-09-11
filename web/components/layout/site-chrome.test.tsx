@@ -27,5 +27,8 @@ describe('SiteChrome extra nav', () => {
     expect(footer).toMatch(/getVisibleNavItems\(flags\)/)
     expect(layout).toMatch(/extraNavFromPages|showInNav/)
     expect(layout).toMatch(/extra=/)
+    expect(chrome).toMatch(/siteName/)
+    expect(header).toMatch(/siteName/)
+    expect(footer).toMatch(/siteName/)
   })
 })

@@ -12,10 +12,12 @@ export function SiteHeader({
   flags,
   extra = [],
   logoSrc = '/logo-astrum-deus.png',
+  siteName = 'Astrum Deus',
 }: {
   flags?: MenuFlags
   extra?: ExtraNavItem[]
   logoSrc?: string
+  siteName?: string
 }) {
   const pathname = usePathname()
   const items = mergeNav(getVisibleNavItems(flags), extra)
@@ -23,15 +25,18 @@ export function SiteHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface-base/85 backdrop-blur">
       <div className="mx-auto flex h-20 max-w-page items-center gap-8 px-5 md:px-8">
-        <Link href="/" className={`flex items-center ${KELAS_FOKUS}`}>
+        <Link href="/" className={`flex items-center gap-3 ${KELAS_FOKUS}`}>
           <Image
             src={logoSrc}
-            alt="Astrum Deus"
+            alt=""
             width={40}
             height={40}
             priority
             unoptimized={logoSrc.startsWith('/media/')}
           />
+          <span className="max-md:sr-only font-display text-label uppercase text-content-primary">
+            {siteName}
+          </span>
         </Link>
 
         <nav aria-label="Navigasi utama" className="ml-auto hidden md:block">

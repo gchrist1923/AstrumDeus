@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import {
   createTournament,
   deactivateTournament,
@@ -6,6 +5,7 @@ import {
 } from '@/app/cms/kategori/actions'
 import { ConfirmSubmit } from '@/components/admin/confirm-submit'
 import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { KategoriJudul } from '@/components/admin/kategori-judul'
 import { Button } from '@/components/ui/button'
 import { can } from '@/lib/auth/grants'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
@@ -26,12 +26,7 @@ export default async function CmsKategoriTurnamenPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <header>
-        <Link href="/cms/kategori" className="text-small text-content-secondary underline">
-          Kembali ke kategori
-        </Link>
-        <h2 className="mt-3 font-display text-section uppercase">Turnamen</h2>
-      </header>
+      <KategoriJudul>Turnamen</KategoriJudul>
 
       {params.kesalahan === 'pakai' ? (
         <p role="alert" className="text-body text-danger">
@@ -78,7 +73,7 @@ export default async function CmsKategoriTurnamenPage({
       )}
 
       {bisaTulis ? (
-        <form action={createTournament} className="flex max-w-xl flex-col gap-4">
+        <form action={createTournament} className="mx-auto flex w-full max-w-xl flex-col gap-4">
           <h3 className="font-display text-label uppercase text-accent">Tambah turnamen</h3>
           <Field id="turnamen-name" label="Nama">
             <input id="turnamen-name" name="name" required className={KELAS_KONTROL} />

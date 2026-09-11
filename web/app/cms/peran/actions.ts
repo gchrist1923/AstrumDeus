@@ -65,7 +65,7 @@ async function createNamedRole(name: string, grants: GrantMatrix): Promise<void>
     redirect('/cms/peran?kesalahan=nama')
   }
 
-  await prisma.accessRole.create({
+  const role = await prisma.accessRole.create({
     data: {
       name,
       slug,
@@ -74,8 +74,8 @@ async function createNamedRole(name: string, grants: GrantMatrix): Promise<void>
     },
   })
 
-  revalidatePeran()
-  redirect('/cms/peran')
+  revalidatePeran(role.id)
+  redirect(`/cms/peran/${role.id}`)
 }
 
 export async function createRole(formData: FormData): Promise<void> {
