@@ -24,7 +24,7 @@ export function MediaKitAssetForm({
   canDelete?: boolean
 }) {
   return (
-    <form action={saveAsset} className="flex max-w-xl flex-col gap-4">
+    <form action={saveAsset} className="mx-auto flex w-full max-w-xl flex-col gap-4">
       {asset?.id ? <input type="hidden" name="id" value={asset.id} /> : null}
       <Field id="name" label="Nama">
         <input id="name" name="name" required defaultValue={asset?.name} disabled={!canSave} className={KELAS_KONTROL} />

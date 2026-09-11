@@ -33,7 +33,7 @@ export function PlayerForm({
   const socials = player ? parseSocials(player.socials).map((item) => `${item.label}|${item.href}`).join('\n') : ''
 
   return (
-    <form action={savePlayer} className="flex max-w-2xl flex-col gap-6">
+    <form action={savePlayer} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       {player?.id ? <input type="hidden" name="id" value={player.id} /> : null}
       <Field id="ign" label="IGN">
         <input id="ign" name="ign" required defaultValue={player?.ign} disabled={!canSave} className={KELAS_KONTROL} />

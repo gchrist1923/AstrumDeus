@@ -13,6 +13,7 @@ export async function saveSettings(formData: FormData): Promise<void> {
   const existing = await prisma.siteSetting.findUnique({ where: { id: 'default' } })
   const nextLogo = teks(formData, 'logo') || '/logo-astrum-deus.png'
   const nextFavicon = teks(formData, 'favicon') || '/logo-astrum-deus.png'
+  const nextHero = teks(formData, 'heroImage') || '/hero.jpg'
 
   await prisma.siteSetting.update({
     where: { id: 'default' },
@@ -28,11 +29,17 @@ export async function saveSettings(formData: FormData): Promise<void> {
       titles: angka(formData, 'titles') ?? 0,
       tournaments: angka(formData, 'tournaments') ?? 0,
       wwcd: angka(formData, 'wwcd') ?? 0,
+      heroEyebrow: teks(formData, 'heroEyebrow'),
+      heroTitle: teks(formData, 'heroTitle'),
+      heroTagline: teks(formData, 'heroTagline'),
+      heroImage: nextHero,
+      heroImageAlt: teks(formData, 'heroImageAlt'),
     },
   })
 
   await releaseMediaPath(existing?.logo, nextLogo)
   await releaseMediaPath(existing?.favicon, nextFavicon)
+  await releaseMediaPath(existing?.heroImage, nextHero)
 
   revalidatePath('/', 'layout')
   revalidatePath('/')
