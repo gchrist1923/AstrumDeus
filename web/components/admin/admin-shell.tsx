@@ -83,7 +83,7 @@ export function AdminShell({
   return (
     <div className="min-h-screen bg-surface-base text-content-primary">
       <header className="border-b border-border">
-        <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-4 px-5 py-4 md:px-8">
+        <div className="flex w-full flex-wrap items-center justify-between gap-4 px-5 py-4 md:px-8">
           <div>
             <p className="font-display text-label uppercase tracking-[0.16em] text-accent">
               {area === 'cms' ? 'CMS' : 'Internal'}
@@ -100,7 +100,7 @@ export function AdminShell({
           </div>
         </div>
       </header>
-      <div className="mx-auto flex max-w-page flex-col gap-10 px-5 py-10 md:flex-row md:px-8">
+      <div className="flex w-full flex-col gap-10 px-5 py-10 md:flex-row md:px-8">
         <nav aria-label="Navigasi admin" className="flex w-full flex-col gap-1 md:w-52 md:shrink-0">
           {links.map((link) => (
             <Link
