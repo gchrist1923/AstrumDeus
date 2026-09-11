@@ -9,15 +9,21 @@ function baca(berkas: string): string {
 }
 
 describe('jadwal kalender', () => {
-  it('kisi bulan dan query hari/id mengisi panel', () => {
+  it('kisi bulan, dua chip, dan dialog hari/id', () => {
     const page = baca('page.tsx')
     expect(page).toMatch(/monthGrid/)
     expect(page).toMatch(/grid-cols-7/)
+    expect(page).toMatch(/chipKalender/)
+    expect(page).toMatch(/\+\$\{sisa\} event/)
+    expect(page).toMatch(/JadwalDialog/)
+    expect(page).toMatch(/baru=1/)
     expect(page).toMatch(/hari=/)
     expect(page).toMatch(/id=/)
     expect(page).toMatch(/autoFocus/)
     expect(page).toMatch(/Hari ini/)
+    expect(page).toMatch(/Buat event/)
     expect(page).not.toMatch(/Event baru/)
+    expect(page).not.toMatch(/Pilih hari atau event/)
   })
 
   it('saveEvent mempertahankan bulan dan peringatan tumpang', () => {
