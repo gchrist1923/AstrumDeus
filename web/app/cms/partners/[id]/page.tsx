@@ -21,7 +21,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
   const bisaHapus = can(user.matrix, 'partners', 'delete')
 
   return (
-    <form action={savePartner} className="flex max-w-xl flex-col gap-4">
+    <form action={savePartner} className="mx-auto flex w-full max-w-xl flex-col gap-4">
       <input type="hidden" name="id" value={partner.id} />
       <Field id="name" label="Nama">
         <input id="name" name="name" required defaultValue={partner.name} disabled={!bisaUbah} className={KELAS_KONTROL} />
