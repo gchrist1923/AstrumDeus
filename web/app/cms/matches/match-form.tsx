@@ -30,7 +30,7 @@ export function MatchForm({
   canDelete?: boolean
 }) {
   return (
-    <form action={saveMatch} className="flex max-w-2xl flex-col gap-6">
+    <form action={saveMatch} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       {match?.id ? <input type="hidden" name="id" value={match.id} /> : null}
       <Field id="tournamentId" label="Turnamen">
         <select id="tournamentId" name="tournamentId" required defaultValue={match?.tournamentId} disabled={!canSave} className={KELAS_KONTROL}>

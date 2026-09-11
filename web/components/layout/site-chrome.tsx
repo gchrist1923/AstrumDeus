@@ -14,11 +14,13 @@ export function SiteChrome({
   flags,
   extra = [],
   logoSrc = '/logo-astrum-deus.png',
+  siteName = 'Astrum Deus',
   children,
 }: {
   flags: MenuFlags
   extra?: ExtraNavItem[]
   logoSrc?: string
+  siteName?: string
   children: ReactNode
 }) {
   const path = usePathname()
@@ -29,9 +31,9 @@ export function SiteChrome({
 
   return (
     <>
-      <SiteHeader flags={flags} extra={extra} logoSrc={logoSrc} />
+      <SiteHeader flags={flags} extra={extra} logoSrc={logoSrc} siteName={siteName} />
       {children}
-      <SiteFooter flags={flags} extra={extra} logoSrc={logoSrc} />
+      <SiteFooter flags={flags} extra={extra} logoSrc={logoSrc} siteName={siteName} />
     </>
   )
 }

@@ -39,34 +39,6 @@ export async function saveUser(formData: FormData): Promise<void> {
   revalidatePath('/cms/users')
 }
 
-export async function saveUserRoles(formData: FormData): Promise<void> {
-  const actor = await requireCmsUser()
-  requireGrant(actor, 'users', 'update')
-
-  const id = teks(formData, 'id')
-  const user = await prisma.user.findUnique({ where: { id } })
-  if (!user) {
-    return
-  }
-
-  const selected = await selectedAccessRoles(formData)
-
-  await prisma.$transaction(async (tx) => {
-    await tx.userAccessRole.deleteMany({ where: { userId: id } })
-    if (selected.length > 0) {
-      await tx.userAccessRole.createMany({
-        data: selected.map((role) => ({ userId: id, roleId: role.id })),
-      })
-    }
-    await tx.user.update({
-      where: { id },
-      data: { roles: legacyRolesJsonFromSlugs(selected.map((role) => role.slug)) },
-    })
-  })
-
-  revalidatePath('/cms/users')
-}
-
 export async function toggleUserActive(formData: FormData): Promise<void> {
   const actor = await requireCmsUser()
   requireGrant(actor, 'users', 'update')

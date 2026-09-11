@@ -14,6 +14,26 @@ describe('UI kategori', () => {
     expect(hub).toMatch(/\/cms\/kategori\/berita/)
     expect(hub).not.toMatch(/deactivateTournament/)
     expect(hub).not.toMatch(/prisma\.tournament\.findMany/)
+    expect(hub).not.toMatch(/mx-auto/)
+  })
+
+  it('judul detail memakai ikon kembali di samping judul', () => {
+    for (const halaman of ['turnamen/page.tsx', 'kas/page.tsx', 'berita/page.tsx']) {
+      const page = baca(halaman)
+      expect(page).toMatch(/KategoriJudul/)
+      expect(page).not.toMatch(/Kembali ke kategori/)
+    }
+
+    const judul = readFileSync(
+      path.join(process.cwd(), 'components', 'admin', 'kategori-judul.tsx'),
+      'utf8',
+    )
+    expect(judul).toMatch(/aria-label="Kembali ke kategori"/)
+    expect(judul).toMatch(/<svg/)
+    expect(judul).toMatch(/min-h-11 min-w-11/)
+    expect(judul).toMatch(/href="\/cms\/kategori"/)
+    expect(judul).toMatch(/rtl:-scale-x-100/)
+    expect(judul).not.toMatch(/>Kembali ke kategori</)
   })
 
   it('hapus ditolak jika masih ada relasi', () => {

@@ -1,12 +1,14 @@
 'use client'
 
 import { type ChangeEvent, useEffect, useRef, useState } from 'react'
-import { KELAS_FOKUS, KELAS_LABEL } from '@/components/admin/form-field'
+import { Field, KELAS_FOKUS, KELAS_KONTROL, KELAS_LABEL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
 import { MAX_IMAGE_BYTES } from '@/lib/media/constants'
+import { KIND_LABEL, formatFileSize } from '@/lib/media/meta'
 import { validateImageBuffer } from '@/lib/media/validate'
 
 const HINT = 'JPG, PNG, atau WebP. Maksimal 15 MB.'
+const HINT_META = 'Diisi otomatis dari berkas.'
 
 const PESAN = {
   jenis: 'Pilih file JPG, PNG, atau WebP.',
@@ -27,6 +29,8 @@ export function ImageUpload({
   defaultValue = '',
   required = false,
   disabled = false,
+  hidePreview = false,
+  meta,
   onPathChange,
 }: {
   name: string
@@ -34,15 +38,26 @@ export function ImageUpload({
   defaultValue?: string
   required?: boolean
   disabled?: boolean
+  hidePreview?: boolean
+  meta?: {
+    fileTypeName: string
+    fileSizeName: string
+    defaultFileType?: string
+    defaultFileSize?: string
+  }
   onPathChange?: (path: string) => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
   const uploadingRef = useRef(false)
   const [path, setPath] = useState(defaultValue)
+  const [fileType, setFileType] = useState(meta?.defaultFileType ?? '')
+  const [fileSize, setFileSize] = useState(meta?.defaultFileSize ?? '')
   const [error, setError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const fileId = `${name}-file`
   const errorId = `${name}-error`
+  const idJenis = `${name}-fileType`
+  const idUkuran = `${name}-fileSize`
 
   useEffect(() => {
     if (error && !uploading) {
@@ -94,6 +109,8 @@ export function ImageUpload({
           return
         }
         setPath(data.path)
+        setFileType(KIND_LABEL[hasil.kind])
+        setFileSize(formatFileSize(file.size))
         onPathChange?.(data.path)
         setError(null)
       } catch {
@@ -107,51 +124,75 @@ export function ImageUpload({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={disabled ? undefined : fileId} className={`${KELAS_LABEL}${uploading ? ' pointer-events-none' : ''}`}>
-        {label}
-      </label>
-      {path ? (
-        <img
-          src={path}
-          alt={`Pratinjau ${label}`}
-          className="max-h-48 w-auto max-w-full outline outline-1 outline-content-primary/10"
-        />
-      ) : null}
-      <input type="hidden" name={name} value={path} required={required} />
-      {disabled ? null : (
-      <div
-        className={`relative inline-flex ${KELAS_FOKUS} focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent`}
-      >
-        <Button
-          type="button"
-          variant="secondary"
-          disabled={uploading}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
-          onClick={() => fileRef.current?.click()}
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <label htmlFor={disabled ? undefined : fileId} className={`${KELAS_LABEL}${uploading ? ' pointer-events-none' : ''}`}>
+          {label}
+        </label>
+        {path && !hidePreview ? (
+          <img
+            src={path}
+            alt={`Pratinjau ${label}`}
+            className="max-h-48 h-auto w-auto max-w-full self-start object-contain outline outline-1 outline-content-primary/10"
+          />
+        ) : null}
+        <input type="hidden" name={name} value={path} required={required} />
+        {disabled ? null : (
+        <div
+          className={`relative inline-flex ${KELAS_FOKUS} focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent`}
         >
-          {uploading ? 'Mengunggah…' : 'Pilih gambar'}
-        </Button>
-        <input
-          ref={fileRef}
-          id={fileId}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          disabled={uploading}
-          className="absolute inset-0 opacity-0"
-          tabIndex={-1}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
-          onChange={onChange}
-        />
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={uploading}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+            onClick={() => fileRef.current?.click()}
+          >
+            {uploading ? 'Mengunggah…' : 'Pilih gambar'}
+          </Button>
+          <input
+            ref={fileRef}
+            id={fileId}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            disabled={uploading}
+            className="absolute inset-0 opacity-0"
+            tabIndex={-1}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+            onChange={onChange}
+          />
+        </div>
+        )}
+        {disabled ? null : <p className="text-small text-content-muted">{HINT}</p>}
+        {error ? (
+          <p id={errorId} role="alert" className="text-small text-danger">
+            {error}
+          </p>
+        ) : null}
       </div>
-      )}
-      {disabled ? null : <p className="text-small text-content-muted">{HINT}</p>}
-      {error ? (
-        <p id={errorId} role="alert" className="text-small text-danger">
-          {error}
-        </p>
+      {meta ? (
+        <>
+          <Field id={idJenis} label="Jenis" hint={HINT_META}>
+            <input
+              id={idJenis}
+              name={meta.fileTypeName}
+              value={fileType}
+              readOnly
+              className={KELAS_KONTROL}
+            />
+          </Field>
+          <Field id={idUkuran} label="Ukuran" hint={HINT_META}>
+            <input
+              id={idUkuran}
+              name={meta.fileSizeName}
+              value={fileSize}
+              readOnly
+              className={KELAS_KONTROL}
+            />
+          </Field>
+        </>
       ) : null}
     </div>
   )

@@ -41,7 +41,7 @@ export default async function HalamanKanvasPage({
   if (!shouldEditOnCanvas(page.kind)) {
     const builtin = BUILTIN_PAGES.find((item) => item.menuKey === page.menuKey)
     return (
-      <div className="flex max-w-2xl flex-col gap-8">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
         <header>
           <h2 className="font-display text-section uppercase">{page.title}</h2>
           <p className="mt-3 text-body text-content-secondary">
@@ -75,7 +75,7 @@ export default async function HalamanKanvasPage({
         </p>
       ) : null}
 
-      <form action={updateCustomPage} className="flex max-w-2xl flex-col gap-6">
+      <form action={updateCustomPage} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
         <input type="hidden" name="id" value={page.id} />
         <Field id="title" label="Judul">
           <input
@@ -120,7 +120,7 @@ export default async function HalamanKanvasPage({
       </form>
 
       {bisaHapus ? (
-        <form action={deleteCustomPage} className="max-w-2xl">
+        <form action={deleteCustomPage} className="mx-auto w-full max-w-2xl">
           <input type="hidden" name="id" value={page.id} />
           <ConfirmSubmit message="Hapus halaman ini?" variant="destructive">
             Hapus

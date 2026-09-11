@@ -1,9 +1,10 @@
-import { deleteInboxMessage, updateInboxStatus } from '@/app/cms/inbox/actions'
+import { deleteInboxMessage } from '@/app/cms/inbox/actions'
 import { ConfirmSubmit } from '@/components/admin/confirm-submit'
-import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
+import { Field, KELAS_FOKUS, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Pager } from '@/components/admin/pager'
 import { Button } from '@/components/ui/button'
 import { pageFromQuery, paginate } from '@/lib/admin/paginate'
+import { ringkasPesan } from '@/lib/admin/ringkas-pesan'
 import { can } from '@/lib/auth/grants'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
@@ -20,6 +21,14 @@ function hrefInbox(q: string, hal: number): string {
   return qs ? `/cms/inbox?${qs}` : '/cms/inbox'
 }
 
+function hrefPesan(id: string, q: string, hal: number): string {
+  const params = new URLSearchParams()
+  if (q) params.set('q', q)
+  if (hal > 1) params.set('hal', String(hal))
+  const qs = params.toString()
+  return qs ? `/cms/inbox/${id}?${qs}` : `/cms/inbox/${id}`
+}
+
 export default async function InboxPage({
   searchParams,
 }: {
@@ -29,7 +38,6 @@ export default async function InboxPage({
   requireGrant(user, 'inbox', 'view')
   const params = await searchParams
   const q = (params.q ?? '').trim()
-  const bisaUbah = can(user.matrix, 'inbox', 'update')
   const bisaHapus = can(user.matrix, 'inbox', 'delete')
 
   const where = q
@@ -81,13 +89,15 @@ export default async function InboxPage({
               {messages.map((message) => (
                 <tr
                   key={message.id}
-                  className="align-top max-md:mb-4 max-md:block max-md:border-2 max-md:border-border-strong"
+                  className="relative align-top max-md:mb-4 max-md:block max-md:border-2 max-md:border-border-strong"
                 >
                   <td data-label="Status" className={`${KELAS_SEL_INBOX} font-display text-label uppercase text-accent`}>
                     {message.status}
                   </td>
                   <td data-label="Subjek" className={`${KELAS_SEL_INBOX} font-display text-body font-semibold`}>
-                    {message.subject}
+                    <a href={hrefPesan(message.id, q, paging.page)} className={`after:absolute after:inset-0 ${KELAS_FOKUS}`}>
+                      {message.subject}
+                    </a>
                   </td>
                   <td data-label="Pengirim" className={`${KELAS_SEL_INBOX} text-small text-content-muted`}>
                     {message.name} · {message.email}
@@ -96,32 +106,19 @@ export default async function InboxPage({
                     {toDateInput(message.createdAt)}
                   </td>
                   <td data-label="Pesan" className={`${KELAS_SEL_INBOX} text-body text-pretty`}>
-                    {message.message}
+                    {ringkasPesan(message.message)}
                   </td>
-                  <td data-label="Aksi" className={KELAS_SEL_INBOX}>
-                    <div className="flex flex-col gap-2">
-                      {bisaUbah ? (
-                        <form action={updateInboxStatus} className="flex flex-wrap gap-2">
-                          <input type="hidden" name="id" value={message.id} />
-                          <Button type="submit" name="status" value="dibaca" variant="secondary">
-                            Dibaca
-                          </Button>
-                          <Button type="submit" name="status" value="selesai" variant="secondary">
-                            Selesai
-                          </Button>
-                        </form>
-                      ) : null}
-                      {bisaHapus ? (
-                        <form action={deleteInboxMessage}>
-                          <input type="hidden" name="id" value={message.id} />
-                          <input type="hidden" name="q" value={q} />
-                          <input type="hidden" name="hal" value={String(paging.page)} />
-                          <ConfirmSubmit message="Hapus pesan ini?" variant="destructive">
-                            Hapus
-                          </ConfirmSubmit>
-                        </form>
-                      ) : null}
-                    </div>
+                  <td data-label="Aksi" className={`${KELAS_SEL_INBOX} relative z-10`}>
+                    {bisaHapus ? (
+                      <form action={deleteInboxMessage}>
+                        <input type="hidden" name="id" value={message.id} />
+                        <input type="hidden" name="q" value={q} />
+                        <input type="hidden" name="hal" value={String(paging.page)} />
+                        <ConfirmSubmit message="Hapus pesan ini?" variant="destructive">
+                          Hapus
+                        </ConfirmSubmit>
+                      </form>
+                    ) : null}
                   </td>
                 </tr>
               ))}
