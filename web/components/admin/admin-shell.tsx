@@ -43,15 +43,19 @@ function cmsLinks(matrix: GrantMatrix): NavLink[] {
   return links
 }
 
-function internalLinks(matrix: GrantMatrix): NavLink[] {
+export function internalNavLinks(matrix: GrantMatrix): NavLink[] {
   const links: NavLink[] = [{ href: '/internal', label: 'Ringkasan' }]
 
   if (can(matrix, 'jadwal', 'view')) {
     links.push({ href: '/internal/schedule', label: 'Jadwal' })
   }
 
-  if (can(matrix, 'kas-operasional', 'view') || can(matrix, 'kas-tim', 'view')) {
-    links.push({ href: '/internal/cash', label: 'Kas' })
+  if (can(matrix, 'kas-operasional', 'view')) {
+    links.push({ href: '/internal/cash/operasional', label: 'Kas operasional' })
+  }
+
+  if (can(matrix, 'kas-tim', 'view')) {
+    links.push({ href: '/internal/cash/tim', label: 'Kas tim' })
   }
 
   if (can(matrix, 'laporan', 'view')) {
@@ -78,7 +82,7 @@ export function AdminShell({
   name: string
   children: ReactNode
 }) {
-  const links = area === 'cms' ? cmsLinks(matrix) : internalLinks(matrix)
+  const links = area === 'cms' ? cmsLinks(matrix) : internalNavLinks(matrix)
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary">
