@@ -115,3 +115,30 @@ describe('halaman [id]', () => {
     expect(page).not.toMatch(/rounded-/)
   })
 })
+
+describe('hapus halaman kustom', () => {
+  it('deleteCustomPage hanya kind custom dan grant delete', () => {
+    const actions = baca('actions.ts')
+    expect(actions).toMatch(/export async function deleteCustomPage/)
+    expect(actions).toMatch(/requireGrant\(user, 'halaman', 'delete'\)/)
+    expect(actions).toMatch(/kind !== 'custom'/)
+    expect(actions).toMatch(/sitePage\.delete/)
+  })
+
+  it('daftar kustom punya Hapus; baris bawaan tidak memakai kalimat hapus halaman', () => {
+    const page = baca('page.tsx')
+    expect(page).toMatch(/deleteCustomPage/)
+    expect(page).toMatch(/Hapus halaman ini\?/)
+    expect(page).toMatch(/can\(user.matrix, 'halaman', 'delete'\)/)
+    expect(page).toMatch(/ConfirmSubmit/)
+    const [sebelumKustom] = page.split('custom.map')
+    expect(sebelumKustom).not.toMatch(/Hapus halaman ini\?/)
+  })
+
+  it('kanvas kustom punya hapus halaman', () => {
+    const page = baca(path.join('[id]', 'page.tsx'))
+    expect(page).toMatch(/deleteCustomPage/)
+    expect(page).toMatch(/Hapus halaman ini\?/)
+    expect(page).toMatch(/ConfirmSubmit/)
+  })
+})

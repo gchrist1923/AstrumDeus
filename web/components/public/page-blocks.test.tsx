@@ -60,4 +60,26 @@ describe('PageBlocks', () => {
     )
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
+
+  it('merender garis dan cover video YouTube', () => {
+    render(
+      <PageBlocks
+        title="Halaman"
+        rows={[
+          {
+            id: 'r1',
+            blocks: [
+              { id: 'd', type: 'divider', width: 12, payload: { color: 'accent', thickness: 4 } },
+              { id: 'v', type: 'video', width: 12, payload: { url: 'https://youtu.be/dQw4w9wgGcQ' } },
+            ],
+          },
+        ]}
+      />,
+    )
+    expect(screen.getByRole('separator')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Putar video' }).querySelector('img')).toHaveAttribute(
+      'src',
+      'https://i.ytimg.com/vi/dQw4w9wgGcQ/hqdefault.jpg',
+    )
+  })
 })

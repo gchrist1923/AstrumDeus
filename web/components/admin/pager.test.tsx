@@ -14,4 +14,20 @@ describe('Pager', () => {
     const { container } = render(<Pager page={1} pageCount={1} hrefFor={(hal) => `?hal=${hal}`} />)
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('empat halaman tidak memakai Berikut sebagai pengganti nomor', () => {
+    render(<Pager page={1} pageCount={4} hrefFor={(hal) => `/cms/inbox?hal=${hal}`} />)
+    expect(screen.getAllByRole('link')).toHaveLength(4)
+    expect(screen.queryByRole('link', { name: 'Berikut' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/Hal 1 dari 4/)).not.toBeInTheDocument()
+  })
+
+  it('lebih dari 10 halaman memakai Sebelum/Berikut, bukan deretan nomor', () => {
+    render(<Pager page={1} pageCount={11} hrefFor={(hal) => `/cms/inbox?hal=${hal}`} />)
+    expect(screen.getByRole('link', { name: 'Berikut' })).toHaveAttribute('href', '/cms/inbox?hal=2')
+    expect(screen.queryByRole('link', { name: 'Sebelum' })).not.toBeInTheDocument()
+    expect(screen.getByText('Hal 1 dari 11')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '11' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('link')).toHaveLength(1)
+  })
 })

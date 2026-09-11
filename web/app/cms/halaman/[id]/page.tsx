@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { saveLayout, updateCustomPage } from '@/app/cms/halaman/actions'
+import { deleteCustomPage, saveLayout, updateCustomPage } from '@/app/cms/halaman/actions'
+import { ConfirmSubmit } from '@/components/admin/confirm-submit'
 import { Field, KELAS_FOKUS, KELAS_KONTROL } from '@/components/admin/form-field'
 import { PageCanvas } from '@/components/admin/page-canvas'
 import { Button } from '@/components/ui/button'
+import { can } from '@/lib/auth/grants'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 import { BUILTIN_PAGES } from '@/lib/pages/builtins'
@@ -28,6 +30,7 @@ export default async function HalamanKanvasPage({
 }) {
   const user = await requireCmsUser()
   requireGrant(user, 'halaman', 'view')
+  const bisaHapus = can(user.matrix, 'halaman', 'delete')
   const { id } = await params
   const query = await searchParams
   const page = await prisma.sitePage.findUnique({ where: { id } })
@@ -115,6 +118,15 @@ export default async function HalamanKanvasPage({
         </label>
         <Button type="submit">Simpan status</Button>
       </form>
+
+      {bisaHapus ? (
+        <form action={deleteCustomPage} className="max-w-2xl">
+          <input type="hidden" name="id" value={page.id} />
+          <ConfirmSubmit message="Hapus halaman ini?" variant="destructive">
+            Hapus
+          </ConfirmSubmit>
+        </form>
+      ) : null}
 
       <section className="flex flex-col gap-6">
         <h3 className="font-display text-card uppercase">Kanvas</h3>

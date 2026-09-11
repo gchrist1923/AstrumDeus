@@ -87,4 +87,18 @@ describe('assertValidLayout', () => {
       ]),
     ).not.toThrow()
   })
+
+  it('menerima blok video dan divider', () => {
+    expect(() =>
+      assertValidLayout([
+        {
+          id: 'r1',
+          blocks: [
+            { id: 'v1', type: 'video', width: 8, payload: { url: 'https://youtu.be/dQw4w9wgGcQ' } },
+            { id: 'd1', type: 'divider', width: 4, payload: { thickness: 2, color: 'accent' } },
+          ],
+        },
+      ]),
+    ).not.toThrow()
+  })
 })

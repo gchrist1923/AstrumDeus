@@ -1,4 +1,6 @@
-export type BlockType = 'heading' | 'text' | 'image' | 'button' | 'list'
+export type BlockType = 'heading' | 'text' | 'image' | 'button' | 'list' | 'video' | 'divider'
+
+export type BlockColor = 'default' | 'accent' | 'muted'
 
 export interface PageBlock {
   id: string
