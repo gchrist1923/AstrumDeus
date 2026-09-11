@@ -228,6 +228,7 @@ describe('PageCanvas', () => {
     fireEvent.click(screen.getByLabelText('Blok Logo'))
     expect(screen.getByRole('button', { name: 'Pilih gambar' })).toBeInTheDocument()
     expect(screen.getByDisplayValue('/media/a.jpg')).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'Pratinjau Gambar' })).not.toBeInTheDocument()
   })
 
   it('ketik judul di blok masuk ke layout JSON', () => {

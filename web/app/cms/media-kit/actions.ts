@@ -5,7 +5,23 @@ import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
-import { releaseMediaPath } from '@/lib/media/store'
+import { describeImageMeta } from '@/lib/media/meta'
+import { filenameFromPublicPath, isManagedMediaPath, readMediaFile, releaseMediaPath } from '@/lib/media/store'
+
+async function metaDariBerkas(
+  href: string,
+  fallback: { fileType: string; fileSize: string },
+): Promise<{ fileType: string; fileSize: string }> {
+  if (!isManagedMediaPath(href)) {
+    return fallback
+  }
+  const filename = filenameFromPublicPath(href)
+  const file = filename ? await readMediaFile(filename) : null
+  if (!file) {
+    return fallback
+  }
+  return describeImageMeta(file.bytes) ?? fallback
+}
 
 export async function saveAsset(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
@@ -17,13 +33,17 @@ export async function saveAsset(formData: FormData): Promise<void> {
     const existing = await prisma.mediaKitAsset.findUnique({ where: { id } })
     prevHref = existing?.href ?? null
   }
+  const meta = await metaDariBerkas(nextHref, {
+    fileType: teks(formData, 'fileType'),
+    fileSize: teks(formData, 'fileSize'),
+  })
   const data = {
     name: teks(formData, 'name'),
     description: teks(formData, 'description'),
     groupName: teks(formData, 'groupName'),
     href: nextHref,
-    fileType: teks(formData, 'fileType'),
-    fileSize: teks(formData, 'fileSize'),
+    fileType: meta.fileType,
+    fileSize: meta.fileSize,
     sortOrder: angka(formData, 'sortOrder') ?? 0,
   }
 
