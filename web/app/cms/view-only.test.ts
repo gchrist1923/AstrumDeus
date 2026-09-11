@@ -13,6 +13,6 @@ describe('form CMS view-only', () => {
     expect(baca('app/cms/matches/match-form.tsx')).toMatch(/disabled=\{!canSave\}/)
     expect(baca('app/cms/settings/page.tsx')).toMatch(/disabled=\{!bisaUbah\}/)
     expect(baca('app/cms/partners/[id]/page.tsx')).toMatch(/disabled=\{!bisaUbah\}/)
-    expect(baca('app/cms/media-kit/[id]/page.tsx')).toMatch(/disabled=\{!bisaUbah\}/)
+    expect(baca('app/cms/media-kit/asset-form.tsx')).toMatch(/disabled=\{!canSave\}/)
   })
 })

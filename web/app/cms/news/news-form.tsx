@@ -29,7 +29,7 @@ export function NewsForm({
   canDelete?: boolean
 }) {
   return (
-    <form action={saveNews} className="flex max-w-2xl flex-col gap-6">
+    <form action={saveNews} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       {post?.id ? <input type="hidden" name="id" value={post.id} /> : null}
       <Field id="title" label="Judul">
         <input id="title" name="title" required defaultValue={post?.title} disabled={!canSave} className={KELAS_KONTROL} />
