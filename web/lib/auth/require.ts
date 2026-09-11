@@ -39,3 +39,9 @@ export function requireCashView(user: AuthUser): void {
     redirect('/internal')
   }
 }
+
+export function requireCashBookView(user: AuthUser, type: 'operasional' | 'tim'): void {
+  if (!canReadCashBook(user.matrix, type)) {
+    redirect('/internal')
+  }
+}

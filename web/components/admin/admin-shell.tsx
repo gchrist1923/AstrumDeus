@@ -43,15 +43,19 @@ function cmsLinks(matrix: GrantMatrix): NavLink[] {
   return links
 }
 
-function internalLinks(matrix: GrantMatrix): NavLink[] {
+export function internalNavLinks(matrix: GrantMatrix): NavLink[] {
   const links: NavLink[] = [{ href: '/internal', label: 'Ringkasan' }]
 
   if (can(matrix, 'jadwal', 'view')) {
     links.push({ href: '/internal/schedule', label: 'Jadwal' })
   }
 
-  if (can(matrix, 'kas-operasional', 'view') || can(matrix, 'kas-tim', 'view')) {
-    links.push({ href: '/internal/cash', label: 'Kas' })
+  if (can(matrix, 'kas-operasional', 'view')) {
+    links.push({ href: '/internal/cash/operasional', label: 'Kas operasional' })
+  }
+
+  if (can(matrix, 'kas-tim', 'view')) {
+    links.push({ href: '/internal/cash/tim', label: 'Kas tim' })
   }
 
   if (can(matrix, 'laporan', 'view')) {
@@ -78,12 +82,12 @@ export function AdminShell({
   name: string
   children: ReactNode
 }) {
-  const links = area === 'cms' ? cmsLinks(matrix) : internalLinks(matrix)
+  const links = area === 'cms' ? cmsLinks(matrix) : internalNavLinks(matrix)
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary">
       <header className="border-b border-border">
-        <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-4 px-5 py-4 md:px-8">
+        <div className="flex w-full flex-wrap items-center justify-between gap-4 px-5 py-4 md:px-8">
           <div>
             <p className="font-display text-label uppercase tracking-[0.16em] text-accent">
               {area === 'cms' ? 'CMS' : 'Internal'}
@@ -100,7 +104,7 @@ export function AdminShell({
           </div>
         </div>
       </header>
-      <div className="mx-auto flex max-w-page flex-col gap-10 px-5 py-10 md:flex-row md:px-8">
+      <div className="flex w-full flex-col gap-10 px-5 py-10 md:flex-row md:px-8">
         <nav aria-label="Navigasi admin" className="flex w-full flex-col gap-1 md:w-52 md:shrink-0">
           {links.map((link) => (
             <Link

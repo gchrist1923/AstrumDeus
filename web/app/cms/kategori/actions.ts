@@ -17,6 +17,8 @@ function revalidateKategori(): void {
   revalidatePath('/cms/matches')
   revalidatePath('/cms/news')
   revalidatePath('/internal/cash')
+  revalidatePath('/internal/cash/operasional')
+  revalidatePath('/internal/cash/tim')
 }
 
 export async function createTournament(formData: FormData): Promise<void> {

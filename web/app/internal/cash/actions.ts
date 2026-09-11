@@ -6,6 +6,7 @@ import { requireInternalUser } from '@/lib/auth/require'
 import { fromDateInput } from '@/lib/datetime'
 import { angka, teks } from '@/lib/form'
 import { buildReversal } from '@/lib/finance/report'
+import { cashBookPath } from '@/lib/finance/cash-path'
 import { prisma } from '@/lib/db'
 
 export async function saveCashEntry(formData: FormData): Promise<void> {
@@ -29,6 +30,7 @@ export async function saveCashEntry(formData: FormData): Promise<void> {
     },
   })
 
+  revalidatePath(cashBookPath(book.type))
   revalidatePath('/internal/cash')
   revalidatePath('/internal/reports')
 }
@@ -70,6 +72,7 @@ export async function reverseCashEntry(formData: FormData): Promise<void> {
     }),
   ])
 
+  revalidatePath(cashBookPath(entry.cashBook.type))
   revalidatePath('/internal/cash')
   revalidatePath('/internal/reports')
 }
