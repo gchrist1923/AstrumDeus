@@ -131,6 +131,16 @@ describe('PageCanvas', () => {
     expect(screen.getByText('Pilih blok di tampilan.')).toBeInTheDocument()
   })
 
+  it('inspector sticky seperti palet saat gulir', () => {
+    render(<PageCanvas pageId="p1" initialRows={[]} />)
+    const palet = screen.getByRole('heading', { name: 'Palet' }).closest('aside')
+    const inspector = screen.getByRole('heading', { name: 'Blok dipilih' }).closest('aside')
+    expect(palet?.className).toMatch(/lg:sticky/)
+    expect(palet?.className).toMatch(/lg:top-4/)
+    expect(inspector?.className).toMatch(/lg:sticky/)
+    expect(inspector?.className).toMatch(/lg:top-4/)
+  })
+
   it('memindah blok kiri dan kanan', () => {
     render(
       <PageCanvas
@@ -228,6 +238,7 @@ describe('PageCanvas', () => {
     fireEvent.click(screen.getByLabelText('Blok Logo'))
     expect(screen.getByRole('button', { name: 'Pilih gambar' })).toBeInTheDocument()
     expect(screen.getByDisplayValue('/media/a.jpg')).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'Pratinjau Gambar' })).not.toBeInTheDocument()
   })
 
   it('ketik judul di blok masuk ke layout JSON', () => {

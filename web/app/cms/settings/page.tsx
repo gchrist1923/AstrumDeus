@@ -18,7 +18,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <form action={saveSettings} className="flex max-w-xl flex-col gap-6">
+    <form action={saveSettings} className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <h2 className="font-display text-section uppercase">Situs</h2>
       <Field id="siteName" label="Nama situs">
         <input id="siteName" name="siteName" defaultValue={setting.siteName} disabled={!bisaUbah} className={KELAS_KONTROL} />
@@ -30,6 +30,20 @@ export default async function SettingsPage() {
       </Field>
       <Field id="defaultMetaDesc" label="Deskripsi meta">
         <textarea id="defaultMetaDesc" name="defaultMetaDesc" rows={3} defaultValue={setting.defaultMetaDesc} disabled={!bisaUbah} className={KELAS_KONTROL} />
+      </Field>
+      <h3 className="font-display text-label uppercase text-content-muted">Beranda</h3>
+      <Field id="heroEyebrow" label="Eyebrow">
+        <input id="heroEyebrow" name="heroEyebrow" defaultValue={setting.heroEyebrow} disabled={!bisaUbah} className={KELAS_KONTROL} />
+      </Field>
+      <Field id="heroTitle" label="Judul hero">
+        <input id="heroTitle" name="heroTitle" defaultValue={setting.heroTitle} disabled={!bisaUbah} className={KELAS_KONTROL} />
+      </Field>
+      <Field id="heroTagline" label="Paragraf hero">
+        <textarea id="heroTagline" name="heroTagline" rows={3} defaultValue={setting.heroTagline} disabled={!bisaUbah} className={KELAS_KONTROL} />
+      </Field>
+      <ImageUpload name="heroImage" label="Gambar hero" defaultValue={setting.heroImage} disabled={!bisaUbah} />
+      <Field id="heroImageAlt" label="Alt foto">
+        <input id="heroImageAlt" name="heroImageAlt" defaultValue={setting.heroImageAlt} disabled={!bisaUbah} className={KELAS_KONTROL} />
       </Field>
       <Field id="contactEmail" label="Email kontak">
         <input id="contactEmail" name="contactEmail" defaultValue={setting.contactEmail} disabled={!bisaUbah} className={KELAS_KONTROL} />
