@@ -341,7 +341,7 @@ export function PageCanvas({
         <Button type="submit">Simpan tata letak</Button>
       </div>
 
-      <aside className="flex w-full flex-col gap-4">
+      <aside className="flex w-full flex-col gap-4 lg:sticky lg:top-4">
         <h3 className="font-display text-card uppercase">Blok dipilih</h3>
         {terpilih ? (
           <>
@@ -455,6 +455,7 @@ function CanvasBlock({
           name={`image-${block.id}`}
           label="Gambar"
           defaultValue={src}
+          hidePreview
           onPathChange={(path) => onPayload({ ...block.payload, src: path })}
         />
         <label htmlFor={idAlt} className="font-display text-label uppercase text-content-muted">

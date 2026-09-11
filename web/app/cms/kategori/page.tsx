@@ -18,7 +18,7 @@ export default async function CmsKategoriPage() {
           Pilih jenis kategori. Nonaktif hilang dari form baru. Hapus hanya jika belum dipakai data.
         </p>
       </header>
-      <ul className="flex max-w-xl flex-col gap-3">
+      <ul className="mx-auto flex w-full max-w-xl flex-col gap-3">
         {JENIS.map((item) => (
           <li key={item.href}>
             <Link
