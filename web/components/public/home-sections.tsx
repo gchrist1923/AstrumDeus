@@ -7,7 +7,16 @@ import { PlayerCard } from '@/components/public/player-card'
 import { SectionHeading } from '@/components/public/section-heading'
 import { StatTrio } from '@/components/public/stat-trio'
 import type { LiveEvent, Match, NewsPost, Partner, Player, SiteStats } from '@/lib/content/types'
+import { pecahJudulHero } from '@/lib/content/hero-title'
 import { isMenuEnabled, type MenuFlags } from '@/lib/nav'
+
+export interface HomeHero {
+  eyebrow: string
+  title: string
+  tagline: string
+  image: string
+  imageAlt: string
+}
 
 export interface HomeContent {
   live: LiveEvent | null
@@ -18,15 +27,33 @@ export interface HomeContent {
   partners: Partner[]
 }
 
+const HERO_BAWAAN: HomeHero = {
+  eyebrow: 'PUBG Mobile · Indonesia',
+  title: 'Astrum Deus',
+  tagline:
+    'Tim PUBG Mobile yang berlatih terjadwal dan membuka hasilnya, dari klasemen sampai catatan scrim.',
+  image: '/hero.jpg',
+  imageAlt: 'Lima pemain Astrum Deus berdiri berjajar memegang ponsel',
+}
+
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 const KELAS_CTA =
   'inline-flex min-h-11 min-w-11 items-center justify-center px-6 py-3 font-display text-label uppercase tracking-[0.12em]'
 
-export function HomeSections({ flags, content }: { flags: MenuFlags; content: HomeContent }) {
+export function HomeSections({
+  flags,
+  content,
+  hero = HERO_BAWAAN,
+}: {
+  flags: MenuFlags
+  content: HomeContent
+  hero?: HomeHero
+}) {
   const rosterNyala = isMenuEnabled('roster', flags)
   const pertandinganNyala = isMenuEnabled('matches', flags)
   const partnerNyala = isMenuEnabled('partners', flags)
   const beritaNyala = isMenuEnabled('news', flags)
+  const judul = pecahJudulHero(hero.title)
 
   return (
     <>
@@ -34,8 +61,8 @@ export function HomeSections({ flags, content }: { flags: MenuFlags; content: Ho
       <main>
         <section className="relative flex min-h-[min(80vh,700px)] items-center overflow-hidden [clip-path:polygon(0_0,100%_0,100%_94%,0_100%)]">
           <img
-            src="/hero.jpg"
-            alt="Lima pemain Astrum Deus berdiri berjajar memegang ponsel"
+            src={hero.image}
+            alt={hero.imageAlt}
             className="absolute inset-0 size-full object-cover object-[18%_26%] grayscale contrast-[1.08] brightness-[.7]"
           />
           <div
@@ -45,15 +72,20 @@ export function HomeSections({ flags, content }: { flags: MenuFlags; content: Ho
           <div className="relative z-10 mx-auto w-full max-w-page px-5 py-20 md:px-8">
             <p className="mb-5 flex items-center gap-3 font-display text-label uppercase tracking-[0.2em] text-accent">
               <span className="inline-block h-0.5 w-8 bg-accent" aria-hidden="true" />
-              PUBG Mobile · Indonesia
+              {hero.eyebrow}
             </p>
             <h1 className="font-display text-display uppercase tracking-[-0.015em] text-balance">
-              Astrum
-              <br />
-              Deus
+              {judul.pertama}
+              {judul.kedua ? (
+                <>
+                  {' '}
+                  <br />
+                  {judul.kedua}
+                </>
+              ) : null}
             </h1>
             <p className="mt-6 max-w-[44ch] text-[1.25rem] text-content-secondary text-pretty">
-              Tim PUBG Mobile yang berlatih terjadwal dan membuka hasilnya, dari klasemen sampai catatan scrim.
+              {hero.tagline}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               {rosterNyala ? (
