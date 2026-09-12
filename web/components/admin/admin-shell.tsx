@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { logoutAction } from '@/app/login/actions'
+import { FlashToast } from '@/components/admin/flash-toast'
 import { Button } from '@/components/ui/button'
 import { can, type AccessModule, type GrantMatrix } from '@/lib/auth/grants'
 import { canAccessCms, canAccessInternal } from '@/lib/auth/permissions'
@@ -116,7 +117,12 @@ export function AdminShell({
             </Link>
           ))}
         </nav>
-        <div className="min-w-0 flex-1">{children}</div>
+        <div className="min-w-0 flex-1">
+          <Suspense fallback={null}>
+            <FlashToast />
+          </Suspense>
+          {children}
+        </div>
       </div>
     </div>
   )

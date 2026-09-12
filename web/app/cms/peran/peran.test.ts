@@ -23,7 +23,7 @@ describe('UI peran', () => {
   it('buat peran membuka halaman Ubah', () => {
     const actions = baca('actions.ts')
     expect(actions).toMatch(/accessRole\.create/)
-    expect(actions).toMatch(/redirect\(`\/cms\/peran\/\$\{role\.id\}`\)/)
+    expect(actions).toMatch(/pathDenganFlash\(`\/cms\/peran\/\$\{role\.id\}`/)
   })
 
   it('halaman Ubah mengelompokkan menu CMS dan Internal', () => {

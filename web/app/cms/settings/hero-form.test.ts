@@ -19,4 +19,13 @@ describe('CMS Situs hero', () => {
     expect(sumber).toMatch(/heroImage/)
     expect(sumber).toMatch(/releaseMediaPath\(existing\?\.heroImage/)
   })
+
+  it('nama situs, judul meta, dan email kontak wajib', () => {
+    const sumber = readFileSync(path.join(process.cwd(), 'app', 'cms', 'settings', 'page.tsx'), 'utf8')
+    expect(sumber).toMatch(/name="siteName"[^>]*required/)
+    expect(sumber).toMatch(/name="defaultMetaTitle"[^>]*required/)
+    expect(sumber).toMatch(/name="contactEmail"[^>]*type="email"/)
+    expect(sumber).toMatch(/name="contactEmail"[^>]*required/)
+    expect(sumber).toMatch(/name="titles"[^>]*min=\{0\}/)
+  })
 })

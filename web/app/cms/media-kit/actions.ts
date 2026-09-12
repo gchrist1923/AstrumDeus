@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
-import { angka, teks } from '@/lib/form'
+import { pathDenganFlash } from '@/lib/flash'
+import { adaKosong, angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 import { describeImageMeta } from '@/lib/media/meta'
 import { filenameFromPublicPath, isManagedMediaPath, readMediaFile, releaseMediaPath } from '@/lib/media/store'
@@ -27,6 +28,9 @@ export async function saveAsset(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
   const id = teks(formData, 'id')
   requireGrant(user, 'media-kit', id ? 'update' : 'create')
+  if (adaKosong(formData, ['name', 'href'])) {
+    redirect(pathDenganFlash(id ? `/cms/media-kit/${id}` : '/cms/media-kit/new', { kesalahan: 'isi' }))
+  }
   const nextHref = teks(formData, 'href')
   let prevHref: string | null = null
   if (id) {
@@ -57,7 +61,7 @@ export async function saveAsset(formData: FormData): Promise<void> {
 
   revalidatePath('/media-kit')
   revalidatePath('/cms/media-kit')
-  redirect('/cms/media-kit')
+  redirect(pathDenganFlash('/cms/media-kit', { ok: id ? 'ubah' : 'simpan' }))
 }
 
 export async function deleteAsset(formData: FormData): Promise<void> {
@@ -73,5 +77,5 @@ export async function deleteAsset(formData: FormData): Promise<void> {
 
   revalidatePath('/media-kit')
   revalidatePath('/cms/media-kit')
-  redirect('/cms/media-kit')
+  redirect(pathDenganFlash('/cms/media-kit', { ok: 'hapus' }))
 }

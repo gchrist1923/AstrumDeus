@@ -1,10 +1,12 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { hashPassword } from '@/lib/auth/password'
 import { legacyRolesJsonFromSlugs } from '@/lib/auth/roles'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
-import { teks } from '@/lib/form'
+import { pathDenganFlash } from '@/lib/flash'
+import { adaKosong, emailValid, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
 async function selectedAccessRoles(formData: FormData) {
@@ -20,6 +22,13 @@ export async function saveUser(formData: FormData): Promise<void> {
   const name = teks(formData, 'name')
   const password = typeof formData.get('password') === 'string' ? String(formData.get('password')) : ''
   const selected = await selectedAccessRoles(formData)
+
+  if (adaKosong(formData, ['name', 'email']) || !password) {
+    redirect(pathDenganFlash('/cms/users', { kesalahan: 'isi' }))
+  }
+  if (!emailValid(email)) {
+    redirect(pathDenganFlash('/cms/users', { kesalahan: 'email' }))
+  }
 
   const user = await prisma.user.create({
     data: {
@@ -37,6 +46,7 @@ export async function saveUser(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/cms/users')
+  redirect(pathDenganFlash('/cms/users', { ok: 'simpan' }))
 }
 
 export async function toggleUserActive(formData: FormData): Promise<void> {
@@ -55,4 +65,5 @@ export async function toggleUserActive(formData: FormData): Promise<void> {
   })
 
   revalidatePath('/cms/users')
+  redirect(pathDenganFlash('/cms/users', { ok: 'ubah' }))
 }

@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
+import { pathDenganFlash } from '@/lib/flash'
 import { applyMenuToggle } from '@/lib/content/menu'
 import { checked } from '@/lib/form'
 import { prisma } from '@/lib/db'
@@ -45,4 +47,5 @@ export async function saveMenuFlags(formData: FormData): Promise<void> {
   revalidatePath('/', 'layout')
   revalidatePath('/cms/menu')
   revalidatePath('/cms/halaman')
+  redirect(pathDenganFlash('/cms/menu', { ok: 'ubah' }))
 }

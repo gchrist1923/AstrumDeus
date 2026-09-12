@@ -12,5 +12,6 @@ describe('AdminShell lebar', () => {
     expect(sumber).toMatch(/flex-1/)
     expect(sumber).toMatch(/px-5/)
     expect(sumber).toMatch(/md:px-8/)
+    expect(sumber).toMatch(/FlashToast/)
   })
 })

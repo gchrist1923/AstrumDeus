@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { fromDateInput } from '@/lib/datetime'
-import { angka, checked, teks } from '@/lib/form'
+import { pathDenganFlash } from '@/lib/flash'
+import { adaKosong, angka, checked, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 import { releaseMediaPath } from '@/lib/media/store'
 
@@ -23,6 +24,9 @@ export async function savePlayer(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
   const id = teks(formData, 'id')
   requireGrant(user, 'roster', id ? 'update' : 'create')
+  if (adaKosong(formData, ['ign', 'slug', 'joinedAt'])) {
+    redirect(pathDenganFlash(id ? `/cms/players/${id}` : '/cms/players/new', { kesalahan: 'isi' }))
+  }
   const nextPhoto = teks(formData, 'photo') || '/portrait.jpg'
   let prevPhoto: string | null = null
   if (id) {
@@ -54,7 +58,7 @@ export async function savePlayer(formData: FormData): Promise<void> {
   revalidatePath('/roster')
   revalidatePath('/')
   revalidatePath('/cms/players')
-  redirect('/cms/players')
+  redirect(pathDenganFlash('/cms/players', { ok: id ? 'ubah' : 'simpan' }))
 }
 
 export async function deletePlayer(formData: FormData): Promise<void> {
@@ -70,5 +74,5 @@ export async function deletePlayer(formData: FormData): Promise<void> {
 
   revalidatePath('/roster')
   revalidatePath('/cms/players')
-  redirect('/cms/players')
+  redirect(pathDenganFlash('/cms/players', { ok: 'hapus' }))
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
+import { pathDenganFlash } from '@/lib/flash'
 import { teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
@@ -26,9 +27,5 @@ export async function deleteInboxMessage(formData: FormData): Promise<void> {
 
   revalidatePath('/cms')
   revalidatePath('/cms/inbox')
-  const params = new URLSearchParams()
-  if (q) params.set('q', q)
-  if (hal) params.set('hal', hal)
-  const qs = params.toString()
-  redirect(qs ? `/cms/inbox?${qs}` : '/cms/inbox')
+  redirect(pathDenganFlash('/cms/inbox', { ok: 'hapus' }, { q: q || undefined, hal: hal || undefined }))
 }

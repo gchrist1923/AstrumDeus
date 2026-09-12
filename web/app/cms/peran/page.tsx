@@ -6,14 +6,9 @@ import { can } from '@/lib/auth/grants'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
-export default async function CmsPeranPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ kesalahan?: string }>
-}) {
+export default async function CmsPeranPage() {
   const user = await requireCmsUser()
   requireGrant(user, 'peran', 'view')
-  const params = await searchParams
   const bisaTambah = can(user.matrix, 'peran', 'create')
   const bisaHapus = can(user.matrix, 'peran', 'delete')
 
@@ -28,17 +23,6 @@ export default async function CmsPeranPage({
           CMS dan internal. Peran Admin tidak bisa dihapus atau dikurangi.
         </p>
       </header>
-
-      {params.kesalahan === 'nama' ? (
-        <p role="alert" className="text-body text-danger">
-          Nama peran sudah dipakai.
-        </p>
-      ) : null}
-      {params.kesalahan === 'hapus' ? (
-        <p role="alert" className="text-body text-danger">
-          Peran Admin tidak bisa dihapus.
-        </p>
-      ) : null}
 
       <section className="flex flex-col gap-6">
         <h3 className="font-display text-card uppercase">Daftar peran</h3>

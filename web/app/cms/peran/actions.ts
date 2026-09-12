@@ -16,6 +16,7 @@ import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { slugify } from '@/lib/content/slug'
 import { rewriteLegacyRolesForUsers } from '@/lib/auth/rewrite-legacy-roles'
 import { prisma } from '@/lib/db'
+import { pathDenganFlash } from '@/lib/flash'
 import { checked, teks } from '@/lib/form'
 
 const TEMPLATES = {
@@ -55,14 +56,14 @@ function revalidatePeran(id?: string): void {
 async function createNamedRole(name: string, grants: GrantMatrix): Promise<void> {
   const slug = slugify(name)
   if (!name || !slug) {
-    redirect('/cms/peran')
+    redirect(pathDenganFlash('/cms/peran', { kesalahan: 'isi' }))
   }
 
   const existing = await prisma.accessRole.findFirst({
     where: { OR: [{ name }, { slug }] },
   })
   if (existing) {
-    redirect('/cms/peran?kesalahan=nama')
+    redirect(pathDenganFlash('/cms/peran', { kesalahan: 'nama' }))
   }
 
   const role = await prisma.accessRole.create({
@@ -75,7 +76,7 @@ async function createNamedRole(name: string, grants: GrantMatrix): Promise<void>
   })
 
   revalidatePeran(role.id)
-  redirect(`/cms/peran/${role.id}`)
+  redirect(pathDenganFlash(`/cms/peran/${role.id}`, { ok: 'simpan' }))
 }
 
 export async function createRole(formData: FormData): Promise<void> {
@@ -107,7 +108,7 @@ export async function saveGrants(formData: FormData): Promise<void> {
   const next = matrixFromFormData(formData)
   const verdict = assertAdminRoleMutation(role, next)
   if (verdict !== 'ok') {
-    redirect(`/cms/peran/${id}?kesalahan=${verdict}`)
+    redirect(pathDenganFlash(`/cms/peran/${id}`, { kesalahan: verdict }))
   }
 
   await prisma.accessRole.update({
@@ -116,7 +117,7 @@ export async function saveGrants(formData: FormData): Promise<void> {
   })
 
   revalidatePeran(id)
-  redirect(`/cms/peran/${id}`)
+  redirect(pathDenganFlash(`/cms/peran/${id}`, { ok: 'ubah' }))
 }
 
 export async function deleteRole(formData: FormData): Promise<void> {
@@ -133,7 +134,7 @@ export async function deleteRole(formData: FormData): Promise<void> {
 
   const verdict = assertAdminRoleMutation(role)
   if (verdict !== 'ok') {
-    redirect(`/cms/peran?kesalahan=${verdict}`)
+    redirect(pathDenganFlash('/cms/peran', { kesalahan: verdict }))
   }
 
   await prisma.$transaction(async (tx) => {
@@ -148,5 +149,5 @@ export async function deleteRole(formData: FormData): Promise<void> {
     )
   })
   revalidatePeran()
-  redirect('/cms/peran')
+  redirect(pathDenganFlash('/cms/peran', { ok: 'hapus' }))
 }

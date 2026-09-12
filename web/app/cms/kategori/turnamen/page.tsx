@@ -11,15 +11,9 @@ import { can } from '@/lib/auth/grants'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
-export default async function CmsKategoriTurnamenPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ kesalahan?: string; n?: string }>
-}) {
+export default async function CmsKategoriTurnamenPage() {
   const user = await requireCmsUser()
   requireGrant(user, 'kategori', 'view')
-  const params = await searchParams
-  const n = Number.parseInt(params.n ?? '0', 10)
   const bisaTulis = can(user.matrix, 'kategori', 'create') || can(user.matrix, 'kategori', 'update')
   const bisaHapus = can(user.matrix, 'kategori', 'delete')
   const tournaments = await prisma.tournament.findMany({ orderBy: { name: 'asc' } })
@@ -27,12 +21,6 @@ export default async function CmsKategoriTurnamenPage({
   return (
     <div className="flex flex-col gap-8">
       <KategoriJudul>Turnamen</KategoriJudul>
-
-      {params.kesalahan === 'pakai' ? (
-        <p role="alert" className="text-body text-danger">
-          Tidak bisa dihapus. Masih dipakai {n} pertandingan atau statistik.
-        </p>
-      ) : null}
 
       {tournaments.length === 0 ? (
         <p className="text-content-secondary">Belum ada turnamen.</p>

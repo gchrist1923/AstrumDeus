@@ -78,15 +78,12 @@ function TabelHak({
 
 export default async function CmsPeranDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ kesalahan?: string }>
 }) {
   const user = await requireCmsUser()
   requireGrant(user, 'peran', 'view')
   const { id } = await params
-  const query = await searchParams
   const bisaUbah = can(user.matrix, 'peran', 'update')
   const bisaHapus = can(user.matrix, 'peran', 'delete')
 
@@ -108,17 +105,6 @@ export default async function CmsPeranDetailPage({
             : 'Centang Lihat supaya menu muncul saat login. Tambah, Ubah, dan Hapus adalah aksi di dalam menu itu. Tulis tanpa lihat diabaikan.'}
         </p>
       </div>
-
-      {query.kesalahan === 'kurangi' ? (
-        <p role="alert" className="text-body text-danger">
-          Hak Admin tidak bisa dikurangi.
-        </p>
-      ) : null}
-      {query.kesalahan === 'hapus' ? (
-        <p role="alert" className="text-body text-danger">
-          Peran Admin tidak bisa dihapus.
-        </p>
-      ) : null}
 
       <form action={saveGrants} className="flex flex-col gap-10">
         <input type="hidden" name="id" value={role.id} />

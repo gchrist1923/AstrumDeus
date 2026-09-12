@@ -1,10 +1,12 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { canWriteCashBook } from '@/lib/auth/permissions'
 import { requireInternalUser } from '@/lib/auth/require'
 import { fromDateInput } from '@/lib/datetime'
-import { angka, teks } from '@/lib/form'
+import { pathDenganFlash } from '@/lib/flash'
+import { adaKosong, angka, teks } from '@/lib/form'
 import { buildReversal } from '@/lib/finance/report'
 import { cashBookPath } from '@/lib/finance/cash-path'
 import { prisma } from '@/lib/db'
@@ -18,21 +20,32 @@ export async function saveCashEntry(formData: FormData): Promise<void> {
     return
   }
 
+  const path = cashBookPath(book.type)
+  if (adaKosong(formData, ['date', 'amount', 'categoryId', 'description'])) {
+    redirect(pathDenganFlash(path, { kesalahan: 'isi' }))
+  }
+
+  const amount = angka(formData, 'amount')
+  if (amount === null || amount < 1) {
+    redirect(pathDenganFlash(path, { kesalahan: 'angka' }))
+  }
+
   await prisma.cashEntry.create({
     data: {
       cashBookId: book.id,
       date: fromDateInput(teks(formData, 'date')),
       direction: teks(formData, 'direction') === 'keluar' ? 'keluar' : 'masuk',
-      amount: Math.abs(angka(formData, 'amount') ?? 0),
+      amount: Math.abs(amount),
       categoryId: teks(formData, 'categoryId'),
       description: teks(formData, 'description'),
       recordedById: user.id,
     },
   })
 
-  revalidatePath(cashBookPath(book.type))
+  revalidatePath(path)
   revalidatePath('/internal/cash')
   revalidatePath('/internal/reports')
+  redirect(pathDenganFlash(path, { ok: 'simpan' }))
 }
 
 export async function reverseCashEntry(formData: FormData): Promise<void> {
@@ -52,6 +65,7 @@ export async function reverseCashEntry(formData: FormData): Promise<void> {
   }
 
   const reversal = buildReversal(entry)
+  const path = cashBookPath(entry.cashBook.type)
 
   await prisma.$transaction([
     prisma.cashEntry.create({
@@ -72,7 +86,8 @@ export async function reverseCashEntry(formData: FormData): Promise<void> {
     }),
   ])
 
-  revalidatePath(cashBookPath(entry.cashBook.type))
+  revalidatePath(path)
   revalidatePath('/internal/cash')
   revalidatePath('/internal/reports')
+  redirect(pathDenganFlash(path, { ok: 'ubah' }))
 }

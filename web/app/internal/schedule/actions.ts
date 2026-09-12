@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation'
 import { canWriteSchedule } from '@/lib/auth/permissions'
 import { requireInternalUser } from '@/lib/auth/require'
 import { fromDatetimeLocal } from '@/lib/datetime'
-import { checked, teks } from '@/lib/form'
+import { pathDenganFlash } from '@/lib/flash'
+import { adaKosong, checked, teks } from '@/lib/form'
 import { eventsOverlap } from '@/lib/schedule/overlap'
 import { prisma } from '@/lib/db'
 
@@ -20,6 +21,10 @@ export async function saveEvent(formData: FormData): Promise<void> {
 
   if (!existing && !canWriteSchedule(user.matrix, user.id, user.id)) {
     redirect('/internal/schedule')
+  }
+
+  if (adaKosong(formData, ['title', 'startAt', 'endAt'])) {
+    redirect(pathDenganFlash('/internal/schedule', { kesalahan: 'isi' }))
   }
 
   const startAt = fromDatetimeLocal(teks(formData, 'startAt'))
@@ -47,15 +52,16 @@ export async function saveEvent(formData: FormData): Promise<void> {
 
   revalidatePath('/internal/schedule')
   const bulan = teks(formData, 'bulan')
-  const qs = new URLSearchParams()
-  if (/^\d{4}-\d{2}$/.test(bulan)) {
-    qs.set('bulan', bulan)
-  }
-  if (overlap) {
-    qs.set('peringatan', 'tumpang')
-  }
-  const query = qs.toString()
-  redirect(query ? `/internal/schedule?${query}` : '/internal/schedule')
+  redirect(
+    pathDenganFlash(
+      '/internal/schedule',
+      {
+        ok: id ? 'ubah' : 'simpan',
+        peringatan: overlap ? 'tumpang' : undefined,
+      },
+      /^\d{4}-\d{2}$/.test(bulan) ? { bulan } : {},
+    ),
+  )
 }
 
 export async function deleteEvent(formData: FormData): Promise<void> {
@@ -70,5 +76,11 @@ export async function deleteEvent(formData: FormData): Promise<void> {
   await prisma.scheduleEvent.delete({ where: { id } })
   revalidatePath('/internal/schedule')
   const bulan = teks(formData, 'bulan')
-  redirect(/^\d{4}-\d{2}$/.test(bulan) ? `/internal/schedule?bulan=${bulan}` : '/internal/schedule')
+  redirect(
+    pathDenganFlash(
+      '/internal/schedule',
+      { ok: 'hapus' },
+      /^\d{4}-\d{2}$/.test(bulan) ? { bulan } : {},
+    ),
+  )
 }

@@ -3,14 +3,9 @@ import { Field, KELAS_KONTROL } from '@/components/admin/form-field'
 import { Button } from '@/components/ui/button'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 
-export default async function NewHalamanPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ kesalahan?: string }>
-}) {
+export default async function NewHalamanPage() {
   const user = await requireCmsUser()
   requireGrant(user, 'halaman', 'create')
-  const params = await searchParams
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
@@ -20,12 +15,6 @@ export default async function NewHalamanPage({
           Halaman kustom tampil di /slug setelah terbit dan dinyalakan.
         </p>
       </header>
-
-      {params.kesalahan === 'slug' ? (
-        <p role="alert" className="text-body text-danger">
-          Slug tidak tersedia.
-        </p>
-      ) : null}
 
       <form action={createPage} className="flex flex-col gap-6">
         <Field id="title" label="Judul">
