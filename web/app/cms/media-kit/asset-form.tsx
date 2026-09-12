@@ -25,6 +25,7 @@ export function MediaKitAssetForm({
 }) {
   return (
     <form action={saveAsset} className="mx-auto flex w-full max-w-xl flex-col gap-4">
+      <h2 className="font-display text-section uppercase">{asset?.id ? 'Ubah aset' : 'Aset baru'}</h2>
       {asset?.id ? <input type="hidden" name="id" value={asset.id} /> : null}
       <Field id="name" label="Nama">
         <input id="name" name="name" required defaultValue={asset?.name} disabled={!canSave} className={KELAS_KONTROL} />

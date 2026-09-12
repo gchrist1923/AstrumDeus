@@ -30,6 +30,7 @@ export function NewsForm({
 }) {
   return (
     <form action={saveNews} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+      <h2 className="font-display text-section uppercase">{post?.id ? 'Ubah berita' : 'Berita baru'}</h2>
       {post?.id ? <input type="hidden" name="id" value={post.id} /> : null}
       <Field id="title" label="Judul">
         <input id="title" name="title" required defaultValue={post?.title} disabled={!canSave} className={KELAS_KONTROL} />

@@ -9,6 +9,30 @@ vi.mock('@/components/admin/image-upload', () => ({
 }))
 
 describe('NewsForm', () => {
+  it('memakai judul Berita baru atau Ubah berita', () => {
+    const { rerender } = render(<NewsForm categories={[{ id: 'c1', name: 'Recap' }]} canSave />)
+    expect(screen.getByRole('heading', { name: 'Berita baru' })).toBeInTheDocument()
+    rerender(
+      <NewsForm
+        categories={[{ id: 'c1', name: 'Recap' }]}
+        canSave
+        post={{
+          id: 'p1',
+          title: 'A',
+          slug: 'a',
+          excerpt: '',
+          body: 'b',
+          cover: '',
+          categoryId: 'c1',
+          author: 'Admin',
+          publishedAt: new Date('2026-01-01'),
+          status: 'draft',
+        }}
+      />,
+    )
+    expect(screen.getByRole('heading', { name: 'Ubah berita' })).toBeInTheDocument()
+  })
+
   it('mengunci field jika hanya lihat', () => {
     render(<NewsForm categories={[{ id: 'c1', name: 'Recap' }]} canSave={false} />)
     expect(screen.getByLabelText('Judul')).toBeDisabled()

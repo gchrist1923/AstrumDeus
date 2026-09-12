@@ -1,13 +1,27 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import type { ExtraNavItem } from '@/lib/nav'
 
 const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
-export function MobileMenu({ items, pathname }: { items: ExtraNavItem[]; pathname: string }) {
+export function MobileMenu({
+  items,
+  pathname,
+  dialogLabel = 'Menu utama',
+  panelId = 'menu-utama',
+  isActive,
+  footer,
+}: {
+  items: ExtraNavItem[]
+  pathname: string
+  dialogLabel?: string
+  panelId?: string
+  isActive?: (href: string, pathname: string) => boolean
+  footer?: ReactNode
+}) {
   const [terbuka, setTerbuka] = useState(false)
   const tombolRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -103,7 +117,7 @@ export function MobileMenu({ items, pathname }: { items: ExtraNavItem[]; pathnam
         type="button"
         onClick={() => setTerbuka(true)}
         aria-expanded={terbuka}
-        aria-controls="menu-utama"
+        aria-controls={panelId}
         className={`inline-flex min-h-11 min-w-11 items-center justify-center border-2 border-border-strong px-4 font-display text-label uppercase ${KELAS_FOKUS}`}
       >
         Menu
@@ -112,11 +126,11 @@ export function MobileMenu({ items, pathname }: { items: ExtraNavItem[]; pathnam
       {terbuka
         ? createPortal(
             <div
-              id="menu-utama"
+              id={panelId}
               ref={panelRef}
               role="dialog"
               aria-modal="true"
-              aria-label="Menu utama"
+              aria-label={dialogLabel}
               className="fixed inset-0 z-50 flex flex-col gap-10 bg-surface-base px-5 py-6 md:hidden"
             >
               <button
@@ -128,10 +142,10 @@ export function MobileMenu({ items, pathname }: { items: ExtraNavItem[]; pathnam
                 <span className="sr-only">menu</span>
               </button>
 
-              <nav aria-label="Navigasi utama">
+              <nav aria-label="Navigasi utama" className="min-h-0 flex-1 overflow-y-auto">
                 <ul className="flex flex-col gap-6">
                   {items.map((item) => {
-                    const aktif = item.href === pathname
+                    const aktif = isActive ? isActive(item.href, pathname) : item.href === pathname
 
                     return (
                       <li key={item.href}>
@@ -152,6 +166,7 @@ export function MobileMenu({ items, pathname }: { items: ExtraNavItem[]; pathnam
                   })}
                 </ul>
               </nav>
+              {footer ? <div className="mt-auto border-t border-border pt-6">{footer}</div> : null}
             </div>,
             document.body,
           )
