@@ -31,6 +31,7 @@ export function MatchForm({
 }) {
   return (
     <form action={saveMatch} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+      <h2 className="font-display text-section uppercase">{match?.id ? 'Ubah pertandingan' : 'Pertandingan baru'}</h2>
       {match?.id ? <input type="hidden" name="id" value={match.id} /> : null}
       <Field id="tournamentId" label="Turnamen">
         <select id="tournamentId" name="tournamentId" required defaultValue={match?.tournamentId} disabled={!canSave} className={KELAS_KONTROL}>

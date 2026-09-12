@@ -20,6 +20,7 @@ export default async function MenuPage() {
 
   return (
     <form action={saveMenuFlags} className="mx-auto flex w-full max-w-xl flex-col gap-6">
+      <h2 className="font-display text-section uppercase">Menu</h2>
       <p className="text-content-secondary">
         Menu wajib tetap tampil. Item opsional bisa dimatikan tanpa deploy ulang.
       </p>

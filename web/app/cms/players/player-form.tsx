@@ -34,6 +34,7 @@ export function PlayerForm({
 
   return (
     <form action={savePlayer} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+      <h2 className="font-display text-section uppercase">{player?.id ? 'Ubah pemain' : 'Pemain baru'}</h2>
       {player?.id ? <input type="hidden" name="id" value={player.id} /> : null}
       <Field id="ign" label="IGN">
         <input id="ign" name="ign" required defaultValue={player?.ign} disabled={!canSave} className={KELAS_KONTROL} />

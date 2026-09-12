@@ -22,6 +22,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
 
   return (
     <form action={savePartner} className="mx-auto flex w-full max-w-xl flex-col gap-4">
+      <h2 className="font-display text-section uppercase">Ubah partner</h2>
       <input type="hidden" name="id" value={partner.id} />
       <Field id="name" label="Nama">
         <input id="name" name="name" required defaultValue={partner.name} disabled={!bisaUbah} className={KELAS_KONTROL} />

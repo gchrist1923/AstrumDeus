@@ -1,12 +1,10 @@
-import Link from 'next/link'
 import { Suspense, type ReactNode } from 'react'
 import { logoutAction } from '@/app/login/actions'
+import { AdminMobileTrigger, AdminSidebar } from '@/components/admin/admin-nav'
 import { FlashToast } from '@/components/admin/flash-toast'
 import { Button } from '@/components/ui/button'
 import { can, type AccessModule, type GrantMatrix } from '@/lib/auth/grants'
 import { canAccessCms, canAccessInternal } from '@/lib/auth/permissions'
-
-const KELAS_FOKUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
 interface NavLink {
   href: string
@@ -88,35 +86,28 @@ export function AdminShell({
   return (
     <div className="min-h-screen bg-surface-base text-content-primary">
       <header className="border-b border-border">
-        <div className="flex w-full flex-wrap items-center justify-between gap-4 px-5 py-4 md:px-8">
-          <div>
+        <div className="flex w-full flex-nowrap items-center justify-between gap-4 px-5 py-4 md:px-8">
+          <div className="min-w-0">
             <p className="font-display text-label uppercase tracking-[0.16em] text-accent">
               {area === 'cms' ? 'CMS' : 'Internal'}
             </p>
             <h1 className="font-display text-card uppercase">{title}</h1>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-small text-content-secondary">{name}</p>
-            <form action={logoutAction}>
-              <Button type="submit" variant="secondary">
-                Keluar
-              </Button>
-            </form>
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="hidden items-center gap-3 md:flex">
+              <p className="text-small text-content-secondary">{name}</p>
+              <form action={logoutAction}>
+                <Button type="submit" variant="secondary">
+                  Keluar
+                </Button>
+              </form>
+            </div>
+            <AdminMobileTrigger tautan={links} name={name} />
           </div>
         </div>
       </header>
       <div className="flex w-full flex-col gap-10 px-5 py-10 md:flex-row md:px-8">
-        <nav aria-label="Navigasi admin" className="flex w-full flex-col gap-1 md:w-52 md:shrink-0">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`inline-flex min-h-11 items-center px-3 font-display text-label uppercase tracking-[0.12em] text-content-secondary hover:text-content-primary ${KELAS_FOKUS}`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <AdminSidebar tautan={links} />
         <div className="min-w-0 flex-1">
           <Suspense fallback={null}>
             <FlashToast />
