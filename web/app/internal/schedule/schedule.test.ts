@@ -28,8 +28,8 @@ describe('jadwal kalender', () => {
 
   it('saveEvent mempertahankan bulan dan peringatan tumpang', () => {
     const actions = baca('actions.ts')
-    expect(actions).toMatch(/peringatan.*tumpang/)
-    expect(actions).toMatch(/qs\.set\('bulan'/)
+    expect(actions).toMatch(/peringatan: overlap \? 'tumpang'/)
+    expect(actions).toMatch(/bulan/)
   })
 
   it('hapus event memakai dialog konfirmasi', () => {

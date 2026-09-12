@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { slugify } from '@/lib/content/slug'
 import { prisma } from '@/lib/db'
+import { pathDenganFlash } from '@/lib/flash'
 import { angka, teks } from '@/lib/form'
 
 async function requireKategori(action: 'create' | 'update' | 'delete'): Promise<void> {
@@ -29,7 +30,7 @@ export async function createTournament(formData: FormData): Promise<void> {
   const season = teks(formData, 'season')
   const year = angka(formData, 'year')
   if (!name || !organizer || !season || year === null) {
-    redirect('/cms/kategori/turnamen')
+    redirect(pathDenganFlash('/cms/kategori/turnamen', { kesalahan: 'isi' }))
   }
 
   await prisma.tournament.create({
@@ -37,7 +38,7 @@ export async function createTournament(formData: FormData): Promise<void> {
   })
 
   revalidateKategori()
-  redirect('/cms/kategori/turnamen')
+  redirect(pathDenganFlash('/cms/kategori/turnamen', { ok: 'simpan' }))
 }
 
 export async function deactivateTournament(formData: FormData): Promise<void> {
@@ -49,7 +50,7 @@ export async function deactivateTournament(formData: FormData): Promise<void> {
   }
 
   revalidateKategori()
-  redirect('/cms/kategori/turnamen')
+  redirect(pathDenganFlash('/cms/kategori/turnamen', { ok: 'ubah' }))
 }
 
 export async function deleteTournament(formData: FormData): Promise<void> {
@@ -63,11 +64,11 @@ export async function deleteTournament(formData: FormData): Promise<void> {
   ])
   const n = matches + stats
   if (n > 0) {
-    redirect(`/cms/kategori/turnamen?kesalahan=pakai&n=${n}`)
+    redirect(pathDenganFlash('/cms/kategori/turnamen', { kesalahan: 'pakai', n, pakai: 'turnamen' }))
   }
   await prisma.tournament.delete({ where: { id } })
   revalidateKategori()
-  redirect('/cms/kategori/turnamen')
+  redirect(pathDenganFlash('/cms/kategori/turnamen', { ok: 'hapus' }))
 }
 
 export async function createCashCategory(formData: FormData): Promise<void> {
@@ -76,7 +77,7 @@ export async function createCashCategory(formData: FormData): Promise<void> {
   const name = teks(formData, 'name')
   const direction = teks(formData, 'direction') === 'keluar' ? 'keluar' : 'masuk'
   if (!name) {
-    redirect('/cms/kategori/kas')
+    redirect(pathDenganFlash('/cms/kategori/kas', { kesalahan: 'isi' }))
   }
 
   await prisma.expenseCategory.create({
@@ -84,7 +85,7 @@ export async function createCashCategory(formData: FormData): Promise<void> {
   })
 
   revalidateKategori()
-  redirect('/cms/kategori/kas')
+  redirect(pathDenganFlash('/cms/kategori/kas', { ok: 'simpan' }))
 }
 
 export async function deactivateCashCategory(formData: FormData): Promise<void> {
@@ -96,7 +97,7 @@ export async function deactivateCashCategory(formData: FormData): Promise<void> 
   }
 
   revalidateKategori()
-  redirect('/cms/kategori/kas')
+  redirect(pathDenganFlash('/cms/kategori/kas', { ok: 'ubah' }))
 }
 
 export async function deleteCashCategory(formData: FormData): Promise<void> {
@@ -105,11 +106,11 @@ export async function deleteCashCategory(formData: FormData): Promise<void> {
   if (!id) redirect('/cms/kategori/kas')
   const n = await prisma.cashEntry.count({ where: { categoryId: id } })
   if (n > 0) {
-    redirect(`/cms/kategori/kas?kesalahan=pakai&n=${n}`)
+    redirect(pathDenganFlash('/cms/kategori/kas', { kesalahan: 'pakai', n, pakai: 'kas' }))
   }
   await prisma.expenseCategory.delete({ where: { id } })
   revalidateKategori()
-  redirect('/cms/kategori/kas')
+  redirect(pathDenganFlash('/cms/kategori/kas', { ok: 'hapus' }))
 }
 
 export async function createNewsCategory(formData: FormData): Promise<void> {
@@ -118,12 +119,12 @@ export async function createNewsCategory(formData: FormData): Promise<void> {
   const name = teks(formData, 'name')
   const slug = slugify(name)
   if (!name || !slug) {
-    redirect('/cms/kategori/berita')
+    redirect(pathDenganFlash('/cms/kategori/berita', { kesalahan: 'isi' }))
   }
 
   const existing = await prisma.newsCategory.findUnique({ where: { slug } })
   if (existing) {
-    redirect('/cms/kategori/berita?kesalahan=nama')
+    redirect(pathDenganFlash('/cms/kategori/berita', { kesalahan: 'nama' }))
   }
 
   await prisma.newsCategory.create({
@@ -131,7 +132,7 @@ export async function createNewsCategory(formData: FormData): Promise<void> {
   })
 
   revalidateKategori()
-  redirect('/cms/kategori/berita')
+  redirect(pathDenganFlash('/cms/kategori/berita', { ok: 'simpan' }))
 }
 
 export async function deactivateNewsCategory(formData: FormData): Promise<void> {
@@ -143,7 +144,7 @@ export async function deactivateNewsCategory(formData: FormData): Promise<void> 
   }
 
   revalidateKategori()
-  redirect('/cms/kategori/berita')
+  redirect(pathDenganFlash('/cms/kategori/berita', { ok: 'ubah' }))
 }
 
 export async function deleteNewsCategory(formData: FormData): Promise<void> {
@@ -152,9 +153,9 @@ export async function deleteNewsCategory(formData: FormData): Promise<void> {
   if (!id) redirect('/cms/kategori/berita')
   const n = await prisma.newsPost.count({ where: { categoryId: id } })
   if (n > 0) {
-    redirect(`/cms/kategori/berita?kesalahan=pakai&n=${n}`)
+    redirect(pathDenganFlash('/cms/kategori/berita', { kesalahan: 'pakai', n, pakai: 'berita' }))
   }
   await prisma.newsCategory.delete({ where: { id } })
   revalidateKategori()
-  redirect('/cms/kategori/berita')
+  redirect(pathDenganFlash('/cms/kategori/berita', { ok: 'hapus' }))
 }

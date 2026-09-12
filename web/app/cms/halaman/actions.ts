@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
+import { pathDenganFlash } from '@/lib/flash'
 import { checked, teks } from '@/lib/form'
 import { applyBuiltinToggle, BUILTIN_PAGES } from '@/lib/pages/builtins'
 import { assertValidLayout } from '@/lib/pages/grid'
@@ -28,7 +29,7 @@ export async function toggleBuiltinEnabled(formData: FormData): Promise<void> {
   try {
     applyBuiltinToggle(builtin.mandatory, enabled)
   } catch {
-    redirect('/cms/halaman?kesalahan=wajib')
+    redirect(pathDenganFlash('/cms/halaman', { kesalahan: 'wajib' }))
   }
 
   await syncBuiltinEnabled(prisma, menuKey, enabled)
@@ -36,7 +37,7 @@ export async function toggleBuiltinEnabled(formData: FormData): Promise<void> {
   revalidatePath('/', 'layout')
   revalidatePath('/cms/halaman')
   revalidatePath('/cms/menu')
-  redirect('/cms/halaman')
+  redirect(pathDenganFlash('/cms/halaman', { ok: 'ubah' }))
 }
 
 function revalidateHalamanPublik(slug?: string): void {
@@ -57,16 +58,16 @@ export async function createPage(formData: FormData): Promise<void> {
   const showInNav = checked(formData, 'showInNav')
 
   if (!title || !slug) {
-    redirect('/cms/halaman/new')
+    redirect(pathDenganFlash('/cms/halaman/new', { kesalahan: 'isi' }))
   }
 
   if (customSlugError(slug) === 'Slug tidak tersedia.') {
-    redirect('/cms/halaman/new?kesalahan=slug')
+    redirect(pathDenganFlash('/cms/halaman/new', { kesalahan: 'slug' }))
   }
 
   const existing = await prisma.sitePage.findUnique({ where: { slug } })
   if (existing) {
-    redirect('/cms/halaman/new?kesalahan=slug')
+    redirect(pathDenganFlash('/cms/halaman/new', { kesalahan: 'slug' }))
   }
 
   await prisma.sitePage.create({
@@ -82,7 +83,7 @@ export async function createPage(formData: FormData): Promise<void> {
   })
 
   revalidateHalamanPublik(slug)
-  redirect('/cms/halaman')
+  redirect(pathDenganFlash('/cms/halaman', { ok: 'simpan' }))
 }
 
 export async function updateCustomPage(formData: FormData): Promise<void> {
@@ -95,7 +96,10 @@ export async function updateCustomPage(formData: FormData): Promise<void> {
     redirect('/cms/halaman')
   }
 
-  const title = teks(formData, 'title') || page.title
+  const title = teks(formData, 'title')
+  if (!title) {
+    redirect(pathDenganFlash(`/cms/halaman/${page.id}`, { kesalahan: 'isi' }))
+  }
   const statusRaw = teks(formData, 'status')
   const status = statusRaw === 'draft' || statusRaw === 'published' ? statusRaw : page.status
   const showInNav = checkboxAtauTetap(formData, 'showInNav', page.showInNav)
@@ -107,7 +111,7 @@ export async function updateCustomPage(formData: FormData): Promise<void> {
   })
 
   revalidateHalamanPublik(page.slug)
-  redirect('/cms/halaman')
+  redirect(pathDenganFlash('/cms/halaman', { ok: 'ubah' }))
 }
 
 function checkboxAtauTetap(formData: FormData, kunci: string, sekarang: boolean): boolean {
@@ -135,7 +139,7 @@ export async function saveLayout(formData: FormData): Promise<void> {
     rows = parsed as PageRow[]
     assertValidLayout(rows)
   } catch {
-    redirect(`/cms/halaman/${page.id}?kesalahan=layout`)
+    redirect(pathDenganFlash(`/cms/halaman/${page.id}`, { kesalahan: 'layout' }))
   }
 
   await prisma.sitePage.update({
@@ -144,7 +148,7 @@ export async function saveLayout(formData: FormData): Promise<void> {
   })
 
   revalidateHalamanPublik(page.slug)
-  redirect(`/cms/halaman/${page.id}`)
+  redirect(pathDenganFlash(`/cms/halaman/${page.id}`, { ok: 'ubah' }))
 }
 
 export async function deleteCustomPage(formData: FormData): Promise<void> {
@@ -159,5 +163,5 @@ export async function deleteCustomPage(formData: FormData): Promise<void> {
 
   await prisma.sitePage.delete({ where: { id: page.id } })
   revalidateHalamanPublik(page.slug)
-  redirect('/cms/halaman')
+  redirect(pathDenganFlash('/cms/halaman', { ok: 'hapus' }))
 }

@@ -3,6 +3,14 @@ export function teks(formData: FormData, kunci: string): string {
   return typeof nilai === 'string' ? nilai.trim() : ''
 }
 
+export function adaKosong(formData: FormData, kunci: string[]): boolean {
+  return kunci.some((nama) => !teks(formData, nama))
+}
+
+export function emailValid(nilai: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nilai)
+}
+
 export function angka(formData: FormData, kunci: string): number | null {
   const mentah = teks(formData, kunci)
   if (!mentah) {

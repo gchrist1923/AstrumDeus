@@ -4,13 +4,17 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { fromDatetimeLocal } from '@/lib/datetime'
-import { angka, teks } from '@/lib/form'
+import { pathDenganFlash } from '@/lib/flash'
+import { adaKosong, angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 
 export async function saveMatch(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
   const id = teks(formData, 'id')
   requireGrant(user, 'matches', id ? 'update' : 'create')
+  if (adaKosong(formData, ['tournamentId', 'stage', 'scheduledAt'])) {
+    redirect(pathDenganFlash(id ? `/cms/matches/${id}` : '/cms/matches/new', { kesalahan: 'isi' }))
+  }
   const recapSlug = teks(formData, 'recapSlug')
   const recap = recapSlug ? await prisma.newsPost.findUnique({ where: { slug: recapSlug } }) : null
 
@@ -37,7 +41,7 @@ export async function saveMatch(formData: FormData): Promise<void> {
   revalidatePath('/matches')
   revalidatePath('/')
   revalidatePath('/cms/matches')
-  redirect('/cms/matches')
+  redirect(pathDenganFlash('/cms/matches', { ok: id ? 'ubah' : 'simpan' }))
 }
 
 export async function deleteMatch(formData: FormData): Promise<void> {
@@ -51,5 +55,5 @@ export async function deleteMatch(formData: FormData): Promise<void> {
 
   revalidatePath('/matches')
   revalidatePath('/cms/matches')
-  redirect('/cms/matches')
+  redirect(pathDenganFlash('/cms/matches', { ok: 'hapus' }))
 }

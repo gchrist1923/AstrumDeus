@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
-import { angka, teks } from '@/lib/form'
+import { pathDenganFlash } from '@/lib/flash'
+import { adaKosong, angka, teks } from '@/lib/form'
 import { prisma } from '@/lib/db'
 import { releaseMediaPath } from '@/lib/media/store'
 
@@ -11,6 +12,9 @@ export async function savePartner(formData: FormData): Promise<void> {
   const user = await requireCmsUser()
   const id = teks(formData, 'id')
   requireGrant(user, 'partners', id ? 'update' : 'create')
+  if (adaKosong(formData, ['name', 'slug', 'tier', 'logoText'])) {
+    redirect(pathDenganFlash(id ? `/cms/partners/${id}` : '/cms/partners', { kesalahan: 'isi' }))
+  }
   const nextLogo = teks(formData, 'logo') || null
   let prevLogo: string | null = null
   if (id) {
@@ -39,7 +43,7 @@ export async function savePartner(formData: FormData): Promise<void> {
   revalidatePath('/partners')
   revalidatePath('/')
   revalidatePath('/cms/partners')
-  redirect('/cms/partners')
+  redirect(pathDenganFlash('/cms/partners', { ok: id ? 'ubah' : 'simpan' }))
 }
 
 export async function deletePartner(formData: FormData): Promise<void> {
@@ -55,5 +59,5 @@ export async function deletePartner(formData: FormData): Promise<void> {
 
   revalidatePath('/partners')
   revalidatePath('/cms/partners')
-  redirect('/cms/partners')
+  redirect(pathDenganFlash('/cms/partners', { ok: 'hapus' }))
 }

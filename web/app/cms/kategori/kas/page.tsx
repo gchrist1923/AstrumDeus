@@ -11,15 +11,9 @@ import { can } from '@/lib/auth/grants'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
-export default async function CmsKategoriKasPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ kesalahan?: string; n?: string }>
-}) {
+export default async function CmsKategoriKasPage() {
   const user = await requireCmsUser()
   requireGrant(user, 'kategori', 'view')
-  const params = await searchParams
-  const n = Number.parseInt(params.n ?? '0', 10)
   const bisaTulis = can(user.matrix, 'kategori', 'create') || can(user.matrix, 'kategori', 'update')
   const bisaHapus = can(user.matrix, 'kategori', 'delete')
   const cashCategories = await prisma.expenseCategory.findMany({ orderBy: { name: 'asc' } })
@@ -27,12 +21,6 @@ export default async function CmsKategoriKasPage({
   return (
     <div className="flex flex-col gap-8">
       <KategoriJudul>Kategori kas</KategoriJudul>
-
-      {params.kesalahan === 'pakai' ? (
-        <p role="alert" className="text-body text-danger">
-          Tidak bisa dihapus. Masih dipakai {n} entri kas.
-        </p>
-      ) : null}
 
       {cashCategories.length === 0 ? (
         <p className="text-content-secondary">Belum ada kategori kas.</p>

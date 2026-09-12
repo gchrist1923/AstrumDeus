@@ -11,15 +11,9 @@ import { can } from '@/lib/auth/grants'
 import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 
-export default async function CmsKategoriBeritaPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ kesalahan?: string; n?: string }>
-}) {
+export default async function CmsKategoriBeritaPage() {
   const user = await requireCmsUser()
   requireGrant(user, 'kategori', 'view')
-  const params = await searchParams
-  const n = Number.parseInt(params.n ?? '0', 10)
   const bisaTulis = can(user.matrix, 'kategori', 'create') || can(user.matrix, 'kategori', 'update')
   const bisaHapus = can(user.matrix, 'kategori', 'delete')
   const newsCategories = await prisma.newsCategory.findMany({ orderBy: { name: 'asc' } })
@@ -27,12 +21,6 @@ export default async function CmsKategoriBeritaPage({
   return (
     <div className="flex flex-col gap-8">
       <KategoriJudul>Kategori berita</KategoriJudul>
-
-      {params.kesalahan === 'pakai' ? (
-        <p role="alert" className="text-body text-danger">
-          Tidak bisa dihapus. Masih dipakai {n} berita.
-        </p>
-      ) : null}
 
       {newsCategories.length === 0 ? (
         <p className="text-content-secondary">Belum ada kategori berita.</p>
@@ -73,11 +61,6 @@ export default async function CmsKategoriBeritaPage({
       {bisaTulis ? (
         <form action={createNewsCategory} className="mx-auto flex w-full max-w-xl flex-col gap-4">
           <h3 className="font-display text-label uppercase text-accent">Tambah kategori berita</h3>
-          {params.kesalahan === 'nama' ? (
-            <p role="alert" className="text-body text-danger">
-              Nama kategori sudah dipakai.
-            </p>
-          ) : null}
           <Field id="berita-name" label="Nama">
             <input id="berita-name" name="name" required className={KELAS_KONTROL} />
           </Field>

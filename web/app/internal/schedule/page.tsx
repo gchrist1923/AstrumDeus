@@ -124,12 +124,6 @@ export default async function SchedulePage({
           </a>
         </div>
       </div>
-      {params.peringatan === 'tumpang' ? (
-        <p role="status" className="mb-4 text-body text-accent">
-          Event tersimpan, tetapi menimpa jadwal lain.
-        </p>
-      ) : null}
-
       <div className="grid grid-cols-7 border-2 border-border-strong">
         {HARI.map((nama) => (
           <div

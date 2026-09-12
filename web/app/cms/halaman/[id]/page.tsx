@@ -23,16 +23,13 @@ function parseLayout(raw: string): PageRow[] {
 
 export default async function HalamanKanvasPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ kesalahan?: string }>
 }) {
   const user = await requireCmsUser()
   requireGrant(user, 'halaman', 'view')
   const bisaHapus = can(user.matrix, 'halaman', 'delete')
   const { id } = await params
-  const query = await searchParams
   const page = await prisma.sitePage.findUnique({ where: { id } })
   if (!page) {
     notFound()
@@ -68,12 +65,6 @@ export default async function HalamanKanvasPage({
           Kisi 12 kolom. Di layar sempit tiap blok turun penuh.
         </p>
       </header>
-
-      {query.kesalahan === 'layout' ? (
-        <p role="alert" className="text-body text-danger">
-          Tata letak tidak valid.
-        </p>
-      ) : null}
 
       <form action={updateCustomPage} className="mx-auto flex w-full max-w-2xl flex-col gap-6">
         <input type="hidden" name="id" value={page.id} />

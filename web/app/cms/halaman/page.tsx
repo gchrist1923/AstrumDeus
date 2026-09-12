@@ -8,14 +8,9 @@ import { requireCmsUser, requireGrant } from '@/lib/auth/require'
 import { prisma } from '@/lib/db'
 import { BUILTIN_PAGES } from '@/lib/pages/builtins'
 
-export default async function CmsHalamanPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ kesalahan?: string }>
-}) {
+export default async function CmsHalamanPage() {
   const user = await requireCmsUser()
   requireGrant(user, 'halaman', 'view')
-  const params = await searchParams
   const bisaToggle = can(user.matrix, 'menu', 'update')
   const bisaBuat = can(user.matrix, 'halaman', 'create')
   const bisaHapus = can(user.matrix, 'halaman', 'delete')
@@ -47,12 +42,6 @@ export default async function CmsHalamanPage({
           </Link>
         ) : null}
       </header>
-
-      {params.kesalahan === 'wajib' ? (
-        <p role="alert" className="text-body text-danger">
-          Menu wajib tidak bisa dimatikan.
-        </p>
-      ) : null}
 
       <section className="flex flex-col gap-6">
         <h3 className="font-display text-card uppercase">Daftar halaman</h3>
